@@ -313,7 +313,9 @@ namespace RadeonRays
 
             // Update GPU data
             // Copy translated nodes first
-            m_gpudata->bvh = m_device->CreateBuffer(translator.nodes_.size() * sizeof(FatNodeBvhTranslator::Node), Calc::BufferType::kRead, &translator.nodes_[0]);
+
+
+           
 
             // Create vertex buffer
             {
@@ -387,8 +389,7 @@ namespace RadeonRays
                     int id;
                     // Idx count
                     int cnt;
-
-                    int padding[2];
+                    //int padding[2];
                 };
 
                 // This number is different from the number of faces for some BVHs 
@@ -410,42 +411,79 @@ namespace RadeonRays
                 // Besides that we need to permute the faces accorningly to BVH reordering, whihc
                 // is contained within bvh.primids_
                 int const* reordering = m_bvh->GetIndices();
-                for (int i = 0; i < numindices; ++i)
+
+                for (int i = 0; i < translator.nodes_.size(); ++i)
                 {
-                    int indextolook4 = reordering[i];
-
-                    // We need to find a shape corresponding to current face
-                    auto iter = std::upper_bound(mesh_faces_start_idx.cbegin(), mesh_faces_start_idx.cend(), indextolook4);
-
-                    // Find the index of the shape
-                    int shapeidx = static_cast<int>(std::distance(mesh_faces_start_idx.cbegin(), iter) - 1);
-
-                    // Get the mesh directly or out of instance
-                    Mesh const* mesh = nullptr;
-                    if (shapeidx < nummeshes)
+                    if (translator.nodes_[i].lbound.pmin.w > -1.f)
                     {
-                        mesh = static_cast<Mesh const*>(shapes[shapeidx]);
+                        int indextolook4 = reordering[(int)(translator.nodes_[i].lbound.pmin.w)];
+
+                        // We need to find a shape corresponding to current face
+                        auto iter = std::upper_bound(mesh_faces_start_idx.cbegin(), mesh_faces_start_idx.cend(), indextolook4);
+
+                        // Find the index of the shape
+                        int shapeidx = static_cast<int>(std::distance(mesh_faces_start_idx.cbegin(), iter) - 1);
+
+                        // Get the mesh directly or out of instance
+                        Mesh const* mesh = nullptr;
+                        if (shapeidx < nummeshes)
+                        {
+                            mesh = static_cast<Mesh const*>(shapes[shapeidx]);
+                        }
+                        else
+                        {
+                            mesh = static_cast<Mesh const*>(static_cast<Instance const*>(shapes[shapeidx])->GetBaseShape());
+                        }
+
+                        // Get vertex buffer of the current mesh
+                        Mesh::Face const* myfacedata = mesh->GetFaceData();
+                        // Find face idx
+                        int faceidx = indextolook4 - mesh_faces_start_idx[shapeidx];
+                        // Find mesh start idx
+                        int mystartidx = mesh_vertices_start_idx[shapeidx];
+
+                        translator.nodes_[i].lleaf.idx[0] = myfacedata[faceidx].idx[0] + mystartidx;
+                        translator.nodes_[i].lleaf.idx[1] = myfacedata[faceidx].idx[1] + mystartidx;
+                        translator.nodes_[i].lleaf.idx[2] = myfacedata[faceidx].idx[2] + mystartidx;
+                        translator.nodes_[i].lleaf.face_id = faceidx;
+                        translator.nodes_[i].lleaf.shape_id = shapes[shapeidx]->GetId();;
                     }
-                    else
+
+                    if (translator.nodes_[i].rbound.pmin.w > -1.f)
                     {
-                        mesh = static_cast<Mesh const*>(static_cast<Instance const*>(shapes[shapeidx])->GetBaseShape());
+                        int indextolook4 = reordering[(int)(translator.nodes_[i].rbound.pmin.w)];
+
+                        // We need to find a shape corresponding to current face
+                        auto iter = std::upper_bound(mesh_faces_start_idx.cbegin(), mesh_faces_start_idx.cend(), indextolook4);
+
+                        // Find the index of the shape
+                        int shapeidx = static_cast<int>(std::distance(mesh_faces_start_idx.cbegin(), iter) - 1);
+
+                        // Get the mesh directly or out of instance
+                        Mesh const* mesh = nullptr;
+                        if (shapeidx < nummeshes)
+                        {
+                            mesh = static_cast<Mesh const*>(shapes[shapeidx]);
+                        }
+                        else
+                        {
+                            mesh = static_cast<Mesh const*>(static_cast<Instance const*>(shapes[shapeidx])->GetBaseShape());
+                        }
+
+                        // Get vertex buffer of the current mesh
+                        Mesh::Face const* myfacedata = mesh->GetFaceData();
+                        // Find face idx
+                        int faceidx = indextolook4 - mesh_faces_start_idx[shapeidx];
+                        // Find mesh start idx
+                        int mystartidx = mesh_vertices_start_idx[shapeidx];
+
+                        translator.nodes_[i].rleaf.idx[0] = myfacedata[faceidx].idx[0] + mystartidx;
+                        translator.nodes_[i].rleaf.idx[1] = myfacedata[faceidx].idx[1] + mystartidx;
+                        translator.nodes_[i].rleaf.idx[2] = myfacedata[faceidx].idx[2] + mystartidx;
+                        translator.nodes_[i].rleaf.face_id = faceidx;
+                        translator.nodes_[i].rleaf.shape_id = shapes[shapeidx]->GetId();;
                     }
 
-                    // Get vertex buffer of the current mesh
-                    Mesh::Face const* myfacedata = mesh->GetFaceData();
-                    // Find face idx
-                    int faceidx = indextolook4 - mesh_faces_start_idx[shapeidx];
-                    // Find mesh start idx
-                    int mystartidx = mesh_vertices_start_idx[shapeidx];
-
-                    // Copy face data to GPU buffer
-                    facedata[i].idx[0] = myfacedata[faceidx].idx[0] + mystartidx;
-                    facedata[i].idx[1] = myfacedata[faceidx].idx[1] + mystartidx;
-                    facedata[i].idx[2] = myfacedata[faceidx].idx[2] + mystartidx;
-
-                    facedata[i].shapeidx = shapeidx;
-                    facedata[i].cnt = 0;
-                    facedata[i].id = faceidx;
                 }
 
                 m_device->UnmapBuffer(m_gpudata->faces, 0, facedata, &e);
@@ -453,6 +491,8 @@ namespace RadeonRays
                 e->Wait();
                 m_device->DeleteEvent(e);
             }
+
+            m_gpudata->bvh = m_device->CreateBuffer(translator.nodes_.size() * sizeof(FatNodeBvhTranslator::Node), Calc::BufferType::kRead, &translator.nodes_[0]);
 
             // Create shapes buffer
             m_gpudata->shapes = m_device->CreateBuffer(numshapes * sizeof(ShapeData), Calc::BufferType::kRead, &shapedata[0]);

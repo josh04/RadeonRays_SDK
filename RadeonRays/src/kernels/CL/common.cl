@@ -41,12 +41,15 @@ typedef struct _ray
 
 typedef struct _Intersection
 {
+
     int shapeid;
     int primid;
     int padding0;
     int padding1;
 
     float4 uvwt;
+
+
 } Intersection;
 
 typedef struct _ShapeData
@@ -75,11 +78,11 @@ typedef struct _Face
     // Idx count
     int cnt;
 
-    int2 padding;
+    //int2 padding;
 } Face;
 
 #ifndef APPLE
-
+__attribute__((always_inline))
 float4 make_float4(float x, float y, float z, float w)
 {
     float4 res;
@@ -89,7 +92,7 @@ float4 make_float4(float x, float y, float z, float w)
     res.w = w;
     return res;
 }
-
+__attribute__((always_inline))
 float3 make_float3(float x, float y, float z)
 {
     float3 res;
@@ -98,7 +101,7 @@ float3 make_float3(float x, float y, float z)
     res.z = z;
     return res;
 }
-
+__attribute__((always_inline))
 float2 make_float2(float x, float y)
 {
     float2 res;
@@ -106,7 +109,7 @@ float2 make_float2(float x, float y)
     res.y = y;
     return res;
 }
-
+__attribute__((always_inline))
 int2 make_int2(int x, int y)
 {
     int2 res;
@@ -114,7 +117,7 @@ int2 make_int2(int x, int y)
     res.y = y;
     return res;
 }
-
+__attribute__((always_inline))
 int3 make_int3(int x, int y, int z)
 {
     int3 res;
@@ -125,7 +128,7 @@ int3 make_int3(int x, int y, int z)
 }
 
 #endif
-
+__attribute__((always_inline))
 float3 transform_point(float3 p, float4 m0, float4 m1, float4 m2, float4 m3)
 {
     float3 res;
@@ -134,7 +137,7 @@ float3 transform_point(float3 p, float4 m0, float4 m1, float4 m2, float4 m3)
     res.z = m2.s0 * p.x + m2.s1 * p.y + m2.s2 * p.z + m2.s3;
     return res;
 }
-
+__attribute__((always_inline))
 float3 transform_vector(float3 p, float4 m0, float4 m1, float4 m2, float4 m3)
 {
     float3 res;
@@ -143,7 +146,7 @@ float3 transform_vector(float3 p, float4 m0, float4 m1, float4 m2, float4 m3)
     res.z = m2.s0 * p.x + m2.s1 * p.y + m2.s2 * p.z;
     return res;
 }
-
+__attribute__((always_inline))
 ray transform_ray(ray r, float4 m0, float4 m1, float4 m2, float4 m3)
 {
     ray res;
@@ -153,7 +156,7 @@ ray transform_ray(ray r, float4 m0, float4 m1, float4 m2, float4 m3)
     res.d.w = r.d.w;
     return res;
 }
-
+__attribute__((always_inline))
 float4 quaternion_mul(float4 q1, float4 q2)
 {
     float4 res;
@@ -163,12 +166,12 @@ float4 quaternion_mul(float4 q1, float4 q2)
     res.w = q1.w*q2.w - q1.x*q2.x - q1.y*q2.y - q1.z*q2.z;
     return res;
 }
-
+__attribute__((always_inline))
 float4 quaternion_conjugate(float4 q)
 {
     return make_float4(-q.x, -q.y, -q.z, q.w);
 }
-
+__attribute__((always_inline))
 float4 quaternion_inverse(float4 q)
 {
     float sqnorm = q.x*q.x + q.y*q.y + q.z*q.z + q.w*q.w;
@@ -182,7 +185,7 @@ float4 quaternion_inverse(float4 q)
         return make_float4(0.f, 0.f, 0.f, 1.f);
     }
 }
-
+__attribute__((always_inline))
 void rotate_ray(ray* r, float4 q)
 {
     float4 qinv = quaternion_inverse(q);
@@ -195,6 +198,7 @@ void rotate_ray(ray* r, float4 q)
 }
 
 // Intersect Ray against triangle
+__attribute__((always_inline))
 int IntersectTriangle(ray const* r, float3 v1, float3 v2, float3 v3, Intersection* isect)
 {
     const float3 e1 = v2 - v1;
@@ -218,7 +222,7 @@ int IntersectTriangle(ray const* r, float3 v1, float3 v2, float3 v3, Intersectio
         return 1;
     }
 }
-
+__attribute__((always_inline))
 int IntersectTriangleP(ray const* r, float3 v1, float3 v2, float3 v3)
 {
     const float3 e1 = v2 - v1;
@@ -240,7 +244,18 @@ int IntersectTriangleP(ray const* r, float3 v1, float3 v2, float3 v3)
     return 1;
 }
 
+
+
+
+
+#define AMD_MEDIA_OPS
+
+#ifdef AMD_MEDIA_OPS
+#pragma OPENCL EXTENSION cl_amd_media_ops2 : enable
+#endif
+
 // Intersect ray with the axis-aligned box
+__attribute__((always_inline))
 int IntersectBox(ray const* r, float3 invdir, bbox box, float maxt)
 {
     const float3 f = (box.pmax.xyz - r->o.xyz) * invdir;
@@ -249,12 +264,18 @@ int IntersectBox(ray const* r, float3 invdir, bbox box, float maxt)
     const float3 tmax = max(f, n);
     const float3 tmin = min(f, n);
 
+#ifdef AMD_MEDIA_OPS
+    const float t1 = min(amd_min3(tmax.x, tmax.y, tmax.z), maxt);
+    const float t0 = max(amd_max3(tmin.x, tmin.y, tmin.z), 0.f);
+#else
     const float t1 = min(min(tmax.x, min(tmax.y, tmax.z)), maxt);
     const float t0 = max(max(tmin.x, max(tmin.y, tmin.z)), 0.f);
+#endif
 
     return (t1 >= t0) ? 1 : 0;
 }
 
+__attribute__((always_inline))
 float IntersectBoxF(ray const* r, float3 invdir, bbox box, float maxt)
 {
     const float3 f = (box.pmax.xyz - r->o.xyz) * invdir;
@@ -263,27 +284,36 @@ float IntersectBoxF(ray const* r, float3 invdir, bbox box, float maxt)
     const float3 tmax = max(f, n);
     const float3 tmin = min(f, n);
 
+#ifdef AMD_MEDIA_OPS
+    const float t1 = min(amd_min3(tmax.x, tmax.y, tmax.z), maxt);
+    const float t0 = max(amd_max3(tmin.x, tmin.y, tmin.z), 0.f);
+#else
     const float t1 = min(min(tmax.x, min(tmax.y, tmax.z)), maxt);
     const float t0 = max(max(tmin.x, max(tmin.y, tmin.z)), 0.f);
+#endif
 
     return (t1 >= t0) ? (t0 > 0.f ? t0 : t1) : -1.f;
 }
 
+__attribute__((always_inline))
 int Ray_GetMask(ray const* r)
 {
 	return r->extra.x;
 }
 
+__attribute__((always_inline))
 int Ray_IsActive(ray const* r)
 {
 	return r->extra.y;
 }
 
+__attribute__((always_inline))
 float Ray_GetMaxT(ray const* r)
 {
 	return r->o.w;
 }
 
+__attribute__((always_inline))
 float Ray_GetTime(ray const* r)
 {
 	return r->d.w;

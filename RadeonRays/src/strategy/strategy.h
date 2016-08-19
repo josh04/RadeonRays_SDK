@@ -27,6 +27,8 @@ THE SOFTWARE.
 #include "buffer.h"
 #include "event.h"
 
+#define RR_PROFILE
+
 namespace RadeonRays
 {
 	class World;

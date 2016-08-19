@@ -37,11 +37,27 @@ TYPE DEFINITIONS
 #define LEAFNODE(x)     (((x).pmin.w) != -1.f)
 #define SHORT_STACK_SIZE 16
 
+typedef struct _Leaf
+{
+    int idx[3];
+    int pminw, face_id, shape_id, foo, bar;
+} Leaf;
 
 typedef struct
 {
-	bbox lbound;
-	bbox rbound;
+
+    union
+    {
+        Leaf lleaf;
+        bbox lbound;
+    };
+
+    union
+    {
+        Leaf rleaf;
+        bbox rbound;
+    };
+
 } FatBvhNode;
 
 typedef struct
@@ -68,51 +84,45 @@ HELPER FUNCTIONS
 BVH FUNCTIONS
 **************************************************************************/
 //  intersect a ray with leaf BVH node
+__attribute__((always_inline))
 void IntersectLeafClosest(
 	SceneData const* scenedata,
-	int faceidx,
+    Leaf const* leaf,
 	ray const* r,                // ray to instersect
 	Intersection* isect          // Intersection structure
 	)
 {
 	float3 v1, v2, v3;
-	Face face;
+	v1 = scenedata->vertices[leaf->idx[0]];
+	v2 = scenedata->vertices[leaf->idx[1]];
+	v3 = scenedata->vertices[leaf->idx[2]];
 
-	face = scenedata->faces[faceidx];
-	v1 = scenedata->vertices[face.idx[0]];
-	v2 = scenedata->vertices[face.idx[1]];
-	v3 = scenedata->vertices[face.idx[2]];
 
-	int shapemask = scenedata->shapes[face.shapeidx].mask;
-
-	if (Ray_GetMask(r) & shapemask)
+	//if (Ray_GetMask(r) & shapemask)
 	{
 		if (IntersectTriangle(r, v1, v2, v3, isect))
 		{
-			isect->primid = face.id;
-			isect->shapeid = scenedata->shapes[face.shapeidx].id;
+            isect->primid = leaf->face_id;
+            isect->shapeid = leaf->shape_id;
 		}
 	}
 }
 
 //  intersect a ray with leaf BVH node
+__attribute__((always_inline))
 bool IntersectLeafAny(
 	SceneData const* scenedata,
-	int faceidx,
+    Leaf const* leaf,
 	ray const* r                      // ray to instersect
 	)
 {
 	float3 v1, v2, v3;
-	Face face;
 
-	face = scenedata->faces[faceidx];
-	v1 = scenedata->vertices[face.idx[0]];
-	v2 = scenedata->vertices[face.idx[1]];
-	v3 = scenedata->vertices[face.idx[2]];
+	v1 = scenedata->vertices[leaf->idx[0]];
+	v2 = scenedata->vertices[leaf->idx[1]];
+	v3 = scenedata->vertices[leaf->idx[2]];
 
-	int shapemask = scenedata->shapes[face.shapeidx].mask;
-
-	if (Ray_GetMask(r) & shapemask)
+	//if (Ray_GetMask(r) & shapemask)
 	{
 		if (IntersectTriangleP(r, v1, v2, v3))
 		{
@@ -165,12 +175,12 @@ bool IntersectSceneClosest(SceneData const* scenedata, ray const* r, Intersectio
 
 			if (leftleaf)
 			{
-				IntersectLeafClosest(scenedata, STARTIDX(node.lbound), r, isect);
+				IntersectLeafClosest(scenedata, &node.lleaf, r, isect);
 			}
 
 			if (rightleaf)
 			{
-				IntersectLeafClosest(scenedata, STARTIDX(node.rbound), r, isect);
+				IntersectLeafClosest(scenedata, &node.rleaf, r, isect);
 			}
 
 			if (lefthit > 0.f && righthit > 0.f)
@@ -353,13 +363,13 @@ bool IntersectSceneAny(SceneData const* scenedata, ray const* r, __global int* s
 
 			if (leftleaf)
 			{
-				if (IntersectLeafAny(scenedata, STARTIDX(node.lbound), r))
+				if (IntersectLeafAny(scenedata, &node.lleaf, r))
                     				return true;
 			}
 
 			if (rightleaf)
 			{
-				if (IntersectLeafAny(scenedata, STARTIDX(node.rbound), r))
+				if (IntersectLeafAny(scenedata, &node.rleaf, r))
 			                    return true;
 			}
 

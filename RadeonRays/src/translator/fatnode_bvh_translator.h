@@ -52,11 +52,29 @@ namespace RadeonRays
         // Encoding:
         // xbound.pmin.w == -1.f if x-child is an internal node otherwise triangle index
         //
+        struct Leaf
+        {
+            int idx[3];
+            int pminw, face_id, shape_id, foo, bar;
+        };
+
         struct Node
         {
             // Node's bounding box
-            bbox lbound;
-            bbox rbound;
+            union
+            {
+                Leaf lleaf;
+                bbox lbound;
+            };
+
+            union
+            {
+                Leaf rleaf;
+                bbox rbound;
+            };
+
+            ~Node() {}
+            Node() {}
         };
 
         void Flush();
