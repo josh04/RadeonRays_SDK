@@ -29,10 +29,10 @@ namespace Baikal
 #else
         m_api->SetOption("acc.type", "fatbvh");
         m_api->SetOption("bvh.builder", "sah");
-        m_api->SetOption("bvh.sah.use_splits", 1.f);
-        m_api->SetOption("bvh.sah.min_overlap", 0.05f);
-        m_api->SetOption("bvh.sah.max_split_depth", 5);
-        m_api->SetOption("bvh.sah.extra_ref_budget", 2.f);
+       // m_api->SetOption("bvh.sah.use_splits", 1.f);
+       // m_api->SetOption("bvh.sah.min_overlap", 0.05f);
+       // m_api->SetOption("bvh.sah.max_split_depth", 10);
+       // m_api->SetOption("bvh.sah.extra_ref_budget", 2.f);
 
 #endif
     }

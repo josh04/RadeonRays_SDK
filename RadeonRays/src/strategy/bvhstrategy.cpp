@@ -367,7 +367,7 @@ namespace RadeonRays
                     // Idx count
                     int cnt;
 
-                    int padding[2];
+                    //int padding[2];
                 };
 
                 // This number is different from the number of faces for some BVHs 
