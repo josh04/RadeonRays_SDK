@@ -5,6 +5,12 @@ project "UnitTest"
     links {"Gtest", "RadeonRays", "Calc"}
     files { "**.cpp", "**.h" }
     
+    if _OPTIONS["shared_calc"] then
+       defines {"CALC_IMPORT_API"};
+    else
+       defines {"CALC_STATIC_LIBRARY"}
+    end
+
     if os.is("macosx") then
         buildoptions "-std=c++11 -stdlib=libc++"
     else if os.is("linux") then
@@ -14,7 +20,7 @@ project "UnitTest"
     end
 
     if _ACTION == "vs2012" then
-	defines{ "GTEST_HAS_TR1_TUPLE=0" }
+    defines{ "GTEST_HAS_TR1_TUPLE=0" }
     end
 
     if _OPTIONS["use_opencl"] then

@@ -21,6 +21,8 @@ THE SOFTWARE.
 ********************************************************************/
 #pragma once
 
+#include "calc_common.h"
+
 #include <string>
 #include <cstdint>
 
@@ -33,10 +35,14 @@ THE SOFTWARE.
 namespace Calc
 {
     class DeviceCl;
-	class Buffer;
-    
-	DeviceCl* CreateDeviceFromOpenCL(cl_context context, cl_device_id device, cl_command_queue queue);
-
-	Buffer* CreateBufferFromOpenCL(DeviceCl* device, cl_mem buffer);
+    class Buffer;
 }
 
+#ifdef __cplusplus
+extern "C"
+{
+#endif
+CALC_API Calc::DeviceCl* CreateDeviceFromOpenCL(cl_context context, cl_device_id device, cl_command_queue queue);
+#ifdef __cplusplus
+}
+#endif

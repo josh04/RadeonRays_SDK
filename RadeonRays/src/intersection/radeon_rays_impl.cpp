@@ -105,7 +105,7 @@ namespace RadeonRays
     {
         world_.DetachShape(shape);
     }
-    
+
     void IntersectionApiImpl::DetachAll()
     {
         world_.DetachAll();
@@ -149,56 +149,56 @@ namespace RadeonRays
     {
         m_device->DeleteEvent(event);
     }
-    
+
     Buffer* IntersectionApiImpl::CreateBuffer(size_t size, void* initdata) const
     {
         return m_device->CreateBuffer(size, initdata);
     }
-    
+
     void IntersectionApiImpl::MapBuffer(Buffer* buffer, MapType type, size_t offset, size_t size, void** data, Event** event) const
     {
         return m_device->MapBuffer(buffer, type, offset, size, data, event);
     }
-    
+
     void IntersectionApiImpl::UnmapBuffer(Buffer* buffer, void* ptr, Event** event) const
     {
         return m_device->UnmapBuffer(buffer, ptr, event);
     }
+
 #ifdef USE_OPENCL
-	RRAPI Buffer* CreateFromOpenClBuffer(RadeonRays::IntersectionApi* api, cl_mem buffer)
-	{
-		auto apii = static_cast<IntersectionApiImpl*>(api);
-		// we use dynamic cast (internal only) because otherwise have to
-		// expose platform to intersection api which feel wrong esp. in future
-		// if we support multi backend unified intersection api
-		auto cldev = dynamic_cast<CalcIntersectionDeviceCl*>(apii->GetDevice());
+    RRAPI Buffer* CreateFromOpenClBuffer(RadeonRays::IntersectionApi* api, cl_mem buffer)
+    {
+        auto apii = static_cast<IntersectionApiImpl*>(api);
+        // we use dynamic cast (internal only) because otherwise have to
+        // expose platform to intersection api which feel wrong esp. in future
+        // if we support multi backend unified intersection api
+        auto cldev = dynamic_cast<CalcIntersectionDeviceCl*>(apii->GetDevice());
 
-		if (cldev)
-		{
-			return cldev->CreateBuffer(buffer);
-		}
+        if (cldev)
+        {
+            return cldev->CreateBuffer(buffer);
+        }
 
-		Throw("CL interop not supported");
+        Throw("CL interop not supported");
 
-		return nullptr;
-	}
+        return nullptr;
+    }
 #endif
 
 #ifdef USE_VULKAN
-	RRAPI Buffer* CreateFromVulkanBuffer(RadeonRays::IntersectionApi* api, Anvil::Buffer* buffer)
-	{
-		auto apii = static_cast<IntersectionApiImpl*>(api);
-		auto cldev = dynamic_cast<CalcIntersectionDeviceVK*>(apii->GetDevice());
+    RRAPI Buffer* CreateFromVulkanBuffer(RadeonRays::IntersectionApi* api, Anvil::Buffer* buffer)
+    {
+        auto apii = static_cast<IntersectionApiImpl*>(api);
+        auto cldev = dynamic_cast<CalcIntersectionDeviceVK*>(apii->GetDevice());
 
-		if (cldev)
-		{
-			return cldev->AdoptBuffer(buffer);
-		}
+        if (cldev)
+        {
+            return cldev->AdoptBuffer(buffer);
+        }
 
-		Throw("Vulkan interop not supported");
+        Throw("Vulkan interop not supported");
 
-		return nullptr;
-	}
+        return nullptr;
+    }
 #endif
 }
-

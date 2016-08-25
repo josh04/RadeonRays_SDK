@@ -21,21 +21,23 @@ THE SOFTWARE.
 ********************************************************************/
 #pragma once
 
+#include "calc_common.h"
+
 namespace Calc
 {
-	// Manages region of device memory 
-	class Event
-	{
-	public:
-		Event() {}
-		virtual ~Event() = 0;
+    // Manages region of device memory
+    class CALC_API Event
+    {
+    public:
+        Event() {}
+        virtual ~Event() = 0;
 
-		virtual void Wait() = 0;
-		virtual bool IsComplete() const = 0;
+        virtual void Wait() = 0;
+        virtual bool IsComplete() const = 0;
 
-		Event(Event const&) = delete;
-		Event& operator = (Event const&) = delete;
-	};
+        Event(Event const&) = delete;
+        Event& operator = (Event const&) = delete;
+    };
 
-	inline Event::~Event() {}
+    inline Event::~Event() {}
 }

@@ -26,8 +26,8 @@ newoption {
 
 
 newoption {
-	trigger = "use_vulkan",
-	description = "Use vulkan for GPU hit testing"
+    trigger = "use_vulkan",
+    description = "Use vulkan for GPU hit testing"
 }
 
 newoption {
@@ -36,23 +36,28 @@ newoption {
 }
 
 newoption {
-    trigger = "submit",
-    description = "Submit RadeonRays SDK."
-}
-
-newoption {
-    trigger = "library_only", 
+    trigger = "library_only",
     description = "Don't define a solution just add library to calling parent premake solution"
 }
 
 newoption {
-    trigger = "no_tests", 
+    trigger = "no_tests",
     description = "Don't add any unit tests and remove any test functionality from the library"
 }
 
 newoption {
-    trigger = "static_library", 
+    trigger = "static_library",
     description = "Create static libraries rather than dynamic"
+}
+
+newoption {
+    trigger = "benchmark",
+    description = "Benchmark with command line interface instead of App."
+}
+
+newoption {
+    trigger = "shared_calc",
+    description = "Link Calc(compute abstraction layer) dynamically"
 }
 
 
@@ -60,19 +65,34 @@ if not _OPTIONS["use_opencl"] and not _OPTIONS["use_vulkan"] and not _OPTIONS["u
     _OPTIONS["use_opencl"] = 1
 end
 
-if _OPTIONS["library_only"] then
-    _OPTIONS["no_tests"] = 1
+if _OPTIONS["shared_calc"] and _OPTIONS["use_vulkan"] then
+    print ">>Error: shared_calc option is not yet supported for Vulkan backend"
+    return -1
 end
 
-function build(config)
-	if os.is("windows") then
-		buildcmd="devenv RadeonRays.sln /build \"" .. config .. "|x64\""
-	else
-		config=config .. "_x64"
-		buildcmd="make config=" .. config
-	end
+if _OPTIONS["library_only"] then
+    _OPTIONS["no_tests"] = 1
+    print ">> Disabling test for library only build";
+end
 
-	return os.execute(buildcmd)
+if _OPTIONS["shared_calc"] then
+   print ">> Building Calc as a shared library"
+end
+
+if _OPTIONS["use_embree"] then
+   print ">> Embree backend enabled"
+end
+
+
+function build(config)
+    if os.is("windows") then
+        buildcmd="devenv RadeonRays.sln /build \"" .. config .. "|x64\""
+    else
+        config=config .. "_x64"
+        buildcmd="make config=" .. config
+    end
+
+    return os.execute(buildcmd)
 end
 
 
@@ -98,60 +118,31 @@ if _OPTIONS["package"] then
     os.execute("cp ./Tools/deploy/premake4.lua ./dist")
     os.execute("cp ./Tools/deploy/OpenCLSearch.lua ./dist")
     os.execute("cp ./Tools/deploy/App.lua ./dist/App")
-    os.execute("cp ./Tools/deploy/CLW.lua ./dist/CLW")      
+    os.execute("cp ./Tools/deploy/CLW.lua ./dist/CLW")
     os.execute("cp -r ./Tools/premake ./dist")
-    
+
     os.execute("cp -r ./3rdParty/freeglut ./dist/3rdParty/")
     os.execute("cp -r ./3rdParty/glew ./dist/3rdParty/")
     os.execute("cp -r ./3rdParty/oiio ./dist/3rdParty/")
     os.execute("cp -r ./3rdParty/oiio16 ./dist/3rdParty/")
     os.execute("cp -r ./Tools/deploy/LICENSE.txt ./dist")
-    os.execute("cp -r ./Tools/deploy/README.md ./dist")                  
-elseif _OPTIONS["submit"] then
-    if os.is("macosx") then
-        osPremakeFolder = "osx"
-        project = "gmake"
-    elseif os.is("windows") then
-        osPremakeFolder = "win"
-        project = "vs2015"
-    else
-        osPremakeFolder = "linux64"
-        project = "gmake"
-    end
-
-    result = os.execute("echo generate project && " .. "\"./Tools/premake/".. osPremakeFolder .. "/premake5\" " .. project .. " --embed_kernels")
-    assert(result == 0, "failed to generate project.")
-
-    result = build("release")
-    assert(result == 0, "failed to build project.")
-
-    result = os.execute("cd App && \"../Bin/Release/x64/UnitTest64\"")
-    assert(result == 0, "Unit tests failed.")
-    os.execute("echo packaging && " .. "\"./Tools/premake/".. osPremakeFolder .. "/premake5\" " .. " --package")
-    os.execute("cd ../RadeonRays_SDK/ && git clean -dfx && git checkout .")
-    os.execute("cp -r ./dist/* ../RadeonRays_SDK/")
-    os.execute("cd ../RadeonRays_SDK/ && git add .")
-    os.chdir("../RadeonRays_SDK/")
-    result =  os.execute("echo generate project && " .. "\"./premake/".. osPremakeFolder .. "/premake5\" " .. project)
-    assert(result == 0, "failed to generate SDK project.")
-    result = build("release")
-    assert(result == 0, "failed to build SDK.")
-    result = os.execute("git commit -m \"Update SDK\"")
-    result = os.execute("git push origin master")
-
+    os.execute("cp -r ./Tools/deploy/README.md ./dist")
 else
     if not _OPTIONS["library_only"] then
         solution "RadeonRays"
 
-        configurations { "Debug", "Release" }           
+        configurations { "Debug", "Release" }
         language "C++"
         flags { "NoMinimalRebuild", "EnableSSE", "EnableSSE2" }
     end
+
     if( _OPTIONS["static_library"]) then
         defines{ "RR_STATIC_LIBRARY=1" }
+	print ">> Building Radeon Rays as a static library";
     end
 
     if _OPTIONS["use_opencl"] then
+        print ">> OpenCL backend enabled"
         -- find and add path to Opencl headers
         dofile ("./OpenCLSearch.lua" )
     end
@@ -170,7 +161,7 @@ else
     else
         platforms {"x32", "x64"}
     end
-    
+
     if os.is("windows") then
         targetName = "win"
         defines{ "WIN32" }
@@ -181,10 +172,11 @@ else
     end
 
     if _OPTIONS["use_opencl"] then
-        defines{"USE_OPENCL=1"}        
+        defines{"USE_OPENCL=1"}
     end
     if _OPTIONS["use_vulkan"] then
-        defines{"USE_VULKAN=1"} 
+	print ">> Vulkan backend enabled"
+        defines{"USE_VULKAN=1"}
         vulkanPath = ""
         vulkanSDKPath = os.getenv( "VK_SDK_PATH" );
         if vulkanSDKPath == nil then
@@ -192,7 +184,7 @@ else
         end
 
         if vulkanSDKPath ~= nil then
-            if os.is("linux") then    
+            if os.is("linux") then
                 vulkanPath = vulkanSDKPath .. "/include"
             else
                 vulkanPath = vulkanSDKPath .. "/Include"
@@ -219,8 +211,8 @@ else
     configuration {"x32", "Debug"}
         targetsuffix "D"
     configuration {"x64", "Release"}
-        targetsuffix "64"   
-    
+        targetsuffix "64"
+
     configuration {} -- back to all configurations
 
     if  _OPTIONS["use_vulkan"] then
@@ -241,21 +233,21 @@ else
         if fileExists("./CLW/CLW.lua") then
             dofile("./CLW/CLW.lua")
         end
-        
-        if not _OPTIONS["library_only"] then 
+
+        if not _OPTIONS["library_only"] then
             if fileExists("./App/App.lua") then
                 dofile("./App/App.lua")
             end
-        end 
+        end
     end
-    
-    if not _OPTIONS["no_tests"] then 
+
+    if not _OPTIONS["no_tests"] then
         if fileExists("./Gtest/gtest.lua") then
             dofile("./Gtest/gtest.lua")
-        end     
+        end
         if fileExists("./UnitTest/UnitTest.lua") then
             dofile("./UnitTest/UnitTest.lua")
-        end        
+        end
     end
 
 end
