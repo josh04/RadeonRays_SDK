@@ -165,10 +165,13 @@ bool IntersectSceneClosest2L(SceneData* scenedata, ray* r, Intersection* isect)
                     // Get shape descrition struct index
                     int shapeidx = SHAPEIDX(node);
                     // Get shape mask
+
+#ifdef RR_RAY_MASKING
                     int shapemask = scenedata->shapedata[shapeidx].mask;
                     // Drill into 2nd level BVH only if the geometry is not masked vs current ray
                     // otherwise skip the subtree
                     if (Ray_GetMask(r) && shapemask)
+#endif
                     {
                         // Fetch bottom level BVH index
                         idx = scenedata->shapedata[shapeidx].bvhidx;
@@ -269,10 +272,13 @@ bool IntersectSceneAny2L(SceneData* scenedata, ray* r)
                     // Get shape descrition struct index
                     int shapeidx = SHAPEIDX(node);
                     // Get shape mask
+
+#ifdef RR_RAY_MASKING
                     int shapemask = scenedata->shapedata[shapeidx].mask;
                     // Drill into 2nd level BVH only if the geometry is not masked vs current ray
                     // otherwise skip the subtree
                     if (Ray_GetMask(r) && shapemask)
+#endif
                     {
                         // Fetch bottom level BVH index
                         idx = scenedata->shapedata[shapeidx].bvhidx;

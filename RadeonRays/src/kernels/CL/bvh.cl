@@ -79,9 +79,10 @@ void IntersectLeafClosest(
     v2 = scenedata->vertices[face.idx[1]];
     v3 = scenedata->vertices[face.idx[2]];
 
+#ifdef RR_RAY_MASKING
     int shapemask = scenedata->shapes[face.shapeidx].mask;
-
-    //if (Ray_GetMask(r) & shapemask)
+    if (Ray_GetMask(r) & shapemask)
+#endif
     {
         if (IntersectTriangle(r, v1, v2, v3, isect))
         {
@@ -107,9 +108,10 @@ bool IntersectLeafAny(
     v2 = scenedata->vertices[face.idx[1]];
     v3 = scenedata->vertices[face.idx[2]];
 
-	int shapemask = scenedata->shapes[face.shapeidx].mask;
-
-	//if (Ray_GetMask(r) & shapemask)
+#ifdef RR_RAY_MASKING
+    int shapemask = scenedata->shapes[face.shapeidx].mask;
+	if (Ray_GetMask(r) & shapemask)
+#endif
 	{
 		if (IntersectTriangleP(r, v1, v2, v3))
 		{

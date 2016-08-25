@@ -895,7 +895,7 @@ Scene* Scene::LoadFromObj(std::string const& filename, std::string const& basepa
             scene->materials_.push_back(material);
             scene->material_names_.push_back(objmaterials[i].name);
 
-            float3 spec = float3(0.5f, 0.5f, 0.5f);// float3(objmaterials[i].specular[0], objmaterials[i].specular[1], objmaterials[i].specular[2]);
+            float3 spec = 0.f;// float3(0.5f, 0.5f, 0.5f);// float3(objmaterials[i].specular[0], objmaterials[i].specular[1], objmaterials[i].specular[2]);
             if (spec.sqnorm() > 0.f)
             {
                 Material specular;
@@ -961,7 +961,7 @@ Scene* Scene::LoadFromObj(std::string const& filename, std::string const& basepa
         shape.linearvelocity = float3(0.0f, 0.f, 0.f);
         shape.angularvelocity = quaternion(0.f, 0.f, 0.f, 1.f);
         // Save last index to add to this shape indices
-        // int baseidx = (int)scene->vertices_.size();
+        int baseidx = (int)scene->vertices_.size();
 
         int pos_count = (int)objshapes[s].mesh.positions.size() / 3;
         // Enumerate and copy vertex data

@@ -362,7 +362,7 @@ void InitData()
     std::cout << "F-Stop: " << 1.f / (g_scene->camera_->GetAperture() * 10.f) << "\n";
     std::cout << "Sensor size: " << g_camera_sensor_size.x * 1000.f << "x" << g_camera_sensor_size.y * 1000.f << "mm\n";
 
-    g_scene->SetEnvironment("../Resources/Textures/terrace_near_the_granaries.exr", "", g_envmapmul);
+    g_scene->SetEnvironment("../Resources/Textures/studio015.hdr", "", g_envmapmul);
 
 #pragma omp parallel for
     for (int i = 0; i < g_cfgs.size(); ++i)

@@ -40,7 +40,7 @@ TYPE DEFINITIONS
 typedef struct _Leaf
 {
     int idx[3];
-    int pminw, face_id, shape_id, foo, bar;
+    int pminw, face_id, shape_id, shape_mask, bar;
 } Leaf;
 
 typedef struct
@@ -97,8 +97,9 @@ void IntersectLeafClosest(
 	v2 = scenedata->vertices[leaf->idx[1]];
 	v3 = scenedata->vertices[leaf->idx[2]];
 
-
-	//if (Ray_GetMask(r) & shapemask)
+#ifdef RR_RAY_MASKING
+	if (Ray_GetMask(r) & leaf->shape_mask)
+#endif
 	{
 		if (IntersectTriangle(r, v1, v2, v3, isect))
 		{
@@ -122,7 +123,9 @@ bool IntersectLeafAny(
 	v2 = scenedata->vertices[leaf->idx[1]];
 	v3 = scenedata->vertices[leaf->idx[2]];
 
-	//if (Ray_GetMask(r) & shapemask)
+#ifdef RR_RAY_MASKING
+    if (Ray_GetMask(r) & leaf->shape_mask)
+#endif
 	{
 		if (IntersectTriangleP(r, v1, v2, v3))
 		{
@@ -135,16 +138,12 @@ bool IntersectLeafAny(
 
 #ifndef GLOBAL_STACK
 // intersect Ray against the whole BVH structure
-bool IntersectSceneClosest(SceneData const* scenedata, ray const* r, Intersection* isect, __global int* stack, __local int* ldsstack)
+void IntersectSceneClosest(SceneData const* scenedata, ray const* r, Intersection* isect, __global int* stack, __local int* ldsstack)
 {
 	const float3 invdir = native_recip(r->d.xyz);
 
 	isect->uvwt = make_float4(0.f, 0.f, 0.f, r->o.w);
 	isect->shapeid = -1;
-	isect->primid = -1;
-
-	if (r->o.w < 0.f)
-		return false;
 
 	__global int* gsptr = stack;
 	__local  int* lsptr = ldsstack;
@@ -159,7 +158,6 @@ bool IntersectSceneClosest(SceneData const* scenedata, ray const* r, Intersectio
 	bool rightleaf = false;
 	float lefthit = 0.f;
 	float righthit = 0.f;
-	int step = 0;
 
 	while (idx > -1)
 	{
@@ -241,8 +239,6 @@ bool IntersectSceneClosest(SceneData const* scenedata, ray const* r, Intersectio
 			idx = ldsstack[64 * (SHORT_STACK_SIZE - 1)];
 		}
 	}
-
-	return isect->shapeid >= 0;
 }
 #else
 // intersect Ray against the whole BVH structure
