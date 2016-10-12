@@ -10,6 +10,8 @@
 #include <vector>
 #include <map>
 
+const char * _get_resource_path2(const char * filename);
+
 namespace tinyobj {
 
 typedef struct

@@ -34,6 +34,8 @@
 
 #include <algorithm>
 
+extern const char * _get_resource_path(const char *);
+
  // Preferred work group size for Radeon devices
 static int const kWorkGroupSize = 64;
 static int const kMaxStackSize = 48;
@@ -120,16 +122,16 @@ namespace RadeonRays
 #ifndef RR_EMBED_KERNELS
         if (device->GetPlatform() == Calc::Platform::kOpenCL)
         {
-            char const* headers[] = { "../RadeonRays/src/kernels/CL/common.cl" };
+            char const* headers[] = { "CL/common.cl" };
 
             int numheaders = sizeof(headers) / sizeof(char const*);
 
-            m_gpudata->executable = m_device->CompileExecutable("../RadeonRays/src/kernels/CL/fatbvh.cl", headers, numheaders);
+            m_gpudata->executable = m_device->CompileExecutable(_get_resource_path("CL/fatbvh.cl"), headers, numheaders);
         } 
         else
         {
             assert(device->GetPlatform() == Calc::Platform::kVulkan);
-            m_gpudata->executable = m_device->CompileExecutable("../RadeonRays/src/kernels/GLSL/fatbvh.comp", nullptr, 0);
+            m_gpudata->executable = m_device->CompileExecutable(_get_resource_path("GLSL/fatbvh.comp"), nullptr, 0);
         }
 #else
 #if USE_OPENCL

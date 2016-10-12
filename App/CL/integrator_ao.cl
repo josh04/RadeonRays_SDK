@@ -231,7 +231,8 @@ __kernel void ApplyGammaAndCopyData(
     if (gidx < imgwidth && gidy < imgheight)
     {
         float4 v = data[gid];
-        float4 val = clamp(native_powr(v / v.w, 1.f / gamma), 0.f, 1.f);
+//        float4 val = clamp(native_powr(v / v.w, 1.f / gamma), 0.f, 1.f);
+        float4 val = max(native_powr(v / v.w, 1.f / gamma), 0.f);
         write_imagef(img, make_int2(gidx, gidy), val);
     }
 }

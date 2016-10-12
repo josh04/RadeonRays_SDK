@@ -32,6 +32,8 @@ THE SOFTWARE.
 
 #include <set>
 
+extern const char * _get_resource_path(const char *);
+
 static int const kWorkGroupSize = 64;
 
 namespace RadeonRays
@@ -136,16 +138,16 @@ namespace RadeonRays
 #ifndef RR_EMBED_KERNELS
         if ( device->GetPlatform() == Calc::Platform::kOpenCL )
         {
-            char const* headers[] = { "../RadeonRays/src/kernels/CL/common.cl" };
+            char const* headers[] = { "CL/common.cl" };
 
             int numheaders = sizeof(headers) / sizeof(char const*);
 
-            m_gpudata->executable = m_device->CompileExecutable("../RadeonRays/src/kernels/CL/bvh2l.cl", headers, numheaders);
+            m_gpudata->executable = m_device->CompileExecutable(_get_resource_path("CL/bvh2l.cl"), headers, numheaders);
         }
         else
         {
             assert( device->GetPlatform() == Calc::Platform::kVulkan );
-            m_gpudata->executable = m_device->CompileExecutable( "../RadeonRays/src/kernels/GLSL/bvh2l.comp", nullptr, 0 );
+            m_gpudata->executable = m_device->CompileExecutable( _get_resource_path("GLSL/bvh2l.comp"), nullptr, 0 );
         }
 
 #else

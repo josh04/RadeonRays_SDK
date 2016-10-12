@@ -50,8 +50,8 @@ static int GetTextureForemat(OIIO_NAMESPACE::ImageSpec const& spec)
 static void LoadTexture(std::string const& filename, Scene::Texture& texture, std::vector<std::unique_ptr<char[]> >& data)
 {
     OIIO_NAMESPACE_USING
-
-    ImageInput* input = ImageInput::open(filename);
+    std::string full_path = _get_resource_path2(filename.c_str());
+    ImageInput* input = ImageInput::open(full_path);
 
     if (!input)
     {

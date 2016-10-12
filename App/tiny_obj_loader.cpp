@@ -28,7 +28,24 @@
 #include <fstream>
 #include <sstream>
 
+#import <Foundation/Foundation.h>
+
 #include "tiny_obj_loader.h"
+
+const char * _get_resource_path2(const char * filename) {
+    const char * path = "";
+    std::string output = std::string(path) + std::string(filename);
+    path = output.c_str();
+#ifdef RAD_FRAMEWORK
+#ifdef __APPLE__
+    NSString * resStr = [[[NSBundle bundleWithIdentifier:@"josh04.RadeonRays"] resourcePath] stringByAppendingString:@"/"];
+    NSString * NSvertStr = [resStr stringByAppendingString:[NSString stringWithUTF8String:filename]];
+    path = [NSvertStr UTF8String];
+#endif
+#endif
+    return path;
+}
+
 
 namespace tinyobj {
 
@@ -486,7 +503,7 @@ std::string MaterialFileReader::operator() (
     filepath = matId;
   }
 
-  std::ifstream matIStream(filepath.c_str());
+  std::ifstream matIStream(_get_resource_path2(filepath.c_str()));
   return LoadMtl(matMap, materials, matIStream);
 }
 
@@ -502,7 +519,7 @@ LoadObj(
 
   std::stringstream err;
 
-  std::ifstream ifs(filename);
+  std::ifstream ifs(_get_resource_path2(filename));
   if (!ifs) {
     err << "Cannot open file [" << filename << "]" << std::endl;
     return err.str();
