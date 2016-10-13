@@ -60,6 +60,8 @@
 #include "CLW/clwoutput.h"
 #include "config_manager.h"
 
+#include <Mush Core/mushLog.hpp>
+
 using namespace RadeonRays;
 
 // Help message
@@ -166,11 +168,13 @@ void init_cl(bool share_opencl, cl_context c, cl_device_id d, cl_command_queue q
         }
     }
 
-    std::cout << "Running on devices: \n";
+    putLog("AMD: Running on devices:");
 
     for (int i = 0; i < g_cfgs.size(); ++i)
     {
-        std::cout << i << ": " << g_cfgs[i].context.GetDevice(g_cfgs[i].devidx).GetName() << "\n";
+        std::stringstream strm;
+        strm << "AMD: " << i << ": " << g_cfgs[i].context.GetDevice(g_cfgs[i].devidx).GetName();
+        putLog(strm.str());
     }
     
     g_interop = false;
@@ -191,7 +195,7 @@ void init_cl(bool share_opencl, cl_context c, cl_device_id d, cl_command_queue q
         g_ctrl[i].idx = i;
     }
     
-    std::cout << "OpenGL interop mode disabled\n";
+    putLog("AMD: OpenGL interop mode disabled.");
 }
 /*
 void InitCl()
@@ -284,11 +288,13 @@ void InitData()
     g_scene->camera_->SetFocusDistance(g_camera_focus_distance);
     g_scene->camera_->SetAperture(g_camera_aperture);
     
-    std::cout << "Camera type: " << (g_scene->camera_->GetAperture() > 0.f ? "Physical" : "Pinhole") << "\n";
-    std::cout << "Lens focal length: " << g_scene->camera_->GetFocalLength() * 1000.f << "mm\n";
-    std::cout << "Lens focus distance: " << g_scene->camera_->GetFocusDistance() << "m\n";
-    std::cout << "F-Stop: " << 1.f / (g_scene->camera_->GetAperture() * 10.f) << "\n";
-    std::cout << "Sensor size: " << g_camera_sensor_size.x * 1000.f << "x" << g_camera_sensor_size.y * 1000.f << "mm\n";
+    std::stringstream strm;
+    strm << "AMD: Camera type: " << (g_scene->camera_->GetAperture() > 0.f ? "Physical" : "Pinhole") << "\n";
+    strm << "AMD: Lens focal length: " << g_scene->camera_->GetFocalLength() * 1000.f << "mm\n";
+    strm << "AMD: Lens focus distance: " << g_scene->camera_->GetFocusDistance() << "m\n";
+    strm << "AMD: F-Stop: " << 1.f / (g_scene->camera_->GetAperture() * 10.f) << "\n";
+    strm << "AMD: Sensor size: " << g_camera_sensor_size.x * 1000.f << "x" << g_camera_sensor_size.y * 1000.f << "mm\n";
+    putLog(strm.str());
     
     g_scene->SetEnvironment("../Resources/Textures/studio015.hdr", "", g_envmapmul);
     
@@ -361,7 +367,9 @@ void StartRenderThreads()
         }
     }
     
-    std::cout << g_cfgs.size() << " OpenCL submission threads started\n";
+    std::stringstream strm;
+    strm << "AMD: " << g_cfgs.size() << " OpenCL submission threads started.";
+    putLog(strm.str());
 }
 
 void init(int width, int height, bool share_opencl, cl_context c, cl_device_id d, cl_command_queue q) {
@@ -375,7 +383,7 @@ void init(int width, int height, bool share_opencl, cl_context c, cl_device_id d
     }
     catch (std::runtime_error& err)
     {
-        std::cout << err.what();
+        putLog(err.what());
     }
 }
 
