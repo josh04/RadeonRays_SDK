@@ -30,7 +30,12 @@ THE SOFTWARE.
 #include <algorithm>
 #include <fstream>
 
-extern const char * _get_resource_path(const char *);
+const char * _get_resource_path(const char * filename) {
+	const char * path = "RadeonResources/";
+	std::string output = std::string(path) + std::string(filename);
+	path = output.c_str();
+	return path;
+}
 
 static void load_file_contents(std::string const& name, std::vector<char>& contents, bool binary)
 {
