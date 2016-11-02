@@ -24,8 +24,13 @@ radeonProcess::~radeonProcess() {
 void radeonProcess::init(std::shared_ptr<mush::opencl> context, const std::initializer_list<std::shared_ptr<mush::ringBuffer> > &buffers) {
     assert(buffers.size() == 0);
     
-    ::init(_width, _height, _share_opencl, context->get_cl_context(), context->get_cl_device(), (*context->getQueue())());
+    bool success = ::init(_width, _height, _share_opencl, context->get_cl_context(), context->get_cl_device(), (*context->getQueue())());
     
+	if (!success) {
+		kill();
+		throw std::runtime_error("Exception thrown in RadeonRays.");
+	}
+
     //float_image = context->floatImage(_width, _height);
     
     _divide = context->getKernel("amd_divide");

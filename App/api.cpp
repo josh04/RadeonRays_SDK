@@ -372,19 +372,21 @@ void StartRenderThreads()
     putLog(strm.str());
 }
 
-void init(int width, int height, bool share_opencl, cl_context c, cl_device_id d, cl_command_queue q) {
+bool init(int width, int height, bool share_opencl, cl_context c, cl_device_id d, cl_command_queue q) {
     g_window_width = width;
     g_window_height = height;
+	bool exception_thrown = false;
     try
     {
-        
         init_cl(share_opencl, c, d, q);
         InitData();
     }
     catch (std::runtime_error& err)
     {
         putLog(err.what());
+		exception_thrown = true;
     }
+	return !exception_thrown;
 }
 
 void launch_threads() {

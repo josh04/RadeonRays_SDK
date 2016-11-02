@@ -34,18 +34,17 @@
 
 #include "tiny_obj_loader.h"
 
-const char * _get_resource_path2(const char * filename) {
-    const char * path = "";
-    std::string output = std::string(path) + std::string(filename);
-    path = output.c_str();
+std::string _get_resource_path2(const char * filename) {
+    std::string path = "RadeonResources/Resources/" + std::string(filename);
 #ifdef RAD_FRAMEWORK
 #ifdef __APPLE__
     NSString * resStr = [[[NSBundle bundleWithIdentifier:@"josh04.RadeonRays"] resourcePath] stringByAppendingString:@"/"];
     NSString * NSvertStr = [resStr stringByAppendingString:[NSString stringWithUTF8String:filename]];
     path = [NSvertStr UTF8String];
+	return path;
 #endif
 #endif
-    return path;
+	return path;
 }
 
 

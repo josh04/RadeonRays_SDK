@@ -117,7 +117,7 @@ namespace Baikal
 
         // Load kernels
 #ifndef RR_EMBED_KERNELS
-        m_render_data->program = CLWProgram::CreateFromFile("../App/CL/integrator_pt.cl", m_context);
+        m_render_data->program = CLWProgram::CreateFromFile("CL/integrator_pt.cl", m_context);
 #else
         m_render_data->program = CLWProgram::CreateFromSource(g_integrator_pt_opencl, std::strlen(g_integrator_pt_opencl), context);
 #endif

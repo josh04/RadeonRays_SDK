@@ -13,7 +13,7 @@
 
 #include <Mush Core/opencl.hpp>
 
-void init(int width, int height, bool share_opencl, cl_context c, cl_device_id d, cl_command_queue q);
+bool init(int width, int height, bool share_opencl, cl_context c, cl_device_id d, cl_command_queue q);
 void launch_threads();
 float * update(bool share_opencl, bool update, cl_mem load_image);
 void close_down();

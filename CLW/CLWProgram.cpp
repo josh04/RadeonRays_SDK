@@ -29,13 +29,26 @@ THE SOFTWARE.
 #include <cassert>
 #include <algorithm>
 #include <fstream>
-
+/*
 const char * _get_resource_path(const char * filename) {
 	const char * path = "RadeonResources/";
 	std::string output = std::string(path) + std::string(filename);
 	path = output.c_str();
 	return path;
+}*/
+std::string _get_resource_path(const char * filename) {
+	std::string path = "RadeonResources/" + std::string(filename);
+#ifdef RAD_FRAMEWORK
+#ifdef __APPLE__
+	NSString * resStr = [[[NSBundle bundleWithIdentifier : @"josh04.RadeonRays"] resourcePath] stringByAppendingString:@" / "];
+		NSString * NSvertStr = [resStr stringByAppendingString : [NSString stringWithUTF8String : filename]];
+	path = [NSvertStr UTF8String];
+	return path;
+#endif
+#endif
+	return path;
 }
+
 
 static void load_file_contents(std::string const& name, std::vector<char>& contents, bool binary)
 {
@@ -201,7 +214,7 @@ CLWProgram CLWProgram::CreateFromSource(char const* sourcecode,
 CLWProgram CLWProgram::CreateFromFile(char const* filename, CLWContext context)
 {
     std::vector<char> sourcecode;
-    load_file_contents(filename, sourcecode, false);
+    load_file_contents(_get_resource_path(filename).c_str(), sourcecode, false);
     return CreateFromSource(&sourcecode[0], sourcecode.size(), context);
 }
 
@@ -211,7 +224,7 @@ CLWProgram CLWProgram::CreateFromFile(char const* filename,
                                       CLWContext context)
 {
     std::vector<char> sourcecode;
-    load_file_contents(filename, sourcecode, false);
+    load_file_contents(_get_resource_path(filename).c_str(), sourcecode, false);
     
     std::vector<std::vector<char> > headers;
     std::vector<char const*> headerstrs;
