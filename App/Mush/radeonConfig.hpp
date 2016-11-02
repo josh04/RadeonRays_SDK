@@ -21,6 +21,8 @@ namespace mush {
         
         int width = 1280;
         int height = 720;
+
+		bool share_opencl = true;
         
         char const * path = "bmw";
         char const * model_name = "i8.obj";

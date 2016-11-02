@@ -14,8 +14,9 @@
 #include "radeonEventHandler.hpp"
 #include "radeonProcessor.hpp"
 #include "radeonProcess.hpp"
+#include "api.hpp"
 
-radeonProcessor::radeonProcessor(mush::radeonConfig config) : mush::imageProcessor(), _width(width), _height(height) {
+radeonProcessor::radeonProcessor(mush::radeonConfig config) : mush::imageProcessor(), _config(config) {
     
 }
 
@@ -24,11 +25,12 @@ radeonProcessor::~radeonProcessor() {
 }
 
 void radeonProcessor::init(std::shared_ptr<mush::opencl> context, const std::initializer_list<std::shared_ptr<mush::ringBuffer>>& buffers) {
-    
+	setup(_config);
+
     _quit = std::make_shared<mush::quitEventHandler>();
     _rad_event = std::make_shared<radeonEventHandler>();
     
-    _radeon = std::make_shared<radeonProcess>(_rad_event, _width, _height, true);
+    _radeon = std::make_shared<radeonProcess>(_rad_event, _config.width, _config.height, _config.share_opencl);
     _radeon->init(context, {});
     _copy = std::make_shared<mush::singleKernelProcess>("flip_vertical");
     _copy->init(context, _radeon);

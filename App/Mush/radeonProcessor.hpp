@@ -53,7 +53,7 @@ private:
     
     std::unique_ptr<mush::timerWrapper> _timer = nullptr;
     
-    unsigned int _width, _height;
+	mush::radeonConfig _config;
 };
 
 #endif /* radeonProcessor_hpp */

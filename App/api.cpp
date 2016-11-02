@@ -149,6 +149,27 @@ static bool     g_is_mouse_tracking = false;
 static float2   g_mouse_pos = float2(0, 0);
 static float2   g_mouse_delta = float2(0, 0);
 
+
+void setup(const mush::radeonConfig& config) {
+	g_path = config.path;
+	g_modelname = config.model_name;
+
+	g_num_shadow_rays = config.shadow_rays;
+	g_num_ao_rays = config.ao_rays;
+	g_ao_enabled = config.ao_enabled;
+	g_progressive = config.progressive_enabled;
+	g_num_bounces = config.num_bounces;
+	g_num_samples = config.num_samples;
+
+	g_ao_radius = config.ao_radius;
+	g_camera_pos = config.camera_position;
+	g_camera_sensor_size = config.camera_sensor_size;
+	g_camera_zcap = config.camera_zcap;
+	g_camera_focal_length = config.camera_focal_length;
+	g_camera_focus_distance = config.camera_focus_distance;
+	g_camera_aperture = config.camera_aperture;
+}
+
 void init_cl(bool share_opencl, cl_context c, cl_device_id d, cl_command_queue q) {
     g_cfgs.clear();
     
