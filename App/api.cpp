@@ -391,7 +391,7 @@ void launch_threads() {
     StartRenderThreads();
 }
 
-float * update(bool share_opencl, bool update, cl_image load_image) {
+float * update(bool share_opencl, bool update, cl_mem load_image) {
     
     if (update)
     {
@@ -454,7 +454,7 @@ float * update(bool share_opencl, bool update, cl_image load_image) {
         copykernel.SetArg(argc++, g_outputs[g_primary].output->height());
         copykernel.SetArg(argc++, 1.0f);
         
-        auto err = clSetKernelArg(copykernel, argc++, sizeof(cl_image), &load_image);
+        auto err = clSetKernelArg(copykernel, argc++, sizeof(cl_mem), &load_image);
         
         //copykernel.SetArg(argc++, load_image);
         

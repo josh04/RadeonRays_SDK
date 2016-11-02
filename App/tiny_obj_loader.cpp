@@ -28,7 +28,9 @@
 #include <fstream>
 #include <sstream>
 
+#ifdef __APPLE__
 #import <Foundation/Foundation.h>
+#endif
 
 #include "tiny_obj_loader.h"
 
