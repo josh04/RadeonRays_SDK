@@ -15,7 +15,7 @@
 #include "radeonProcessor.hpp"
 #include "radeonProcess.hpp"
 
-radeonProcessor::radeonProcessor(mush::radeonConfig config) : mush::imageProcessor(), _width(width), _height(height) {
+radeonProcessor::radeonProcessor(unsigned int width, unsigned int height) : mush::imageProcessor(), _width(width), _height(height) {
     
 }
 

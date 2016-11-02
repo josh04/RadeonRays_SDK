@@ -25,7 +25,7 @@ namespace mush {
 
 class RADEONEXPORTS_API radeonProcessor : public mush::imageProcessor {
 public:
-    radeonProcessor(mush::radeonConfig config);
+    radeonProcessor(unsigned int width, unsigned int height);
     ~radeonProcessor();
     
     void init(std::shared_ptr<mush::opencl> context, const std::initializer_list<std::shared_ptr<mush::ringBuffer>>& buffers) override;

@@ -30,7 +30,7 @@ THE SOFTWARE.
 #include <algorithm>
 #include <fstream>
 
-const char * _get_resource_path(const char * filename) {
+const char * _get_resource_path3(const char * filename) {
 	const char * path = "RadeonResources/";
 	std::string output = std::string(path) + std::string(filename);
 	path = output.c_str();
@@ -222,7 +222,7 @@ CLWProgram CLWProgram::CreateFromFile(char const* filename,
         for (int i = 0; i < numheaders; ++i)
         {
             std::vector<char> headersource;
-            load_file_contents(_get_resource_path(headernames[i]), headersource, false);
+            load_file_contents(_get_resource_path3(headernames[i]), headersource, false);
             headerssizes.push_back(headersource.size());
             headers.push_back(std::move(headersource));
             headerstrs.push_back(&headers[i][0]);
