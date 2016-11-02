@@ -70,15 +70,15 @@ char const* kHelpMessage =
 //char const* g_path = "bmw";
 //char const* g_modelname = "i8.obj";
 
+//std::unique_ptr<ShaderManager>    g_shader_manager;
+
+//GLuint g_vertex_buffer;
+//GLuint g_index_buffer;
+//GLuint g_texture;
+
+
 char const* g_path = "bmw";
 char const* g_modelname = "i8.obj";
-
-std::unique_ptr<ShaderManager>    g_shader_manager;
-
-GLuint g_vertex_buffer;
-GLuint g_index_buffer;
-GLuint g_texture;
-
 int g_window_width = 1280;
 int g_window_height = 720;
 int g_num_shadow_rays = 1;
