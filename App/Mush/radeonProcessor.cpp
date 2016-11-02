@@ -16,7 +16,7 @@
 #include "radeonProcess.hpp"
 #include "api.hpp"
 
-radeonProcessor::radeonProcessor(mush::radeonConfig config) : mush::imageProcessor(), _config(config) {
+radeonProcessor::radeonProcessor(const mush::radeonConfig& config) : mush::imageProcessor(), _config(config) {
     
 }
 

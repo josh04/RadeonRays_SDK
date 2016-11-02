@@ -13,36 +13,60 @@
 
 namespace mush {
     struct radeonConfig {
-        /*
+        
         void defaults() {
-            
-        }
-         */
-        
-        int width = 1280;
-        int height = 720;
 
-		bool share_opencl = true;
+			width = 1280;
+			height = 720;
+
+			share_opencl = true;
+
+			path = "bmw";
+			model_name = "i8.obj";
+
+			shadow_rays = 1;
+			ao_rays = 1;
+			ao_enabled = false;
+			progressive_enabled = false;
+			num_bounces = 5;
+			num_samples = -1;
+
+			ao_radius = 1.f;
+
+			camera_position = { 0.f, 1.f, 4.f };
+
+			camera_sensor_size = { 0.036f, 0.024f };  // default full frame sensor 36x24 mm
+			camera_zcap = { 0.0f, 100000.f };
+			camera_focal_length = 0.035f; // 35mm lens
+			camera_focus_distance = 0.f;
+			camera_aperture = 0.f;
+        }
+         
         
-        char const * path = "bmw";
-        char const * model_name = "i8.obj";
+        int width;
+        int height;
+
+		bool share_opencl;
         
-        int shadow_rays = 1;
-        int ao_rays = 1;
-        int ao_enabled = false;
-        int progressive_enabled = false;
-        int num_bounces = 5;
-        int num_samples = -1;
+        char const * path;
+        char const * model_name;
         
-        float ao_radius = 1.f;
+        int shadow_rays;
+        int ao_rays;
+        int ao_enabled;
+        int progressive_enabled;
+        int num_bounces;
+        int num_samples;
         
-        cl_float3 camera_position = {0.f, 1.f, 4.f};
+        float ao_radius;
         
-        cl_float2 camera_sensor_size = {0.036f, 0.024f};  // default full frame sensor 36x24 mm
-        cl_float2 camera_zcap = {0.0f, 100000.f};
-        float camera_focal_length = 0.035f; // 35mm lens
-        float camera_focus_distance = 0.f;
-        float camera_aperture = 0.f;
+        cl_float3 camera_position;
+        
+        cl_float2 camera_sensor_size;  // default full frame sensor 36x24 mm
+        cl_float2 camera_zcap;
+        float camera_focal_length; // 35mm lens
+        float camera_focus_distance;
+        float camera_aperture;
         
     };
 }

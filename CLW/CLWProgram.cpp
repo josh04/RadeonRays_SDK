@@ -235,7 +235,7 @@ CLWProgram CLWProgram::CreateFromFile(char const* filename,
         for (int i = 0; i < numheaders; ++i)
         {
             std::vector<char> headersource;
-            load_file_contents(_get_resource_path3(headernames[i]), headersource, false);
+            load_file_contents(_get_resource_path(headernames[i]), headersource, false);
             headerssizes.push_back(headersource.size());
             headers.push_back(std::move(headersource));
             headerstrs.push_back(&headers[i][0]);
