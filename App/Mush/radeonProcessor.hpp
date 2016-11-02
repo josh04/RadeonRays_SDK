@@ -13,6 +13,7 @@
 #include <Mush Core/imageProcessor.hpp>
 #include <Mush Core/quitEventHandler.hpp>
 
+#include "radeonConfig.hpp"
 #include "mush-radeon-dll.hpp"
 
 class radeonProcess;
@@ -24,7 +25,7 @@ namespace mush {
 
 class RADEONEXPORTS_API radeonProcessor : public mush::imageProcessor {
 public:
-    radeonProcessor(unsigned int width, unsigned int height);
+    radeonProcessor(mush::radeonConfig config);
     ~radeonProcessor();
     
     void init(std::shared_ptr<mush::opencl> context, const std::initializer_list<std::shared_ptr<mush::ringBuffer>>& buffers) override;
