@@ -41,6 +41,8 @@
 		9EC0F7E51DABE2AB00DBE0A8 /* bmw in CopyFiles */ = {isa = PBXBuildFile; fileRef = 9EC0F7E21DABE2AB00DBE0A8 /* bmw */; };
 		9EC0F7E61DABE2AB00DBE0A8 /* CornellBox in CopyFiles */ = {isa = PBXBuildFile; fileRef = 9EC0F7E31DABE2AB00DBE0A8 /* CornellBox */; };
 		9EC0F7E71DABE2AB00DBE0A8 /* Textures in CopyFiles */ = {isa = PBXBuildFile; fileRef = 9EC0F7E41DABE2AB00DBE0A8 /* Textures */; };
+		9EE3DAB81DCA457E000AD800 /* radeonConfig.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 9EE3DAB71DC9EF8F000AD800 /* radeonConfig.hpp */; settings = {ATTRIBUTES = (Public, ); }; };
+		9EE3DABA1DCA4602000AD800 /* mush-radeon-dll.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 9EE3DAB91DCA4602000AD800 /* mush-radeon-dll.hpp */; settings = {ATTRIBUTES = (Public, ); }; };
 		B0A08FD08423080069EF3B8AF545AC009049A61AB0C5800 /* shproject.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9FE2F9D4B266E800CDB117C6DAA1A000B0E04B93C23D3000 /* shproject.cpp */; };
 		B908E623E1F54800821DDD3C63C4F809619F7954A298000 /* ptrenderer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 18CD8766E5456C00F1D403EC16296000FF73B9BB29419800 /* ptrenderer.cpp */; };
 		C54C38DBB68AC000334AB5E30D182C00EC99B774E5914000 /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 956E2449E21F50006CEFA940E59024005BE2FBB166FCC800 /* main.cpp */; };
@@ -173,6 +175,8 @@
 		9EC0F7E21DABE2AB00DBE0A8 /* bmw */ = {isa = PBXFileReference; lastKnownFileType = folder; name = bmw; path = ../Resources/bmw; sourceTree = "<group>"; };
 		9EC0F7E31DABE2AB00DBE0A8 /* CornellBox */ = {isa = PBXFileReference; lastKnownFileType = folder; name = CornellBox; path = ../Resources/CornellBox; sourceTree = "<group>"; };
 		9EC0F7E41DABE2AB00DBE0A8 /* Textures */ = {isa = PBXFileReference; lastKnownFileType = folder; name = Textures; path = ../Resources/Textures; sourceTree = "<group>"; };
+		9EE3DAB71DC9EF8F000AD800 /* radeonConfig.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; name = radeonConfig.hpp; path = Mush/radeonConfig.hpp; sourceTree = "<group>"; };
+		9EE3DAB91DCA4602000AD800 /* mush-radeon-dll.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = "mush-radeon-dll.hpp"; path = "Mush/mush-radeon-dll.hpp"; sourceTree = "<group>"; };
 		9FE2F9D4B266E800CDB117C6DAA1A000B0E04B93C23D3000 /* shproject.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = shproject.cpp; sourceTree = "<group>"; };
 		A0FB3A04C32078005E7F0F430B916000EFBF83AC50303000 /* clwscene.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = clwscene.h; path = CLW/clwscene.h; sourceTree = "<group>"; };
 		A21AA312A91800BE25EFE15B1A00004F66644A9FB8D000 /* scene.cpp */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.objcpp; name = scene.cpp; path = Scene/scene.cpp; sourceTree = "<group>"; };
@@ -254,9 +258,11 @@
 			children = (
 				9EC0F79A1DA99D9900DBE0A8 /* radeonProcessor.cpp */,
 				9EC0F79B1DA99D9900DBE0A8 /* radeonProcessor.hpp */,
+				9EE3DAB91DCA4602000AD800 /* mush-radeon-dll.hpp */,
 				9EC0F7A21DA9B34300DBE0A8 /* radeonProcess.cpp */,
 				9EC0F7A31DA9B34300DBE0A8 /* radeonProcess.hpp */,
 				9E8375BA1DAD349A00C8AB5C /* radeonEventHandler.hpp */,
+				9EE3DAB71DC9EF8F000AD800 /* radeonConfig.hpp */,
 			);
 			name = Mush;
 			sourceTree = "<group>";
@@ -426,6 +432,8 @@
 			files = (
 				9EC0F7851DA81C6E00DBE0A8 /* api.hpp in Headers */,
 				9EC0F7B81DAAA0B300DBE0A8 /* radeonProcessor.hpp in Headers */,
+				9EE3DABA1DCA4602000AD800 /* mush-radeon-dll.hpp in Headers */,
+				9EE3DAB81DCA457E000AD800 /* radeonConfig.hpp in Headers */,
 				9EC0F7B91DAAA0B400DBE0A8 /* radeonProcess.hpp in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

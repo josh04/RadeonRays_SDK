@@ -40,6 +40,10 @@ namespace mush {
 			camera_focal_length = 0.035f; // 35mm lens
 			camera_focus_distance = 0.f;
 			camera_aperture = 0.f;
+            
+            environment_map_mult = 1.0f;
+            environment_map_path = "Textures";
+            environment_map_name = "studio015.hdr";
         }
          
         
@@ -67,6 +71,10 @@ namespace mush {
         float camera_focal_length; // 35mm lens
         float camera_focus_distance;
         float camera_aperture;
+        
+        float environment_map_mult;
+        const char * environment_map_path;
+        const char * environment_map_name;
         
     };
 }

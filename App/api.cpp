@@ -90,6 +90,10 @@ int g_num_samples = -1;
 int g_samplecount = 0;
 float g_ao_radius = 1.f;
 float g_envmapmul = 1.f;
+
+const char * g_environment_map_path = "Textures";
+const char * g_environment_map_name = "studio015.hdr";
+
 float g_cspeed = 100.25f;
 
 float3 g_camera_pos = float3(0.f, 1.f, 4.f);
@@ -168,6 +172,10 @@ void setup(const mush::radeonConfig& config) {
 	g_camera_focal_length = config.camera_focal_length;
 	g_camera_focus_distance = config.camera_focus_distance;
 	g_camera_aperture = config.camera_aperture;
+    
+    g_envmapmul = config.environment_map_mult;
+    g_environment_map_name = config.environment_map_name;
+    g_environment_map_path = config.environment_map_path;
 }
 
 void init_cl(bool share_opencl, cl_context c, cl_device_id d, cl_command_queue q) {
@@ -317,7 +325,7 @@ void InitData()
     strm << "AMD: Sensor size: " << g_camera_sensor_size.x * 1000.f << "x" << g_camera_sensor_size.y * 1000.f << "mm\n";
     putLog(strm.str());
     
-    g_scene->SetEnvironment("../Resources/Textures/studio015.hdr", "", g_envmapmul);
+    g_scene->SetEnvironment(g_environment_map_name, g_environment_map_path, g_envmapmul);
     
 #pragma omp parallel for
     for (int i = 0; i < g_cfgs.size(); ++i)
