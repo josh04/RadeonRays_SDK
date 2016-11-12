@@ -159,6 +159,7 @@
 		9A78D5263D1490006206DA5A6F0DDC00E2F7FC41E8ED1800 /* tiny_obj_loader.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = tiny_obj_loader.h; sourceTree = "<group>"; };
 		9E3358B695BF20007739D53BC6A3140084D98B0AD9BB4800 /* volumetrics.cl */ = {isa = PBXFileReference; lastKnownFileType = text; name = volumetrics.cl; path = CL/volumetrics.cl; sourceTree = "<group>"; };
 		9E8375BA1DAD349A00C8AB5C /* radeonEventHandler.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; name = radeonEventHandler.hpp; path = Mush/radeonEventHandler.hpp; sourceTree = "<group>"; };
+		9EA610D21DD69A7600192E8F /* radeonDepthProcess.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; name = radeonDepthProcess.hpp; path = Mush/radeonDepthProcess.hpp; sourceTree = "<group>"; };
 		9EC0F77A1DA81C4900DBE0A8 /* RadeonRays.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = RadeonRays.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		9EC0F77C1DA81C4900DBE0A8 /* RadeonRays.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = RadeonRays.h; sourceTree = "<group>"; };
 		9EC0F77E1DA81C4900DBE0A8 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -263,6 +264,7 @@
 				9EC0F7A31DA9B34300DBE0A8 /* radeonProcess.hpp */,
 				9E8375BA1DAD349A00C8AB5C /* radeonEventHandler.hpp */,
 				9EE3DAB71DC9EF8F000AD800 /* radeonConfig.hpp */,
+				9EA610D21DD69A7600192E8F /* radeonDepthProcess.hpp */,
 			);
 			name = Mush;
 			sourceTree = "<group>";

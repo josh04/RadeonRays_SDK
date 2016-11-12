@@ -30256,7 +30256,9 @@ static const char g_integrator_pt_opencl[]= \
 "    // Indirect rays \n"\
 "    __global ray* indirectrays, \n"\
 "    // Radiance \n"\
-"    __global float3* output \n"\
+"    __global float3* output, \n"\
+"    // Output Normals \n"\
+"    __global float4* output_normals \n"\
 ") \n"\
 "{ \n"\
 "    int globalid = get_global_id(0); \n"\
@@ -30493,6 +30495,8 @@ static const char g_integrator_pt_opencl[]= \
 " \n"\
 "        bxdfwo = normalize(bxdfwo); \n"\
 "        float3 t = bxdf * fabs(dot(diffgeo.n, bxdfwo)) * bxdfweight; \n"\
+" \n"\
+"        if (bounce == 0) { output_normals[globalid] += (float4)(diffgeo.n.x, diffgeo.n.y, diffgeo.n.z, 1.0f); }\n"\
 " \n"\
 "        // Only continue if we have non-zero throughput & pdf \n"\
 "        if (NON_BLACK(t) && bxdfpdf > 0.f && !rr_stop) \n"\
@@ -30747,6 +30751,23 @@ static const char g_integrator_pt_opencl[]= \
 "} \n"\
 " \n"\
 " \n"\
+"// JOSH \n"\
+"__kernel void CaptureDepths( \n"\
+"    __global Intersection const* intersections, \n"\
+"    __global int const* numhits, \n"\
+"    __global float* dstdata \n"\
+") \n"\
+"{ \n"\
+"    int gid = get_global_id(0); \n"\
+" \n"\
+"    if (gid < *numhits) \n"\
+"    { \n"\
+"        Intersection v = intersections[gid]; \n"\
+"        dstdata[gid] += v.uvwt.w; \n"\
+"    } \n"\
+"} \n"\
+" \n"\
+
 "// Copy data to interop texture if supported \n"\
 "__kernel void AccumulateData( \n"\
 "    __global float4 const* srcdata, \n"\
@@ -30834,6 +30855,26 @@ static const char g_integrator_pt_opencl[]= \
 "//} \n"\
 " \n"\
 " \n"\
+"// Copy data to interop texture if supported \n"\
+"__kernel void CopyDepth( \n"\
+"    __global float const* data, \n"\
+"    int imgwidth, \n"\
+"    int imgheight, \n"\
+"    write_only image2d_t img \n"\
+") \n"\
+"{ \n"\
+"    int gid = get_global_id(0); \n"\
+" \n"\
+"    int gidx = gid % imgwidth; \n"\
+"    int gidy = gid / imgwidth; \n"\
+" \n"\
+"    if (gidx < imgwidth && gidy < imgheight) \n"\
+"    { \n"\
+"        float v = data[gid]; \n"\
+"//        float4 val = clamp(native_powr(v / v.w, 1.f / gamma), 0.f, 1.f); \n"\
+"        write_imagef(img, make_int2(gidx, gidy), (float4)(v, v, v, 1.0f)); \n"\
+"    } \n"\
+"} \n"\
 "// Copy data to interop texture if supported \n"\
 "__kernel void ApplyGammaAndCopyData( \n"\
 "    __global float4 const* data, \n"\

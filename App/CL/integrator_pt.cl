@@ -284,7 +284,9 @@ __kernel void ShadeSurface(
     // Indirect rays
     __global ray* indirectrays,
     // Radiance
-    __global float3* output
+    __global float3* output,
+    // Output Normals
+    __global float4* output_normals
 )
 {
     int globalid = get_global_id(0);
@@ -521,6 +523,8 @@ __kernel void ShadeSurface(
 
         bxdfwo = normalize(bxdfwo);
         float3 t = bxdf * fabs(dot(diffgeo.n, bxdfwo)) * bxdfweight;
+        
+        if (bounce == 0) { output_normals[globalid] += diffgeo.n; }
 
         // Only continue if we have non-zero throughput & pdf
         if (NON_BLACK(t) && bxdfpdf > 0.f && !rr_stop)
@@ -774,6 +778,22 @@ __kernel void ShadeBackground(
     }
 }
 
+// JOSH
+__kernel void CaptureDepths(
+                            __global Intersection const* intersections,
+                            __global int const* numhits,
+                             __global float* dstdata
+                             )
+{
+    int gid = get_global_id(0);
+    
+    if (gid < *numhits)
+    {
+        Intersection v = intersections[gid];
+        
+        dstdata[gid] += v.uvwt.w;
+    }
+}
 
 // Copy data to interop texture if supported
 __kernel void AccumulateData(

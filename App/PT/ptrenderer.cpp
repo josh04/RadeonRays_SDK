@@ -77,7 +77,7 @@ namespace Baikal
         CLWBuffer<QmcSampler> samplers;
         CLWBuffer<unsigned int> sobolmat;
         CLWBuffer<int> hitcount;
-
+        
         CLWProgram program;
         CLWParallelPrimitives pp;
 
@@ -185,6 +185,10 @@ namespace Baikal
             api->QueryIntersection(m_render_data->fr_rays[pass & 0x1], m_render_data->fr_hitcount, maxrays, m_render_data->fr_intersections, nullptr, nullptr);
             //e->Wait();
             //m_api->DeleteEvent(e);
+            
+            if (pass == 0) {
+                CaptureDepths();
+            }
 
             // Apply scattering
             EvaluateVolume(clwscene, pass);
@@ -373,6 +377,7 @@ namespace Baikal
         shadekernel.SetArg(argc++, m_render_data->paths);
         shadekernel.SetArg(argc++, m_render_data->rays[(pass + 1) & 0x1]);
         shadekernel.SetArg(argc++, m_output->data());
+        shadekernel.SetArg(argc++, m_output->normals_data());
 
         // Run shading kernel
         {
@@ -548,7 +553,13 @@ namespace Baikal
     {
         return m_render_data->program.GetKernel("ApplyGammaAndCopyData");
     }
-
+    
+    // JOSH
+    CLWKernel PtRenderer::GetDepthCopyKernel()
+    {
+        return m_render_data->program.GetKernel("CopyDepth");
+    }
+    
     CLWKernel PtRenderer::GetAccumulateKernel()
     {
         return m_render_data->program.GetKernel("AccumulateData");
@@ -584,7 +595,28 @@ namespace Baikal
         }
 
     }
-
+    
+    // JOSH
+    void PtRenderer::CaptureDepths() {
+        // Fetch kernel
+        CLWKernel depthkernel = m_render_data->program.GetKernel("CaptureDepths");
+        
+        //int numrays = m_output->width() * m_output->height();
+        
+        // Set kernel parameters
+        int argc = 0;
+        depthkernel.SetArg(argc++, m_render_data->intersections);
+        depthkernel.SetArg(argc++, m_render_data->hitcount);
+        depthkernel.SetArg(argc++, m_output->depth_data());
+        
+        // Run shading kernel
+        {
+            int globalsize = m_output->width() * m_output->height();
+            m_context.Launch1D(0, ((globalsize + 63) / 64) * 64, 64, depthkernel);
+        }
+        
+    }
+    
     void PtRenderer::RunBenchmark(Scene const& scene, std::uint32_t num_passes, BenchmarkStats& stats)
     {
         stats.num_passes = num_passes;

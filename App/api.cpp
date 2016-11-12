@@ -120,6 +120,9 @@ struct OutputData
 {
     Baikal::ClwOutput* output;
     std::vector<float3> fdata;
+    // JOSH
+    std::vector<float> depth_data;
+    std::vector<float3> normals_data;
     std::vector<unsigned char> udata;
     CLWBuffer<float3> copybuffer;
 };
@@ -223,8 +226,15 @@ void init_cl(bool share_opencl, cl_context c, cl_device_id d, cl_command_queue q
         g_ctrl[i].newdata.store(0);
         g_ctrl[i].idx = i;
     }
+    if (share_opencl)
+    {
+        putLog("AMD: OpenGL interop mode enabled.");
+    }
+    else
+    {
+        putLog("AMD: OpenGL interop mode disabled.");
+    }
     
-    putLog("AMD: OpenGL interop mode disabled.");
 }
 /*
 void InitCl()
@@ -338,6 +348,9 @@ void InitData()
         g_cfgs[i].renderer->SetOutput(g_outputs[i].output);
         
         g_outputs[i].fdata.resize(g_window_width * g_window_height);
+        // JOSH
+        g_outputs[i].depth_data.resize(g_window_width * g_window_height);
+        g_outputs[i].normals_data.resize(g_window_width * g_window_height);
         g_outputs[i].udata.resize(g_window_width * g_window_height * 4);
         
         if (g_cfgs[i].type == ConfigManager::kPrimary)
@@ -422,7 +435,7 @@ void launch_threads() {
     StartRenderThreads();
 }
 
-float * update(bool share_opencl, bool update, cl_mem load_image) {
+update_return_type update(bool share_opencl, bool update, cl_mem load_image, cl_mem depth_image, cl_mem normals_image) {
     
     if (update)
     {
@@ -492,11 +505,37 @@ float * update(bool share_opencl, bool update, cl_mem load_image) {
         int globalsize = g_outputs[g_primary].output->width() * g_outputs[g_primary].output->height();
         g_cfgs[g_primary].context.Launch1D(0, ((globalsize + 63) / 64) * 64, 64, copykernel);
         
+        argc = 0;
+        copykernel.SetArg(argc++, g_outputs[g_primary].output->normals_data());
+        copykernel.SetArg(argc++, g_outputs[g_primary].output->width());
+        copykernel.SetArg(argc++, g_outputs[g_primary].output->height());
+        copykernel.SetArg(argc++, 1.0f);
+        
+        auto err3 = clSetKernelArg(copykernel, argc++, sizeof(cl_mem), &normals_image);
+        
+        //copykernel.SetArg(argc++, load_image);
+        
+        g_cfgs[g_primary].context.Launch1D(0, ((globalsize + 63) / 64) * 64, 64, copykernel);
+        
         //g_cfgs[g_primary].context.ReleaseGLObjects(0, objects);
+        
+        CLWKernel depthcopykernel = g_cfgs[g_primary].renderer->GetDepthCopyKernel();
+        
+        argc = 0;
+        depthcopykernel.SetArg(argc++, g_outputs[g_primary].output->depth_data());
+        depthcopykernel.SetArg(argc++, g_outputs[g_primary].output->width());
+        depthcopykernel.SetArg(argc++, g_outputs[g_primary].output->height());
+        
+        auto err2 = clSetKernelArg(depthcopykernel, argc++, sizeof(cl_mem), &depth_image);
+        
+        g_cfgs[g_primary].context.Launch1D(0, ((globalsize + 63) / 64) * 64, 64, depthcopykernel);
+        
         g_cfgs[g_primary].context.Finish(0);
     } else {
         
         g_outputs[g_primary].output->GetData(&g_outputs[g_primary].fdata[0]);
+        g_outputs[g_primary].output->GetDepthData(&g_outputs[g_primary].depth_data[0]);
+        g_outputs[g_primary].output->GetNormalsData(&g_outputs[g_primary].normals_data[0]);
         /*
         float gamma = 2.2f;
         for (int i = 0; i < (int)g_outputs[g_primary].fdata.size(); ++i)
@@ -508,7 +547,7 @@ float * update(bool share_opencl, bool update, cl_mem load_image) {
         }
         */
     }
-    return (float *)g_outputs[g_primary].fdata.data();
+    return { (float *)g_outputs[g_primary].fdata.data(), g_outputs[g_primary].depth_data.data(),  (float *)g_outputs[g_primary].normals_data.data()  };
     
 }
 

@@ -34,6 +34,12 @@ void radeonProcess::init(std::shared_ptr<mush::opencl> context, const std::initi
     //float_image = context->floatImage(_width, _height);
     
     _divide = context->getKernel("amd_divide");
+    _depth_to_image = context->getKernel("parDepthToImageNoSamples");
+
+    
+    depth_image = context->floatImage(_width, _height);
+    normals_image = context->floatImage(_width, _height);
+    depth_buffer = context->buffer(_width * _height * sizeof(float));
     
     addItem(context->floatImage(_width, _height));
     queue = context->getQueue();
@@ -51,7 +57,10 @@ void radeonProcess::process() {
     
     inLock();
     
-    auto ptr = update(_share_opencl, up, (*_getImageMem(0))());
+    auto update_return = update(_share_opencl, up, (*_getImageMem(0))(), (*depth_image)(), (*normals_image)());
+    auto ptr = update_return.image;
+    auto depth_ptr = update_return.depth;
+    auto normals_ptr = update_return.normals;
     
     if (!_share_opencl) {
         cl::Event event;
@@ -64,6 +73,25 @@ void radeonProcess::process() {
         
         _divide->setArg(0, *_getImageMem(0));
         _divide->setArg(1, *_getImageMem(0));
+        queue->enqueueNDRangeKernel(*_divide, cl::NullRange, cl::NDRange(_width, _height), cl::NullRange, NULL, &event);
+        event.wait();
+        
+        queue->enqueueWriteBuffer(*depth_buffer, CL_TRUE, 0, _width*_height*sizeof(float), depth_ptr, NULL, &event);
+        event.wait();
+        
+        _depth_to_image->setArg(0, *depth_buffer);
+        _depth_to_image->setArg(1, *depth_image);
+        queue->enqueueNDRangeKernel(*_depth_to_image, cl::NullRange, cl::NDRange(_width, _height), cl::NullRange, NULL, &event);
+        event.wait();
+        
+        //queue->enqueueWriteImage(*depth_image, CL_TRUE, origin, region, 0, 0, depth_ptr, NULL, &event);
+        //event.wait();
+        
+        queue->enqueueWriteImage(*normals_image, CL_TRUE, origin, region, 0, 0, normals_ptr, NULL, &event);
+        event.wait();
+        
+        _divide->setArg(0, *normals_image);
+        _divide->setArg(1, *normals_image);
         queue->enqueueNDRangeKernel(*_divide, cl::NullRange, cl::NDRange(_width, _height), cl::NullRange, NULL, &event);
         event.wait();
         

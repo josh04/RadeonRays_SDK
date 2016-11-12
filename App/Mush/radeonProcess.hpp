@@ -23,9 +23,21 @@ public:
     void process();
     
     void release() override;
+    
+    cl::Image2D * get_depth_image() const {
+        return depth_image;
+    }
+    
+    cl::Image2D * get_normals_image() const {
+        return normals_image;
+    }
 private:
     cl::Image2D * float_image = nullptr;
+    cl::Image2D * depth_image = nullptr;
+    cl::Image2D * normals_image = nullptr;
+    cl::Buffer * depth_buffer = nullptr;
     cl::Kernel * _divide = nullptr;
+    cl::Kernel * _depth_to_image = nullptr;
     
     bool call_once = false;
     

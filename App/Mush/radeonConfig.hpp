@@ -19,7 +19,7 @@ namespace mush {
 			width = 1280;
 			height = 720;
 
-			share_opencl = true;
+			share_opencl = false;
 
 			path = "bmw";
 			model_name = "i8.obj";
