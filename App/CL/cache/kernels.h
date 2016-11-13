@@ -30755,7 +30755,8 @@ static const char g_integrator_pt_opencl[]= \
 "__kernel void CaptureDepths( \n"\
 "    __global Intersection const* intersections, \n"\
 "    __global int const* numhits, \n"\
-"    __global float* dstdata \n"\
+"    __global float* dstdata, \n"\
+"    int count \n"\
 ") \n"\
 "{ \n"\
 "    int gid = get_global_id(0); \n"\
@@ -30763,7 +30764,9 @@ static const char g_integrator_pt_opencl[]= \
 "    if (gid < *numhits) \n"\
 "    { \n"\
 "        Intersection v = intersections[gid]; \n"\
-"        dstdata[gid] += v.uvwt.w; \n"\
+"        float n = dstdata[gid]; \n"\
+"        n = n * (count - 1); \n"\
+"        dstdata[gid] = (n + v.uvwt.w) / count; \n"\
 "    } \n"\
 "} \n"\
 " \n"\

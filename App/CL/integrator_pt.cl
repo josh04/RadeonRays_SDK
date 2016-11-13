@@ -782,7 +782,8 @@ __kernel void ShadeBackground(
 __kernel void CaptureDepths(
                             __global Intersection const* intersections,
                             __global int const* numhits,
-                             __global float* dstdata
+                             __global float* dstdata,
+                            int count;
                              )
 {
     int gid = get_global_id(0);
@@ -790,8 +791,9 @@ __kernel void CaptureDepths(
     if (gid < *numhits)
     {
         Intersection v = intersections[gid];
-        
-        dstdata[gid] += v.uvwt.w;
+        float n = dstdata[gid];
+        n = n * (count - 1);
+        dstdata[gid] = (n + v.uvwt.w) / count;
     }
 }
 

@@ -603,11 +603,14 @@ namespace Baikal
         
         //int numrays = m_output->width() * m_output->height();
         
+        m_output->increment_depth_count();
+        
         // Set kernel parameters
         int argc = 0;
         depthkernel.SetArg(argc++, m_render_data->intersections);
         depthkernel.SetArg(argc++, m_render_data->hitcount);
         depthkernel.SetArg(argc++, m_output->depth_data());
+        depthkernel.SetArg(argc++, m_output->get_depth_count());
         
         // Run shading kernel
         {
