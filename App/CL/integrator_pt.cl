@@ -883,6 +883,25 @@ __kernel void AccumulateData(
 //#undef FILTER_RADIUS
 //}
 
+// Copy data to interop texture if supported
+__kernel void CopyDepth(
+    __global float4 const* data,
+    int imgwidth,
+    int imgheight,
+    write_only image2d_t img
+)
+{
+    int gid = get_global_id(0);
+
+    int gidx = gid % imgwidth;
+    int gidy = gid / imgwidth;
+
+    if (gidx < imgwidth && gidy < imgheight)
+    {
+        float4 v = data[gid];
+        write_imagef(img, make_int2(gidx, gidy), (float4)(v, v, v, 1.0f));
+    }
+}
 
 // Copy data to interop texture if supported
 __kernel void ApplyGammaAndCopyData(
