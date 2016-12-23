@@ -56,7 +56,7 @@ public:
     }
     
 private:
-    std::shared_ptr<radeonProcess> _rad = nullptr;
+    mush::registerContainer<radeonProcess> _rad;
     
     bool _flip;
     

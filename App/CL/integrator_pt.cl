@@ -360,6 +360,8 @@ __kernel void ShadeSurface(
         DifferentialGeometry diffgeo;
         FillDifferentialGeometry(&scene, &isect, &diffgeo);
 
+		if (bounce == 0) { output_normals[globalid] += (float4)(diffgeo.n.x, diffgeo.n.y, diffgeo.n.z, 0.0f); }
+
         // Check if we are hitting from the inside
         float ndotwi = dot(diffgeo.n, wi);
         int twosided = diffgeo.mat.twosided;
@@ -523,8 +525,6 @@ __kernel void ShadeSurface(
 
         bxdfwo = normalize(bxdfwo);
         float3 t = bxdf * fabs(dot(diffgeo.n, bxdfwo)) * bxdfweight;
-        
-        if (bounce == 0) { output_normals[globalid] += (float4)(diffgeo.n, 1.0f); }
 
         // Only continue if we have non-zero throughput & pdf
         if (NON_BLACK(t) && bxdfpdf > 0.f && !rr_stop)
