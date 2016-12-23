@@ -30331,6 +30331,8 @@ static const char g_integrator_pt_opencl[]= \
 "        // Fill surface data \n"\
 "        DifferentialGeometry diffgeo; \n"\
 "        FillDifferentialGeometry(&scene, &isect, &diffgeo); \n"\
+"        if (bounce == 0) { output_normals[globalid] += (float4)(diffgeo.n.x, diffgeo.n.y, diffgeo.n.z, 0.0f); }\n"\
+" \n"\
 " \n"\
 "        // Check if we are hitting from the inside \n"\
 "        float ndotwi = dot(diffgeo.n, wi); \n"\
@@ -30495,8 +30497,6 @@ static const char g_integrator_pt_opencl[]= \
 " \n"\
 "        bxdfwo = normalize(bxdfwo); \n"\
 "        float3 t = bxdf * fabs(dot(diffgeo.n, bxdfwo)) * bxdfweight; \n"\
-" \n"\
-"        if (bounce == 0) { output_normals[globalid] += (float4)(diffgeo.n.x, diffgeo.n.y, diffgeo.n.z, 1.0f); }\n"\
 " \n"\
 "        // Only continue if we have non-zero throughput & pdf \n"\
 "        if (NON_BLACK(t) && bxdfpdf > 0.f && !rr_stop) \n"\

@@ -42,6 +42,11 @@ PerspectiveCamera::PerspectiveCamera(float3 const& eye, float3 const& at, float3
     m_forward = normalize(at - eye);
     m_right   = cross(m_forward, normalize(up));
     m_up      = cross(m_right, m_forward);
+
+	pre_oculus_m_forward = m_forward;
+	pre_oculus_m_right = m_right;
+	pre_oculus_m_up = m_up;
+	pre_oculus_m_p = m_p;
 }
 
 // Rotate camera around world Z axis, use for FPS camera
@@ -157,4 +162,28 @@ void PerspectiveCamera::ArcballRotateVertically(float3 c, float angle)
     dir = rotate_vector(dir, rotation_quaternion(m_right, angle));
 
     m_p = c - dir;
+}
+void PerspectiveCamera::ApplyOculusTransform(RadeonRays::matrix mat, RadeonRays::float3 loc) {
+	pre_oculus_m_forward = m_forward;
+	pre_oculus_m_right = m_right;
+	pre_oculus_m_up = m_up;
+	pre_oculus_m_p = m_p;
+
+	m_forward = mat * m_forward;
+	m_right = mat * m_right;
+	m_up = mat * m_up;
+	m_p = m_p + loc;
+}
+
+void PerspectiveCamera::RemoveOculusTransform() {
+	m_forward = pre_oculus_m_forward;
+	m_right = pre_oculus_m_right;
+	m_up = pre_oculus_m_up;
+	m_p = pre_oculus_m_p;
+}
+
+// Move along camera Y direction
+void PerspectiveCamera::MoveWorldUp(float distance)
+{
+	m_p += distance * float3(0, 1, 0);
 }

@@ -21,6 +21,7 @@ class radeonDepthProcess;
 class radeonEventHandler;
 
 namespace mush {
+	class imageProcess;
     class timerWrapper;
 }
 
