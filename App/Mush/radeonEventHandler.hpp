@@ -167,7 +167,7 @@ class radeonEventHandler : public azure::Eventable {
             }
             
             //float g_cspeed = 100.25f;
-            const float kMovementSpeed = 10.25f;;
+            const float kMovementSpeed = 50.25f;;
             if (_up_pressed)
             {
                 g_scene->camera_->MoveForward((float)dt.count() * kMovementSpeed);
