@@ -217,6 +217,7 @@ namespace Baikal
             std::vector<std::unique_ptr<char[]>> texturedata_;
             // Camera
             std::unique_ptr<PerspectiveCamera> camera_;
+			int camera_type_;
             // Environment texture index
             int envidx_;
             // Environment low-res texture index
