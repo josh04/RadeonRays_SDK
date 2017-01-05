@@ -10,6 +10,7 @@
 #define radeonDepthProcess_h
 
 #include <Mush Core/imageProcess.hpp>
+#include <Mush Core/registerContainer.hpp>
 
 #include "radeonProcess.hpp"
 
@@ -56,7 +57,7 @@ public:
     }
     
 private:
-    std::shared_ptr<radeonProcess> _rad = nullptr;
+    mush::registerContainer<radeonProcess> _rad;
     
     bool _flip;
     

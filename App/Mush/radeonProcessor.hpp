@@ -12,6 +12,7 @@
 #include <memory>
 #include <Mush Core/imageProcessor.hpp>
 #include <Mush Core/quitEventHandler.hpp>
+#include <Mush Core/timerWrapper.hpp>
 
 #include "radeonConfig.hpp"
 #include "mush-radeon-dll.hpp"
@@ -22,6 +23,7 @@ class radeonEventHandler;
 
 namespace mush {
     class timerWrapper;
+    class imageProcessor;
 }
 
 class RADEONEXPORTS_API radeonProcessor : public mush::imageProcessor {

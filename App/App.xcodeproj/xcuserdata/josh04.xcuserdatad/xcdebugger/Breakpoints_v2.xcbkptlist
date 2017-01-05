@@ -16,7 +16,39 @@
             startingLineNumber = "51"
             endingLineNumber = "51"
             landmarkName = "LoadFileContents(std::string const&amp; name, std::vector&lt;char&gt;&amp; contents, bool binary = false)"
-            landmarkType = "7">
+            landmarkType = "9">
+            <Locations>
+               <Location
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "LoadFileContents(std::__1::basic_string&lt;char, std::__1::char_traits&lt;char&gt;, std::__1::allocator&lt;char&gt; &gt; const&amp;, std::__1::vector&lt;char, std::__1::allocator&lt;char&gt; &gt;&amp;, bool)"
+                  moduleName = "RadeonLibrary"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/josh04/Development/RadeonRays_SDK/App/shader_manager.cpp"
+                  timestampString = "504320265.567452"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "51"
+                  endingLineNumber = "51"
+                  offsetFromSymbolStart = "1996">
+               </Location>
+               <Location
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "LoadFileContents(std::__1::basic_string&lt;char, std::__1::char_traits&lt;char&gt;, std::__1::allocator&lt;char&gt; &gt; const&amp;, std::__1::vector&lt;char, std::__1::allocator&lt;char&gt; &gt;&amp;, bool)"
+                  moduleName = "RadeonRays"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/josh04/Development/RadeonRays_SDK/App/shader_manager.cpp"
+                  timestampString = "504320265.619235"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "51"
+                  endingLineNumber = "51"
+                  offsetFromSymbolStart = "1996">
+               </Location>
+            </Locations>
          </BreakpointContent>
       </BreakpointProxy>
       <BreakpointProxy
@@ -39,10 +71,10 @@
                   ignoreCount = "0"
                   continueAfterRunningActions = "No"
                   symbolName = "load_file_contents(std::__1::basic_string&lt;char, std::__1::char_traits&lt;char&gt;, std::__1::allocator&lt;char&gt; &gt; const&amp;, std::__1::vector&lt;char, std::__1::allocator&lt;char&gt; &gt;&amp;, bool)"
-                  moduleName = "RadeonRays"
+                  moduleName = "RadeonLibrary"
                   usesParentBreakpointCondition = "Yes"
                   urlString = "file:///Users/josh04/Development/RadeonRays_SDK/CLW/CLWProgram.cpp"
-                  timestampString = "500693555.984878"
+                  timestampString = "504320265.571915"
                   startingColumnNumber = "9223372036854775807"
                   endingColumnNumber = "9223372036854775807"
                   startingLineNumber = "57"
@@ -57,7 +89,37 @@
                   moduleName = "libRadeonRays64D.dylib"
                   usesParentBreakpointCondition = "Yes"
                   urlString = "file:///Users/josh04/Development/RadeonRays_SDK/CLW/CLWProgram.cpp"
-                  timestampString = "500693556.007735"
+                  timestampString = "504320265.63707"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "57"
+                  endingLineNumber = "57"
+                  offsetFromSymbolStart = "1075">
+               </Location>
+               <Location
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "load_file_contents(std::__1::basic_string&lt;char, std::__1::char_traits&lt;char&gt;, std::__1::allocator&lt;char&gt; &gt; const&amp;, std::__1::vector&lt;char, std::__1::allocator&lt;char&gt; &gt;&amp;, bool)"
+                  moduleName = "RadeonRays"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/josh04/Development/RadeonRays_SDK/CLW/CLWProgram.cpp"
+                  timestampString = "504320265.625534"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "57"
+                  endingLineNumber = "57"
+                  offsetFromSymbolStart = "1075">
+               </Location>
+               <Location
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "load_file_contents(std::__1::basic_string&lt;char, std::__1::char_traits&lt;char&gt;, std::__1::allocator&lt;char&gt; &gt; const&amp;, std::__1::vector&lt;char, std::__1::allocator&lt;char&gt; &gt;&amp;, bool)"
+                  moduleName = "libRadeonRays64D.dylib"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/josh04/Development/RadeonRays_SDK/CLW/CLWProgram.cpp"
+                  timestampString = "504320265.54701"
                   startingColumnNumber = "9223372036854775807"
                   endingColumnNumber = "9223372036854775807"
                   startingLineNumber = "57"

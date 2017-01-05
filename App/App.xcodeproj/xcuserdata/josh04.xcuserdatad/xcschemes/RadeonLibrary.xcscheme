@@ -15,8 +15,8 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "9EC0F7791DA81C4900DBE0A8"
-               BuildableName = "RadeonRays.framework"
-               BlueprintName = "RadeonRays"
+               BuildableName = "RadeonLibrary.framework"
+               BlueprintName = "RadeonLibrary"
                ReferencedContainer = "container:App.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
@@ -75,8 +75,8 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "9EC0F7791DA81C4900DBE0A8"
-            BuildableName = "RadeonRays.framework"
-            BlueprintName = "RadeonRays"
+            BuildableName = "RadeonLibrary.framework"
+            BlueprintName = "RadeonLibrary"
             ReferencedContainer = "container:App.xcodeproj">
          </BuildableReference>
       </MacroExpansion>
@@ -97,8 +97,8 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "9EC0F7791DA81C4900DBE0A8"
-            BuildableName = "RadeonRays.framework"
-            BlueprintName = "RadeonRays"
+            BuildableName = "RadeonLibrary.framework"
+            BlueprintName = "RadeonLibrary"
             ReferencedContainer = "container:App.xcodeproj">
          </BuildableReference>
       </MacroExpansion>
@@ -115,8 +115,8 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "9EC0F7791DA81C4900DBE0A8"
-            BuildableName = "RadeonRays.framework"
-            BlueprintName = "RadeonRays"
+            BuildableName = "RadeonLibrary.framework"
+            BlueprintName = "RadeonLibrary"
             ReferencedContainer = "container:App.xcodeproj">
          </BuildableReference>
       </MacroExpansion>

@@ -36,13 +36,9 @@ void radeonProcessor::init(std::shared_ptr<mush::opencl> context, const std::ini
     
     _depth = std::make_shared<radeonDepthProcess>(_radeon->get_depth_image(), true);
     _depth->init(context, {_radeon});
-    _depth->null();
-    _radeon->addRepeat();
     
     _normals = std::make_shared<radeonDepthProcess>(_radeon->get_normals_image(), true);
     _normals->init(context, {_radeon});
-    _normals->null();
-    _radeon->addRepeat();
     
     _copy = std::make_shared<mush::singleKernelProcess>("flip_vertical");
     _copy->init(context, _radeon);

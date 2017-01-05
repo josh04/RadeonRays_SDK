@@ -169,9 +169,9 @@ void setup(const mush::radeonConfig& config) {
 	g_num_samples = config.num_samples;
 
 	g_ao_radius = config.ao_radius;
-	g_camera_pos = { config.camera_position.s0, config.camera_position.s1, config.camera_position.s2 };
-	g_camera_sensor_size = { config.camera_sensor_size.s0, config.camera_sensor_size.s1 };
-	g_camera_zcap = { config.camera_zcap.s0, config.camera_zcap.s1 };
+	g_camera_pos = { config.camera_position.s[0], config.camera_position.s[1], config.camera_position.s[2] };
+	g_camera_sensor_size = { config.camera_sensor_size.s[0], config.camera_sensor_size.s[1] };
+	g_camera_zcap = { config.camera_zcap.s[0], config.camera_zcap.s[1] };
 	g_camera_focal_length = config.camera_focal_length;
 	g_camera_focus_distance = config.camera_focus_distance;
 	g_camera_aperture = config.camera_aperture;
