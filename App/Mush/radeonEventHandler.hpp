@@ -13,7 +13,7 @@
 #include <azure/Eventable.hpp>
 #include <azure/Event.hpp>
 #include <azure/Eventkey.hpp>
-#include <glm/glm.hpp>
+#include <azure/glm/glm.hpp>
 
 #include "../Scene/scene.h"
 

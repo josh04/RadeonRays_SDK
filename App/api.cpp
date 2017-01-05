@@ -64,19 +64,6 @@
 
 using namespace RadeonRays;
 
-// Help message
-char const* kHelpMessage =
-"App [-p path_to_models][-f model_name][-b][-r][-ns number_of_shadow_rays][-ao ao_radius][-w window_width][-h window_height][-nb number_of_indirect_bounces]";
-//char const* g_path = "bmw";
-//char const* g_modelname = "i8.obj";
-
-//std::unique_ptr<ShaderManager>    g_shader_manager;
-
-//GLuint g_vertex_buffer;
-//GLuint g_index_buffer;
-//GLuint g_texture;
-
-
 char const* g_path = "bmw";
 char const* g_modelname = "i8.obj";
 int g_window_width = 1280;
