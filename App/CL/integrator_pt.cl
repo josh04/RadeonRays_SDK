@@ -360,6 +360,8 @@ __kernel void ShadeSurface(
         DifferentialGeometry diffgeo;
         FillDifferentialGeometry(&scene, &isect, &diffgeo);
 
+		if (bounce == 0) { output_normals[globalid] += (float4)(diffgeo.n.x, diffgeo.n.y, diffgeo.n.z, 0.0f); }
+
         // Check if we are hitting from the inside
         float ndotwi = dot(diffgeo.n, wi);
         int twosided = diffgeo.mat.twosided;
@@ -523,8 +525,6 @@ __kernel void ShadeSurface(
 
         bxdfwo = normalize(bxdfwo);
         float3 t = bxdf * fabs(dot(diffgeo.n, bxdfwo)) * bxdfweight;
-        
-        if (bounce == 0) { output_normals[globalid] += diffgeo.n; }
 
         // Only continue if we have non-zero throughput & pdf
         if (NON_BLACK(t) && bxdfpdf > 0.f && !rr_stop)
@@ -783,7 +783,7 @@ __kernel void CaptureDepths(
                             __global Intersection const* intersections,
                             __global int const* numhits,
                              __global float* dstdata,
-                            int count;
+                            int count
                              )
 {
     int gid = get_global_id(0);
@@ -885,7 +885,7 @@ __kernel void AccumulateData(
 
 // Copy data to interop texture if supported
 __kernel void CopyDepth(
-    __global float4 const* data,
+    __global float const* data,
     int imgwidth,
     int imgheight,
     write_only image2d_t img
@@ -898,7 +898,7 @@ __kernel void CopyDepth(
 
     if (gidx < imgwidth && gidy < imgheight)
     {
-        float4 v = data[gid];
+        float v = data[gid];
         write_imagef(img, make_int2(gidx, gidy), (float4)(v, v, v, 1.0f));
     }
 }

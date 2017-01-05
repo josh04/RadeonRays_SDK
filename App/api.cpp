@@ -145,6 +145,7 @@ int g_primary = -1;
 
 std::unique_ptr<Baikal::Scene> g_scene;
 
+mush::camera_type g_camera_type;
 
 static bool     g_is_left_pressed = false;
 static bool     g_is_right_pressed = false;
@@ -179,6 +180,8 @@ void setup(const mush::radeonConfig& config) {
     g_envmapmul = config.environment_map_mult;
     g_environment_map_name = config.environment_map_name;
     g_environment_map_path = config.environment_map_path;
+
+	g_camera_type = config.camera;
 }
 
 void init_cl(bool share_opencl, cl_context c, cl_device_id d, cl_command_queue q) {
@@ -320,6 +323,18 @@ void InitData()
     // Adjust sensor size based on current aspect ratio
     float aspect = (float)g_window_width / g_window_height;
     g_camera_sensor_size.y = g_camera_sensor_size.x / aspect;
+
+	switch (g_camera_type) {
+	case mush::camera_type::perspective:
+		g_scene->camera_type_ = (int)Baikal::CameraType::kDefault;
+			break;
+	case mush::camera_type::perspective_dof:
+		g_scene->camera_type_ = (int)Baikal::CameraType::kPhysical;
+		break;
+	case mush::camera_type::spherical_equirectangular:
+		g_scene->camera_type_ = (int)Baikal::CameraType::kSpherical;
+		break;
+	}
     
     g_scene->camera_->SetSensorSize(g_camera_sensor_size);
     g_scene->camera_->SetDepthRange(g_camera_zcap);

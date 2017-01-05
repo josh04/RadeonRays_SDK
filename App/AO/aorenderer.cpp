@@ -267,8 +267,23 @@ namespace Baikal
 
     void AoRenderer::GeneratePrimaryRays(ClwScene const& scene)
     {
+		// Fetch kernel
+		std::string kernel_name;
+		// JOSH
+		switch (scene.camera_type) {
+		default:
+		case Baikal::CameraType::kDefault:
+			kernel_name = "PerspectiveCamera_GeneratePaths";
+			break;
+		case Baikal::CameraType::kSpherical:
+			kernel_name = "SphericalCamera_GeneratePaths";
+			break;
+		}
+
+		CLWKernel genkernel = m_render_data->program.GetKernel(kernel_name);
+
         // Fetch kernel
-        CLWKernel genkernel = m_render_data->program.GetKernel("PerspectiveCamera_GeneratePaths");
+        //CLWKernel genkernel = m_render_data->program.GetKernel("PerspectiveCamera_GeneratePaths");
 
         // Set kernel parameters
         genkernel.SetArg(0, scene.camera);

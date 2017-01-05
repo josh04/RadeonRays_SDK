@@ -12,6 +12,13 @@
 #include <Mush Core/opencl.hpp>
 
 namespace mush {
+	enum class camera_type
+	{
+		perspective,
+		perspective_dof,
+		spherical_equirectangular
+	};
+
     struct radeonConfig {
         
         void defaults() {
@@ -44,6 +51,7 @@ namespace mush {
             environment_map_mult = 1.0f;
             environment_map_path = "Textures";
             environment_map_name = "studio015.hdr";
+			camera = camera_type::perspective;
         }
          
         
@@ -76,6 +84,7 @@ namespace mush {
         const char * environment_map_path;
         const char * environment_map_name;
         
+		camera_type camera;
     };
 }
 
