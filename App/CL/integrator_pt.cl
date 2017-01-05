@@ -76,9 +76,9 @@ __kernel void ShadeVolume(
     // Envmap multiplier
     float envmapmul,
     // Emissives
-    __global Emissive const* emissives,
+    __global Light const* lights,
     // Number of emissive objects
-    int numemissives,
+    int num_lights,
     // RNG seed
     int rngseed,
     // Sampler state
@@ -112,10 +112,10 @@ __kernel void ShadeVolume(
         shapes,
         materialids,
         materials,
-        emissives,
+        lights,
         envmapidx,
         envmapmul,
-        numemissives
+        num_lights
     };
 
     if (globalid < *numhits)
@@ -167,7 +167,7 @@ __kernel void ShadeVolume(
         float selection_pdf = 0.f;
         float3 wo;
 
-        int lightidx = Scene_SampleLight(&scene, sample0, &selection_pdf);
+        int light_idx = Scene_SampleLight(&scene, sample0, &selection_pdf);
 
         // Here we need fake differential geometry for light sampling procedure
         DifferentialGeometry dg;
@@ -175,7 +175,7 @@ __kernel void ShadeVolume(
         // since EvaluateVolume has put it there
         dg.p = o + wi * Intersection_GetDistance(isects + hitidx);
         // Get light sample intencity
-        float3 le = Light_Sample(lightidx, &scene, &dg, TEXTURE_ARGS, sample1, &wo, &pdf);
+        float3 le = Light_Sample(light_idx, &scene, &dg, TEXTURE_ARGS, sample1, &wo, &pdf);
 
         // Generate shadow ray
         float shadow_ray_length = 0.999f * length(wo);
@@ -262,9 +262,9 @@ __kernel void ShadeSurface(
     // Envmap multiplier
     float envmapmul,
     // Emissives
-    __global Emissive const* emissives,
+    __global Light const* lights,
     // Number of emissive objects
-    int numemissives,
+    int num_lights,
     // RNG seed
     int rngseed,
     // Sampler states
@@ -300,10 +300,10 @@ __kernel void ShadeSurface(
         shapes,
         materialids,
         materials,
-        emissives,
+        lights,
         envmapidx,
         envmapmul,
-        numemissives
+        num_lights
     };
 
     // Only applied to active rays after compaction
@@ -394,13 +394,22 @@ __kernel void ShadeSurface(
         {
             if (ndotwi > 0.f)
             {
-                // There can be two cases: first we hit after specular vertex or primary ray
-                // where MIS can't be applied. In this case we simply pass radiance as is
-                // because we were using BRDF based estimator at previous step
+                float weight = 1.f;
+
+                if (bounce > 0 && !Path_IsSpecular(path))
+                {
+                    float2 extra = Ray_GetExtra(&rays[hitidx]);
+                    float ld = isect.uvwt.w;
+                    float denom = extra.y * diffgeo.area;
+                    // TODO: num_lights should be num_emissies instead, presence of analytical lights breaks this code
+                    float bxdflightpdf = denom > 0.f ? (ld * ld / denom / num_lights) : 0.f;
+                    weight = BalanceHeuristic(1, extra.x, 1, bxdflightpdf);
+                }
+                
                 {
                     // In this case we hit after an application of MIS process at previous step.
                     // That means BRDF weight has been already applied.
-                    output[pixelidx] += Path_GetThroughput(path) * Emissive_GetLe(&diffgeo, TEXTURE_ARGS);
+                    output[pixelidx] += Path_GetThroughput(path) * Emissive_GetLe(&diffgeo, TEXTURE_ARGS) * weight;
                 }
             }
 
@@ -448,7 +457,7 @@ __kernel void ShadeSurface(
         float bxdfweight = 1.f;
         float lightweight = 1.f;
 
-        int lightidx = numemissives > 0 ? Scene_SampleLight(&scene, sample0.y, &selection_pdf) : -1;
+        int light_idx = num_lights > 0 ? Scene_SampleLight(&scene, sample0.y, &selection_pdf) : -1;
 
         float3 throughput = Path_GetThroughput(path);
 
@@ -456,23 +465,21 @@ __kernel void ShadeSurface(
         float3 bxdf = Bxdf_Sample(&diffgeo, wi, TEXTURE_ARGS, sample2, &bxdfwo, &bxdfpdf);
 
         // If we have light to sample we can hopefully do mis
-        if (lightidx > -1)
+        if (light_idx > -1)
         {
             // Sample light
-            float3 le = Light_Sample(lightidx, &scene, &diffgeo, TEXTURE_ARGS, sample1, &lightwo, &lightpdf);
+            float3 le = Light_Sample(light_idx, &scene, &diffgeo, TEXTURE_ARGS, sample1, &lightwo, &lightpdf);
             lightbxdfpdf = Bxdf_GetPdf(&diffgeo, wi, normalize(lightwo), TEXTURE_ARGS);
-            lightweight = BalanceHeuristic(1, lightpdf, 1, lightbxdfpdf);
+            lightweight = Light_IsSingular(&scene.lights[light_idx]) ? 1.f : BalanceHeuristic(1, lightpdf, 1, lightbxdfpdf);
 
-            // Sample BxDF
-            bxdflightpdf = Light_GetPdf(lightidx, &scene, &diffgeo, bxdfwo, TEXTURE_ARGS);
-            bxdfweight = BalanceHeuristic(1, bxdfpdf, 1, bxdflightpdf);
 
             // Apply MIS to account for both
             if (NON_BLACK(le) && lightpdf > 0.0f && !Bxdf_IsSingular(&diffgeo))
             {
                 wo = lightwo;
                 float ndotwo = fabs(dot(diffgeo.n, normalize(wo)));
-                radiance = le * Bxdf_Evaluate(&diffgeo, wi, normalize(wo), TEXTURE_ARGS) * throughput * ndotwo * lightweight / lightpdf / selection_pdf;
+                radiance = le * Bxdf_Evaluate(&diffgeo, wi, normalize(wo), TEXTURE_ARGS) * throughput *
+                    ndotwo * lightweight / lightpdf / selection_pdf;
             }
         }
 
@@ -520,11 +527,11 @@ __kernel void ShadeSurface(
 
         if (Bxdf_IsSingular(&diffgeo))
         {
-            bxdfweight = 1.f;
+            Path_SetSpecularFlag(path);
         }
 
         bxdfwo = normalize(bxdfwo);
-        float3 t = bxdf * fabs(dot(diffgeo.n, bxdfwo)) * bxdfweight;
+        float3 t = bxdf * fabs(dot(diffgeo.n, bxdfwo));
 
         // Only continue if we have non-zero throughput & pdf
         if (NON_BLACK(t) && bxdfpdf > 0.f && !rr_stop)
@@ -537,6 +544,7 @@ __kernel void ShadeSurface(
             float3 indirect_ray_o = diffgeo.p + CRAZY_LOW_DISTANCE * s * diffgeo.n;
 
             Ray_Init(indirectrays + globalid, indirect_ray_o, indirect_ray_dir, CRAZY_HIGH_DISTANCE, 0.f, 0xFFFFFFFF);
+            Ray_SetExtra(indirectrays + globalid, make_float2(bxdfpdf, fabs(dot(diffgeo.n, bxdfwo))));
         }
         else
         {
@@ -754,7 +762,7 @@ __kernel void ShadeBackground(
     int envmapidx,
     float envmapmul,
     //
-    int numemissives,
+    int num_lights,
     __global Path const* paths,
     __global Volume const* volumes,
     // Output values
@@ -767,7 +775,7 @@ __kernel void ShadeBackground(
     {
         int pixelidx = pixelindices[globalid];
 
-        __global Path* path = paths + pixelidx;
+        __global Path const* path = paths + pixelidx;
 
         // In case of a miss
         if (isects[globalid].shapeid < 0 && Path_IsAlive(path))
@@ -812,76 +820,6 @@ __kernel void AccumulateData(
         dstdata[gid] += v;
     }
 }
-
-//__kernel void ApplySelectiveBlur(
-//    __global float4 const* data,
-//    int imgwidth,
-//    int imgheight,
-//    float alpha,
-//    __global float const* k,
-//    __global float4* output_data
-//    )
-//{
-//#define FILTER_RADIUS 3
-//    int gidx = get_global_id(0);
-//    int gidy = get_global_id(1);
-//    int gid = gidy * imgwidth + gidx;
-//    int gid1 = gidy * imgwidth + gidx + 1;
-//    int gid2 = gidy * imgwidth + gidx - 1;
-//    int gid3 = (gidy + 1) * imgwidth + gidx;
-//    int gid4 = (gidy - 1) * imgwidth + gidx;
-//
-//
-//    if (gidx < imgwidth && gidy < imgheight)
-//    {
-//
-//        int xstart = max(gidx - FILTER_RADIUS, 0);
-//        int xend = min(gidx + FILTER_RADIUS, imgwidth);
-//
-//        int ystart = max(gidy - FILTER_RADIUS, 0);
-//        int yend = min(gidy + FILTER_RADIUS, imgheight);
-//
-//        float3 cv = data[gid].xyz;
-//        float3 d1 = fabs(data[gid1].xyz - cv);
-//        float3 d2 = fabs(data[gid2].xyz - cv);
-//        float3 d3 = fabs(data[gid3].xyz - cv);
-//        float3 d4 = fabs(data[gid4].xyz - cv);
-//
-//
-//        /*if (d1.x > alpha ||
-//            d1.y > alpha ||
-//            d1.z > alpha ||
-//            d2.x > alpha ||
-//            d2.y > alpha ||
-//            d2.z > alpha ||
-//            d3.x > alpha ||
-//            d3.y > alpha ||
-//            d3.z > alpha ||
-//            d4.x > alpha ||
-//            d4.y > alpha ||
-//            d4.z > alpha
-//            )
-//
-//        {
-//            output_data[gid] = data[gid];
-//            return;
-//        }*/
-//
-//        float3 v = 0.f;
-//        for (int x = xstart; x <= xend; ++x)
-//            for (int y = ystart; y <= yend; ++y)
-//            {
-//                float3 pv = data[y * imgwidth + x].xyz;
-//                int fx = x - gidx + FILTER_RADIUS;
-//                int fy = y - gidy + FILTER_RADIUS;
-//                v += pv * k[fy * 7 + fx];
-//            }
-//
-//        output_data[gid].xyz = v;
-//        output_data[gid].w = data[gid].w;
-//    }
-//#undef FILTER_RADIUS
-//}
 
 // Copy data to interop texture if supported
 __kernel void CopyDepth(

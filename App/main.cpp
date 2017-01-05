@@ -77,8 +77,9 @@ using namespace RadeonRays;
 char const* kHelpMessage =
 "App [-p path_to_models][-f model_name][-b][-r][-ns number_of_shadow_rays][-ao ao_radius][-w window_width][-h window_height][-nb number_of_indirect_bounces]";
 char const* g_path =
-"../Resources/bmw";
-char const* g_modelname = "i8.obj";
+"../Resources/CornellBox";
+char const* g_modelname = "orig.objm";
+char const* g_envmapname = "../Resources/Textures/studio015.hdr";
 
 std::unique_ptr<ShaderManager>    g_shader_manager;
 
@@ -86,8 +87,8 @@ GLuint g_vertex_buffer;
 GLuint g_index_buffer;
 GLuint g_texture;
 
-int g_window_width = 1280;
-int g_window_height = 800;
+int g_window_width = 512;
+int g_window_height = 512;
 int g_num_shadow_rays = 1;
 int g_num_ao_rays = 1;
 int g_ao_enabled = false;
@@ -95,7 +96,7 @@ int g_progressive = false;
 int g_num_bounces = 5;
 int g_num_samples = -1;
 int g_samplecount = 0;
-float g_ao_radius = 1.f;
+float g_ao_radius = 1.f; 
 float g_envmapmul = 1.f;
 float g_cspeed = 100.25f;
 
@@ -362,8 +363,11 @@ void InitData()
     std::cout << "F-Stop: " << 1.f / (g_scene->camera_->GetAperture() * 10.f) << "\n";
     std::cout << "Sensor size: " << g_camera_sensor_size.x * 1000.f << "x" << g_camera_sensor_size.y * 1000.f << "mm\n";
 
-    g_scene->SetEnvironment("../Resources/Textures/studio015.hdr", "", g_envmapmul);
-
+    g_scene->SetEnvironment(g_envmapname, "", g_envmapmul);
+    g_scene->AddDirectionalLight(RadeonRays::float3(-0.3f, -1.f, -0.4f), 2.f * RadeonRays::float3(1.f, 1.f, 1.f));
+    g_scene->AddPointLight(RadeonRays::float3(-0.5f, 1.7f, 0.0f), RadeonRays::float3(1.f, 0.9f, 0.6f));
+    g_scene->AddSpotLight(RadeonRays::float3(0.5f, 1.5f, 0.0f), RadeonRays::float3(-0.5f, -1.0f, 0.1f), RadeonRays::float3(1.f, 0.9f, 0.6f),
+                           std::cos(M_PI_4/2), std::cos(M_PI_4));
 #pragma omp parallel for
     for (int i = 0; i < g_cfgs.size(); ++i)
     {
@@ -515,10 +519,6 @@ void OnKeyUp(int key, int x, int y)
 void Update()
 {
     static auto prevtime = std::chrono::high_resolution_clock::now();
-    static auto updatetime = std::chrono::high_resolution_clock::now();
-
-    static int numbnc = 1;
-    static int framesperbnc = 2;
     auto time = std::chrono::high_resolution_clock::now();
     auto dt = std::chrono::duration_cast<std::chrono::duration<double>>(time - prevtime);
     prevtime = time;
@@ -534,16 +534,16 @@ void Update()
 
     if (std::abs(camroty) > 0.001f)
     {
-        g_scene->camera_->Tilt(camroty);
-        //g_scene->camera_->ArcballRotateVertically(float3(0, 0, 0), camroty);
+        //g_scene->camera_->Tilt(camroty);
+        g_scene->camera_->ArcballRotateVertically(float3(0, 0, 0), camroty);
         update = true;
     }
 
     if (std::abs(camrotx) > 0.001f)
     {
 
-        g_scene->camera_->Rotate(camrotx);
-        //g_scene->camera_->ArcballRotateHorizontally(float3(0, 0, 0), camrotx);
+        //g_scene->camera_->Rotate(camrotx);
+        g_scene->camera_->ArcballRotateHorizontally(float3(0, 0, 0), camrotx);
         update = true;
     }
 
@@ -768,6 +768,9 @@ int main(int argc, char * argv[])
     char* modelname = GetCmdOption(argv, argv + argc, "-f");
     g_modelname = modelname ? modelname : g_modelname;
 
+    char* envmapname = GetCmdOption(argv, argv + argc, "-e");
+    g_envmapname = envmapname ? envmapname : g_envmapname;
+
     char* width = GetCmdOption(argv, argv + argc, "-w");
     g_window_width = width ? atoi(width) : g_window_width;
 
@@ -817,7 +820,7 @@ int main(int argc, char * argv[])
     g_interop = interop ? (atoi(interop) > 0) : g_interop;
 
     char* cspeed = GetCmdOption(argv, argv + argc, "-cs");
-    g_cspeed = cspeed ? (atof(cspeed) > 0) : g_cspeed;
+    g_cspeed = cspeed ? atof(cspeed) : g_cspeed;
 
 
     char* cfg = GetCmdOption(argv, argv + argc, "-config");

@@ -148,7 +148,7 @@ Scene* Scene::LoadFromObj(std::string const& filename, std::string const& basepa
     {
         if (objmaterials[i].name == "carpaint" || objmaterials[i].name == "inside1" || objmaterials[i].name == "CarShellNew")
         {
-            Material diffuse;
+	    Material diffuse;
             diffuse.kx = float3(0.787f, 0.081f, 0.027f);
             diffuse.ni = 1.5f;
             diffuse.ns = 0.3f;
@@ -602,7 +602,7 @@ Scene* Scene::LoadFromObj(std::string const& filename, std::string const& basepa
                 }
             }
 
-           
+
                 //auto iter = textures.find("rm.jpg");
                 //if (iter != textures.end())
                 //{
@@ -642,14 +642,207 @@ Scene* Scene::LoadFromObj(std::string const& filename, std::string const& basepa
             matmap[i] = scene->materials_.size() - 1;
             continue;
         }
+        else if (objmaterials[i].name == "mirror")
+        {
+            Material specular;
+            specular.kx = float3(1.f, 1.f, 1.f);
+            specular.ni = 1.4f;
+            specular.ns = 0.05f;
+            specular.type = kIdealReflect;
+            specular.fresnel = 0.f;
+
+            scene->materials_.push_back(specular);
+            scene->material_names_.push_back(objmaterials[i].name);
+            matmap[i] = scene->materials_.size() - 1;
+            continue;
+        }
+        else if (objmaterials[i].name == "fabric")
+        {
+            Material specular;
+            specular.kx = float3(0.6f, 0.6f, 0.6f);
+            specular.ni = 1.3f;
+            specular.ns = 0.3f;
+            specular.type = kMicrofacetGGX;
+            specular.fresnel = 1.f;
+
+            if (!objmaterials[i].normal_texname.empty())
+            {
+                auto iter = textures.find(objmaterials[i].normal_texname);
+                if (iter != textures.end())
+                {
+                    specular.nmapidx = iter->second;
+                }
+                else
+                {
+                    Texture texture;
+
+                    // Load texture
+                    LoadTexture(basepath + "/" + objmaterials[i].normal_texname, texture, scene->texturedata_);
+
+                    // Add texture desc
+                    specular.nmapidx = (int)scene->textures_.size();
+                    scene->textures_.push_back(texture);
+
+                    // Save in the map
+                    textures[objmaterials[i].normal_texname] = specular.nmapidx;
+                }
+            }
+
+            if (!objmaterials[i].diffuse_texname.empty())
+            {
+                auto iter = textures.find(objmaterials[i].diffuse_texname);
+                if (iter != textures.end())
+                {
+                    specular.kxmapidx = iter->second;
+                }
+                else
+                {
+                    Texture texture;
+
+                    // Load texture
+                    LoadTexture(basepath + "/" + objmaterials[i].diffuse_texname, texture, scene->texturedata_);
+
+                    // Add texture desc
+                    specular.kxmapidx = (int)scene->textures_.size();
+                    scene->textures_.push_back(texture);
+
+                    // Save in the map
+                    textures[objmaterials[i].diffuse_texname] = specular.kxmapidx;
+                }
+            }
+
+            scene->materials_.push_back(specular);
+            scene->material_names_.push_back(objmaterials[i].name);
+            matmap[i] = scene->materials_.size() - 1;
+            continue;
+        }
+        else if (objmaterials[i].name == "leather")
+        {
+            Material specular;
+            specular.kx = float3(0.7f, 0.7f, 0.7f);
+            specular.ni = 1.1f;
+            specular.ns = 0.03f;
+            specular.type = kMicrofacetGGX;
+            specular.fresnel = 1.f;
+
+            if (!objmaterials[i].normal_texname.empty())
+            {
+                auto iter = textures.find(objmaterials[i].normal_texname);
+                if (iter != textures.end())
+                {
+                    specular.nmapidx = iter->second;
+                }
+                else
+                {
+                    Texture texture;
+
+                    // Load texture
+                    LoadTexture(basepath + "/" + objmaterials[i].normal_texname, texture, scene->texturedata_);
+
+                    // Add texture desc
+                    specular.nmapidx = (int)scene->textures_.size();
+                    scene->textures_.push_back(texture);
+
+                    // Save in the map
+                    textures[objmaterials[i].normal_texname] = specular.nmapidx;
+                }
+            }
+            if (!objmaterials[i].diffuse_texname.empty())
+            {
+                auto iter = textures.find(objmaterials[i].diffuse_texname);
+                if (iter != textures.end())
+                {
+                    specular.kxmapidx = iter->second;
+                }
+                else
+                {
+                    Texture texture;
+
+                    // Load texture
+                    LoadTexture(basepath + "/" + objmaterials[i].diffuse_texname, texture, scene->texturedata_);
+
+                    // Add texture desc
+                    specular.kxmapidx = (int)scene->textures_.size();
+                    scene->textures_.push_back(texture);
+
+                    // Save in the map
+                    textures[objmaterials[i].diffuse_texname] = specular.kxmapidx;
+                }
+            }
+
+            scene->materials_.push_back(specular);
+            scene->material_names_.push_back(objmaterials[i].name);
+            matmap[i] = scene->materials_.size() - 1;
+            continue;
+        }
+        else if (objmaterials[i].name == "pillow")
+        {
+            Material specular;
+            specular.kx = float3(0.95f, 0.95f, 0.95f);
+            specular.ni = 1.3f;
+            specular.ns = 0.3f;
+            specular.type = kLambert;
+            specular.fresnel = 0.f;
+
+            if (!objmaterials[i].normal_texname.empty())
+            {
+                auto iter = textures.find(objmaterials[i].normal_texname);
+                if (iter != textures.end())
+                {
+                    specular.nmapidx = iter->second;
+                }
+                else
+                {
+                    Texture texture;
+
+                    // Load texture
+                    LoadTexture(basepath + "/" + objmaterials[i].normal_texname, texture, scene->texturedata_);
+
+                    // Add texture desc
+                    specular.nmapidx = (int)scene->textures_.size();
+                    scene->textures_.push_back(texture);
+
+                    // Save in the map
+                    textures[objmaterials[i].normal_texname] = specular.nmapidx;
+                }
+            }
+
+            if (!objmaterials[i].diffuse_texname.empty())
+            {
+                auto iter = textures.find(objmaterials[i].diffuse_texname);
+                if (iter != textures.end())
+                {
+                    specular.kxmapidx = iter->second;
+                }
+                else
+                {
+                    Texture texture;
+
+                    // Load texture
+                    LoadTexture(basepath + "/" + objmaterials[i].diffuse_texname, texture, scene->texturedata_);
+
+                    // Add texture desc
+                    specular.kxmapidx = (int)scene->textures_.size();
+                    scene->textures_.push_back(texture);
+
+                    // Save in the map
+                    textures[objmaterials[i].diffuse_texname] = specular.kxmapidx;
+                }
+            }
+
+            scene->materials_.push_back(specular);
+            scene->material_names_.push_back(objmaterials[i].name);
+            matmap[i] = scene->materials_.size() - 1;
+            continue;
+        }
         else if (objmaterials[i].name == "chrome" || objmaterials[i].name == "wire_225143087" || objmaterials[i].name == "HeadlightChrome" || objmaterials[i].name == "Chrome")
         {
             Material specular;
-            specular.kx = 1.3f * float3(0.58f, 0.58f, 0.58f);
-            specular.ni = 580.5f;
-            specular.ns = 0.0025f;
+            specular.kx = float3(0.99f, 0.99f, 0.99f);
+            specular.ni = 10.5f;
+            specular.ns = 0.025f;
             specular.type = kMicrofacetGGX;
-            //specular.fresnel = 1.f;
+            specular.fresnel = 1.f;
 
             scene->materials_.push_back(specular);
             scene->material_names_.push_back(objmaterials[i].name);
@@ -726,10 +919,45 @@ Scene* Scene::LoadFromObj(std::string const& filename, std::string const& basepa
             matmap[i] = scene->materials_.size() - 1;
             continue;
         }
-        else if (objmaterials[i].name == "light" || objmaterials[i].name == "Emit" || objmaterials[i].name == "Light3" || objmaterials[i].name == "dayLight_portal")
+        else if (objmaterials[i].name == "light" || objmaterials[i].name == "Emit1" || objmaterials[i].name == "Light3" || objmaterials[i].name == "dayLight_portal")
         {
             Material emissive;
-            emissive.kx = 5.f * float3(0.8f, 0.8f, 0.8f);
+            emissive.kx = 10.f * float3(0.8f, 0.8f, 0.8f);
+            emissive.type = kEmissive;
+
+            if (!objmaterials[i].diffuse_texname.empty())
+            {
+                auto iter = textures.find(objmaterials[i].diffuse_texname);
+                if (iter != textures.end())
+                {
+                    emissive.kxmapidx = iter->second;
+                }
+                else
+                {
+                    Texture texture;
+
+                    // Load texture
+                    LoadTexture(basepath + "/" + objmaterials[i].diffuse_texname, texture, scene->texturedata_);
+
+                    // Add texture desc
+                    emissive.kxmapidx = (int)scene->textures_.size();
+                    scene->textures_.push_back(texture);
+
+                    // Save in the map
+                    textures[objmaterials[i].diffuse_texname] = emissive.kxmapidx;
+                }
+            }
+
+
+            scene->materials_.push_back(emissive);
+            scene->material_names_.push_back(objmaterials[i].name);
+            matmap[i] = scene->materials_.size() - 1;
+            continue;
+        } // 
+        else if (objmaterials[i].name == "wire_138008110")
+        {
+            Material emissive;
+            emissive.kx = 5.f * float3(0.8f, 0.8f, 0.7f);
             emissive.type = kEmissive;
 
             if (!objmaterials[i].diffuse_texname.empty())
@@ -760,12 +988,12 @@ Scene* Scene::LoadFromObj(std::string const& filename, std::string const& basepa
             scene->material_names_.push_back(objmaterials[i].name);
             matmap[i] = scene->materials_.size() - 1;
             continue;
-        }
+        } // wire_138008110
         else if (objmaterials[i].name == "HeadLightAngelEye")
         {
             Material emissive;
             emissive.kx = 50.f * float3(0.53f, 0.7f, 0.95f);
-            emissive.type = kEmissive;
+            emissive.type = kLambert;
 
             if (!objmaterials[i].diffuse_texname.empty())
             {
@@ -800,7 +1028,7 @@ Scene* Scene::LoadFromObj(std::string const& filename, std::string const& basepa
         {
             Material emissive;
             emissive.kx = 50.f * float3(0.64f, 0.723f, 0.8f);
-            emissive.type = kEmissive;
+            emissive.type = kLambert;
 
             if (!objmaterials[i].diffuse_texname.empty())
             {
@@ -889,7 +1117,7 @@ Scene* Scene::LoadFromObj(std::string const& filename, std::string const& basepa
              }*/
 
              // Load normal map
-            
+
 
 
             scene->materials_.push_back(material);
@@ -933,7 +1161,7 @@ Scene* Scene::LoadFromObj(std::string const& filename, std::string const& basepa
                 scene->material_names_.push_back(objmaterials[i].name);
 
                 Material layered;
-                layered.ni = 1.33f;// objmaterials[i].ior;
+                layered.ni = 1.9f;// objmaterials[i].ior;
                 layered.type = kFresnelBlend;
                 layered.brdftopidx = scene->materials_.size() - 1;
                 layered.brdfbaseidx = scene->materials_.size() - 2;
@@ -1005,11 +1233,12 @@ Scene* Scene::LoadFromObj(std::string const& filename, std::string const& basepa
 
             if (scene->materials_[matidx].type == kEmissive)
             {
-                Emissive emissive;
-                emissive.shapeidx = s;
-                emissive.primidx = i;
-                emissive.m = matidx;
-                scene->emissives_.push_back(emissive);
+                Light light;
+                light.type = kArea;
+                light.shapeidx = s;
+                light.primidx = i;
+                light.matidx = matidx;
+                scene->lights_.push_back(light);
             }
         }
 
@@ -1025,14 +1254,39 @@ Scene* Scene::LoadFromObj(std::string const& filename, std::string const& basepa
 
     scene->envidx_ = -1;
 
-    std::cout << "Loading complete\n";
-    std::cout << "Number of objects: " << scene->shapes_.size() << "\n";
-    std::cout << "Number of textures: " << scene->textures_.size() << "\n";
-    std::cout << "Number of emissives: " << scene->emissives_.size() << "\n";
-
     return scene;
 }
 
+void Scene::AddDirectionalLight(RadeonRays::float3 const& d, RadeonRays::float3 const& e)
+{
+    Light light;
+    light.type = kDirectional;
+    light.d = normalize(d);
+    light.intensity = e;
+    lights_.push_back(light);
+}
+    
+void Scene::AddPointLight(RadeonRays::float3 const& p, RadeonRays::float3 const& e)
+{
+    Light light;
+    light.type = kPoint;
+    light.p = p;
+    light.intensity = e;
+    lights_.push_back(light);
+}
+    
+void Scene::AddSpotLight(RadeonRays::float3 const& p, RadeonRays::float3 const& d, RadeonRays::float3 const& e, float ia, float oa)
+{
+    Light light;
+    light.type = kSpot;
+    light.p = p;
+    light.d = normalize(d);
+    light.intensity = e;
+    light.ia = ia;
+    light.oa = oa;
+    lights_.push_back(light);
+}
+    
 void Scene::SetEnvironment(std::string const& filename, std::string const& basepath, float envmapmul)
 {
     // Save multiplier
@@ -1049,11 +1303,11 @@ void Scene::SetEnvironment(std::string const& filename, std::string const& basep
     {
         LoadTexture(filename, texture, texturedata_);
     }
-    
+
     //
     //Ibl* ibl = new Ibl((float3*)(texturedata_[texture.dataoffset].get()), texture.w, texture.h);
     //ibl->Simulate("pdf.png");
-    
+
 
     // Save index
     envidx_ = (int)textures_.size();

@@ -111,15 +111,31 @@ namespace Baikal
         , m_scene_tracker(context, devidx)
         , m_num_bounces(num_bounces)
     {
+        std::string buildopts;
 
+        buildopts.append(" -cl-mad-enable -cl-fast-relaxed-math -cl-std=CL1.2 -I . ");
+
+        buildopts.append(
+#if defined(__APPLE__)
+            "-D APPLE "
+#elif defined(_WIN32) || defined (WIN32)
+            "-D WIN32 "
+#elif defined(__linux__)
+            "-D __linux__ "
+#else
+            ""
+#endif
+            );
+        
         // Create parallel primitives
-        m_render_data->pp = CLWParallelPrimitives(m_context);
+        m_render_data->pp = CLWParallelPrimitives(m_context, buildopts.c_str());
 
         // Load kernels
 #ifndef RR_EMBED_KERNELS
-        m_render_data->program = CLWProgram::CreateFromFile("CL/integrator_pt.cl", m_context);
+        m_render_data->program = CLWProgram::CreateFromFile("CL/integrator_pt.cl", buildopts.c_str(), m_context);
 #else
-        m_render_data->program = CLWProgram::CreateFromSource(g_integrator_pt_opencl, std::strlen(g_integrator_pt_opencl), context);
+        m_render_data->program = CLWProgram::CreateFromSource(g_integrator_pt_opencl, std::strlen(g_integrator_pt_opencl), buildopts.c_str(), context);
+
 #endif
 
         m_render_data->sobolmat = m_context.CreateBuffer<unsigned int>(1024 * 52, CL_MEM_READ_ONLY, &g_SobolMatrices[0]);
@@ -382,8 +398,8 @@ namespace Baikal
         shadekernel.SetArg(argc++, scene.texturedata);
         shadekernel.SetArg(argc++, scene.envmapidx);
         shadekernel.SetArg(argc++, scene.envmapmul);
-        shadekernel.SetArg(argc++, scene.emissives);
-        shadekernel.SetArg(argc++, scene.numemissive);
+        shadekernel.SetArg(argc++, scene.lights);
+        shadekernel.SetArg(argc++, scene.num_lights);
         shadekernel.SetArg(argc++, rand_uint());
         shadekernel.SetArg(argc++, m_render_data->samplers);
         shadekernel.SetArg(argc++, m_render_data->sobolmat);
@@ -426,8 +442,8 @@ namespace Baikal
         shadekernel.SetArg(argc++, scene.texturedata);
         shadekernel.SetArg(argc++, scene.envmapidx);
         shadekernel.SetArg(argc++, scene.envmapmul);
-        shadekernel.SetArg(argc++, scene.emissives);
-        shadekernel.SetArg(argc++, scene.numemissive);
+        shadekernel.SetArg(argc++, scene.lights);
+        shadekernel.SetArg(argc++, scene.num_lights);
         shadekernel.SetArg(argc++, rand_uint());
         shadekernel.SetArg(argc++, m_render_data->samplers);
         shadekernel.SetArg(argc++, m_render_data->sobolmat);
@@ -600,7 +616,7 @@ namespace Baikal
         misskernel.SetArg(argc++, scene.texturedata);
         misskernel.SetArg(argc++, scene.envmapidx);
         misskernel.SetArg(argc++, scene.envmapmul);
-        misskernel.SetArg(argc++, scene.numemissive);
+        misskernel.SetArg(argc++, scene.num_lights);
         misskernel.SetArg(argc++, m_render_data->paths);
         misskernel.SetArg(argc++, scene.volumes);
         misskernel.SetArg(argc++, m_output->data());

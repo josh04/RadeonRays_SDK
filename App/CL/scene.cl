@@ -122,10 +122,10 @@ void FillDifferentialGeometry(// Scene
 
 int Scene_SampleLight(Scene const* scene, float sample, float* pdf)
 {
-    int numlights = scene->numemissives;
-    int lightidx = clamp((int)(sample * numlights), 0, numlights - 1);
-    *pdf = 1.f / numlights;
-    return lightidx;
+    int num_lights = scene->num_lights;
+    int light_idx = clamp((int)(sample * num_lights), 0, num_lights - 1);
+    *pdf = 1.f / num_lights;
+    return light_idx;
 }
 
 
