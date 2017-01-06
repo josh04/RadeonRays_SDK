@@ -103,11 +103,27 @@ namespace Baikal
         // Create parallel primitives
         m_render_data->pp = CLWParallelPrimitives(m_context);
 
+        std::string buildopts;
+
+        buildopts.append(" -cl-mad-enable -cl-fast-relaxed-math -cl-std=CL1.2 -I . ");
+
+        buildopts.append(
+#if defined(__APPLE__)
+            "-D APPLE "
+#elif defined(_WIN32) || defined (WIN32)
+            "-D WIN32 "
+#elif defined(__linux__)
+            "-D __linux__ "
+#else
+            ""
+#endif
+            );
+
         // Load kernels
 #ifndef RR_EMBED_KERNELS
-        m_render_data->program = CLWProgram::CreateFromFile("CL/integrator_ao.cl", m_context);
+        m_render_data->program = CLWProgram::CreateFromFile("CL/integrator_ao.cl", buildopts.c_str(), m_context);
 #else
-        m_render_data->program = CLWProgram::CreateFromSource(g_integrator_ao_opencl, std::strlen(g_integrator_ao_opencl), context);
+        m_render_data->program = CLWProgram::CreateFromSource(g_integrator_ao_opencl, std::strlen(g_integrator_ao_opencl), buildopts.c_str(), context);
 #endif
 
         m_render_data->sobolmat = m_context.CreateBuffer<unsigned int>(1024 * 52, CL_MEM_READ_ONLY, &g_SobolMatrices[0]);
@@ -267,8 +283,23 @@ namespace Baikal
 
     void AoRenderer::GeneratePrimaryRays(ClwScene const& scene)
     {
+		// Fetch kernel
+		std::string kernel_name;
+		// JOSH
+		switch (scene.camera_type) {
+		default:
+		case Baikal::CameraType::kDefault:
+			kernel_name = "PerspectiveCamera_GeneratePaths";
+			break;
+		case Baikal::CameraType::kSpherical:
+			kernel_name = "SphericalCamera_GeneratePaths";
+			break;
+		}
+
+		CLWKernel genkernel = m_render_data->program.GetKernel(kernel_name);
+
         // Fetch kernel
-        CLWKernel genkernel = m_render_data->program.GetKernel("PerspectiveCamera_GeneratePaths");
+        //CLWKernel genkernel = m_render_data->program.GetKernel("PerspectiveCamera_GeneratePaths");
 
         // Set kernel parameters
         genkernel.SetArg(0, scene.camera);
@@ -386,8 +417,39 @@ namespace Baikal
         return m_render_data->program.GetKernel("ApplyGammaAndCopyData");
     }
 
+	// JOSH
+	CLWKernel AoRenderer::GetDepthCopyKernel()
+	{
+		return m_render_data->program.GetKernel("CopyDepth");
+	}
+
     CLWKernel AoRenderer::GetAccumulateKernel()
     {
         return m_render_data->program.GetKernel("AccumulateData");
     }
+
+
+	// JOSH
+	void AoRenderer::CaptureDepths() {
+		// Fetch kernel
+		CLWKernel depthkernel = m_render_data->program.GetKernel("CaptureDepths");
+
+		//int numrays = m_output->width() * m_output->height();
+
+		m_output->increment_depth_count();
+
+		// Set kernel parameters
+		int argc = 0;
+		depthkernel.SetArg(argc++, m_render_data->intersections);
+		depthkernel.SetArg(argc++, m_render_data->hitcount);
+		depthkernel.SetArg(argc++, m_output->depth_data());
+		depthkernel.SetArg(argc++, m_output->get_depth_count());
+
+		// Run shading kernel
+		{
+			int globalsize = m_output->width() * m_output->height();
+			m_context.Launch1D(0, ((globalsize + 63) / 64) * 64, 64, depthkernel);
+		}
+
+	}
 }

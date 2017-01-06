@@ -15,11 +15,20 @@
 #include "Mush/radeonConfig.hpp"
 
 void setup(const mush::radeonConfig& config);
-bool init(int width, int height, bool share_opencl, cl_context c, cl_device_id d, cl_command_queue q);
+bool init(int width, int height, bool share_opencl, cl_context c, cl_device_id d, cl_command_queue q, int env_width, int env_height);
 void launch_threads();
-float * update(bool share_opencl, bool update, cl_mem load_image);
+
+struct update_return_type {
+    float * image;
+    float * depth;
+    float * normals;
+};
+
+update_return_type update(bool share_opencl, bool update, cl_mem load_image, cl_mem depth_image, cl_mem normals_image);
 void close_down();
 
-const char * _get_resource_path(const char * filename);
+void update_environment(bool share_opencl, unsigned char * environment_image_host);
+
+//const char * _get_resource_path(const char * filename);
 
 #endif /* api_hpp */

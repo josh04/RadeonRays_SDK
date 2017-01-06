@@ -29,6 +29,7 @@ namespace Baikal
 {
     class PtRenderer;
     class AoRenderer;
+	class Renderer;
 }
 
 class ConfigManager

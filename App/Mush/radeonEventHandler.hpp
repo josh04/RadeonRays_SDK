@@ -13,6 +13,7 @@
 #include <azure/Eventable.hpp>
 #include <azure/Event.hpp>
 #include <azure/Eventkey.hpp>
+#include <azure/glm/glm.hpp>
 
 #include "../Scene/scene.h"
 
@@ -46,9 +47,11 @@ class radeonEventHandler : public azure::Eventable {
                     case azure::Key::d:
                         _right_pressed = true;
                         break;
+					case azure::Key::e:
                     case azure::Key::Home:
                         _home_pressed = true;
                         break;
+					case azure::Key::x:
                     case azure::Key::End:
                         _end_pressed = true;
                         break;
@@ -71,9 +74,11 @@ class radeonEventHandler : public azure::Eventable {
                     case azure::Key::d:
                         _right_pressed = false;
                         break;
+					case azure::Key::e:
                     case azure::Key::Home:
                         _home_pressed = false;
                         break;
+					case azure::Key::x:
                     case azure::Key::End:
                         _end_pressed = false;
                         break;
@@ -106,12 +111,29 @@ class radeonEventHandler : public azure::Eventable {
                     _tracking_mouse = false;
                 }
             }
+			else if (event->isType("camera_additional_shift_matrix")) {
+
+				glm::mat4 mat = event->getAttribute<glm::mat4>("matrix");
+				//float fov = event->getAttribute<float>("fov");
+				glm::vec3 loc = event->getAttribute<glm::vec3>("location");
+
+				memcpy(_oculus_matrix.m, &mat[0][0], sizeof(float) * 4 * 4);
+
+				_oculus_position.x = loc.x;
+				_oculus_position.y = loc.y;
+				_oculus_position.z = loc.z;
+
+				//_camera->set_additional_displacement(loc);
+				//_camera->set_fov(fov);
+				//_camera->set_additional_shift_matrix(mat);
+				_oculus_changed = true;
+			}
             return false;
         }
         
         bool update() {
             
-            
+			g_scene->camera_->RemoveOculusTransform();
             static auto prevtime = std::chrono::high_resolution_clock::now();
             
             auto time = std::chrono::high_resolution_clock::now();
@@ -145,7 +167,7 @@ class radeonEventHandler : public azure::Eventable {
             }
             
             //float g_cspeed = 100.25f;
-            const float kMovementSpeed = 10.25f;;
+            const float kMovementSpeed = 50.25f;;
             if (_up_pressed)
             {
                 g_scene->camera_->MoveForward((float)dt.count() * kMovementSpeed);
@@ -181,17 +203,28 @@ class radeonEventHandler : public azure::Eventable {
                 g_scene->camera_->MoveUp(-(float)dt.count() * kMovementSpeed);
                 update = true;
             }
+
+			if (_oculus_changed.exchange(false)) {
+				update = true;
+			}
+
+			g_scene->camera_->ApplyOculusTransform(_oculus_matrix, _oculus_position);
             return update;
 
         }
         
     private:
         bool _up_pressed = false, _down_pressed = false, _left_pressed = false, _right_pressed = false, _home_pressed = false, _end_pressed = false;
-        float _mouse_delta_x = 0.0f, _mouse_delta_y = 0.0f;
+        
+		float _mouse_delta_x = 0.0f, _mouse_delta_y = 0.0f;
         
         bool _tracking_mouse = false;
         
         int _m_x, _m_y;
+
+		std::atomic_bool _oculus_changed;
+		RadeonRays::matrix _oculus_matrix;
+		RadeonRays::float3 _oculus_position;
     };
 
 #endif /* radeonEventHandler_h */

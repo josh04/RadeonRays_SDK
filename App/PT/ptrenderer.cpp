@@ -77,7 +77,7 @@ namespace Baikal
         CLWBuffer<QmcSampler> samplers;
         CLWBuffer<unsigned int> sobolmat;
         CLWBuffer<int> hitcount;
-
+        
         CLWProgram program;
         CLWParallelPrimitives pp;
 
@@ -111,15 +111,31 @@ namespace Baikal
         , m_scene_tracker(context, devidx)
         , m_num_bounces(num_bounces)
     {
+        std::string buildopts;
 
+        buildopts.append(" -cl-mad-enable -cl-fast-relaxed-math -cl-std=CL1.2 -I . ");
+
+        buildopts.append(
+#if defined(__APPLE__)
+            "-D APPLE "
+#elif defined(_WIN32) || defined (WIN32)
+            "-D WIN32 "
+#elif defined(__linux__)
+            "-D __linux__ "
+#else
+            ""
+#endif
+            );
+        
         // Create parallel primitives
-        m_render_data->pp = CLWParallelPrimitives(m_context);
+        m_render_data->pp = CLWParallelPrimitives(m_context, buildopts.c_str());
 
         // Load kernels
 #ifndef RR_EMBED_KERNELS
-        m_render_data->program = CLWProgram::CreateFromFile("CL/integrator_pt.cl", m_context);
+        m_render_data->program = CLWProgram::CreateFromFile("CL/integrator_pt.cl", buildopts.c_str(), m_context);
 #else
-        m_render_data->program = CLWProgram::CreateFromSource(g_integrator_pt_opencl, std::strlen(g_integrator_pt_opencl), context);
+        m_render_data->program = CLWProgram::CreateFromSource(g_integrator_pt_opencl, std::strlen(g_integrator_pt_opencl), buildopts.c_str(), context);
+
 #endif
 
         m_render_data->sobolmat = m_context.CreateBuffer<unsigned int>(1024 * 52, CL_MEM_READ_ONLY, &g_SobolMatrices[0]);
@@ -185,6 +201,10 @@ namespace Baikal
             api->QueryIntersection(m_render_data->fr_rays[pass & 0x1], m_render_data->fr_hitcount, maxrays, m_render_data->fr_intersections, nullptr, nullptr);
             //e->Wait();
             //m_api->DeleteEvent(e);
+            
+            if (pass == 0) {
+				CaptureDepths();
+            }
 
             // Apply scattering
             EvaluateVolume(clwscene, pass);
@@ -313,7 +333,24 @@ namespace Baikal
     void PtRenderer::GeneratePrimaryRays(ClwScene const& scene)
     {
         // Fetch kernel
-        std::string kernel_name = (scene.camera_type == CameraType::kDefault) ? "PerspectiveCamera_GeneratePaths" : "PerspectiveCameraDof_GeneratePaths";
+		std::string kernel_name;
+		// JOSH
+		switch (scene.camera_type) {
+		default:
+		case Baikal::CameraType::kDefault:
+			kernel_name = "PerspectiveCamera_GeneratePaths";
+			break;
+		case Baikal::CameraType::kPhysical:
+			kernel_name = "PerspectiveCameraDof_GeneratePaths";
+			break;
+		case Baikal::CameraType::kSpherical:
+			kernel_name = "SphericalCamera_GeneratePaths";
+			break;
+		}
+
+		//JOSH
+
+		//std::string kernel_name = "SphericalCamera_GeneratePaths";
 
         CLWKernel genkernel = m_render_data->program.GetKernel(kernel_name);
 
@@ -361,8 +398,8 @@ namespace Baikal
         shadekernel.SetArg(argc++, scene.texturedata);
         shadekernel.SetArg(argc++, scene.envmapidx);
         shadekernel.SetArg(argc++, scene.envmapmul);
-        shadekernel.SetArg(argc++, scene.emissives);
-        shadekernel.SetArg(argc++, scene.numemissive);
+        shadekernel.SetArg(argc++, scene.lights);
+        shadekernel.SetArg(argc++, scene.num_lights);
         shadekernel.SetArg(argc++, rand_uint());
         shadekernel.SetArg(argc++, m_render_data->samplers);
         shadekernel.SetArg(argc++, m_render_data->sobolmat);
@@ -373,6 +410,7 @@ namespace Baikal
         shadekernel.SetArg(argc++, m_render_data->paths);
         shadekernel.SetArg(argc++, m_render_data->rays[(pass + 1) & 0x1]);
         shadekernel.SetArg(argc++, m_output->data());
+        shadekernel.SetArg(argc++, m_output->normals_data());
 
         // Run shading kernel
         {
@@ -404,8 +442,8 @@ namespace Baikal
         shadekernel.SetArg(argc++, scene.texturedata);
         shadekernel.SetArg(argc++, scene.envmapidx);
         shadekernel.SetArg(argc++, scene.envmapmul);
-        shadekernel.SetArg(argc++, scene.emissives);
-        shadekernel.SetArg(argc++, scene.numemissive);
+        shadekernel.SetArg(argc++, scene.lights);
+        shadekernel.SetArg(argc++, scene.num_lights);
         shadekernel.SetArg(argc++, rand_uint());
         shadekernel.SetArg(argc++, m_render_data->samplers);
         shadekernel.SetArg(argc++, m_render_data->sobolmat);
@@ -548,7 +586,19 @@ namespace Baikal
     {
         return m_render_data->program.GetKernel("ApplyGammaAndCopyData");
     }
-
+    
+    // JOSH
+    CLWKernel PtRenderer::GetDepthCopyKernel()
+    {
+        return m_render_data->program.GetKernel("CopyDepth");
+    }
+	/*
+	// JOSH
+	CLWKernel PtRenderer::GetEnvironmentCopyKernel()
+	{
+		return m_render_data->program.GetKernel("CopyEnvironment");
+	}
+    */
     CLWKernel PtRenderer::GetAccumulateKernel()
     {
         return m_render_data->program.GetKernel("AccumulateData");
@@ -572,7 +622,7 @@ namespace Baikal
         misskernel.SetArg(argc++, scene.texturedata);
         misskernel.SetArg(argc++, scene.envmapidx);
         misskernel.SetArg(argc++, scene.envmapmul);
-        misskernel.SetArg(argc++, scene.numemissive);
+        misskernel.SetArg(argc++, scene.num_lights);
         misskernel.SetArg(argc++, m_render_data->paths);
         misskernel.SetArg(argc++, scene.volumes);
         misskernel.SetArg(argc++, m_output->data());
@@ -584,7 +634,31 @@ namespace Baikal
         }
 
     }
-
+    
+    // JOSH
+    void PtRenderer::CaptureDepths() {
+        // Fetch kernel
+        CLWKernel depthkernel = m_render_data->program.GetKernel("CaptureDepths");
+        
+        //int numrays = m_output->width() * m_output->height();
+        
+        m_output->increment_depth_count();
+        
+        // Set kernel parameters
+        int argc = 0;
+        depthkernel.SetArg(argc++, m_render_data->intersections);
+        depthkernel.SetArg(argc++, m_render_data->hitcount);
+        depthkernel.SetArg(argc++, m_output->depth_data());
+        depthkernel.SetArg(argc++, m_output->get_depth_count());
+        
+        // Run shading kernel
+        {
+            int globalsize = m_output->width() * m_output->height();
+            m_context.Launch1D(0, ((globalsize + 63) / 64) * 64, 64, depthkernel);
+        }
+        
+    }
+    
     void PtRenderer::RunBenchmark(Scene const& scene, std::uint32_t num_passes, BenchmarkStats& stats)
     {
         stats.num_passes = num_passes;

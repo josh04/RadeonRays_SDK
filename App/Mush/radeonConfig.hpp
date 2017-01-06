@@ -12,6 +12,13 @@
 #include <Mush Core/opencl.hpp>
 
 namespace mush {
+	enum class camera_type
+	{
+		perspective,
+		perspective_dof,
+		spherical_equirectangular
+	};
+
     struct radeonConfig {
         
         void defaults() {
@@ -19,7 +26,7 @@ namespace mush {
 			width = 1280;
 			height = 720;
 
-			share_opencl = true;
+			share_opencl = false;
 
 			path = "bmw";
 			model_name = "i8.obj";
@@ -40,6 +47,15 @@ namespace mush {
 			camera_focal_length = 0.035f; // 35mm lens
 			camera_focus_distance = 0.f;
 			camera_aperture = 0.f;
+            
+            environment_map_mult = 1.0f;
+            environment_map_path = "Textures";
+            environment_map_name = "studio015.hdr";
+
+			//environment_width = 1280;
+			//environment_height = 720;
+
+			camera = camera_type::perspective;
         }
          
         
@@ -68,6 +84,14 @@ namespace mush {
         float camera_focus_distance;
         float camera_aperture;
         
+        float environment_map_mult;
+        const char * environment_map_path;
+        const char * environment_map_name;
+
+		//int environment_width;
+		//int environment_height;
+        
+		camera_type camera;
     };
 }
 

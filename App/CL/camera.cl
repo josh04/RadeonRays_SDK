@@ -38,10 +38,10 @@ typedef struct _Camera
         float3 right;
         float3 up;
         float3 p;
-        
+
         // Image plane width & height in current units
         float2 dim;
-        
+
         // Near and far Z
         float2 zcap;
         // Focal lenght
@@ -78,7 +78,7 @@ __kernel void PerspectiveCamera_GeneratePaths(
     int2 globalid;
     globalid.x  = get_global_id(0);
     globalid.y  = get_global_id(1);
-    
+
     // Check borders
     if (globalid.x < imgwidth && globalid.y < imgheight)
     {
@@ -88,7 +88,7 @@ __kernel void PerspectiveCamera_GeneratePaths(
 #ifndef NO_PATH_DATA
         __global Path* mypath = paths + globalid.y * imgwidth + globalid.x;
 #endif
-        
+
         // Prepare RNG
         Rng rng;
         InitRng(randseed +  globalid.x * 157 + 10433 * globalid.y, &rng);
@@ -112,17 +112,17 @@ __kernel void PerspectiveCamera_GeneratePaths(
 #else
         float2 sample0 = UniformSampler_Sample2D(&rng);
 #endif
-        
+
         // Calculate [0..1] image plane sample
         float2 imgsample;
         imgsample.x = (float)globalid.x / imgwidth + sample0.x / imgwidth;
         imgsample.y = (float)globalid.y / imgheight + sample0.y / imgheight;
-        
+
         // Transform into [-0.5, 0.5]
         float2 hsample = imgsample - make_float2(0.5f, 0.5f);
         // Transform into [-dim/2, dim/2]
         float2 csample = hsample * camera->dim;
-        
+
         // Calculate direction to image plane
         myray->d.xyz = normalize(camera->focal_length * camera->forward + csample.x * camera->right + csample.y * camera->up);
         // Origin == camera position + nearz * d
@@ -134,6 +134,7 @@ __kernel void PerspectiveCamera_GeneratePaths(
         // Set ray max
         myray->extra.x = 0xFFFFFFFF;
         myray->extra.y = 0xFFFFFFFF;
+        Ray_SetExtra(myray, 1.f);
 
 #ifndef NO_PATH_DATA
         mypath->throughput = make_float3(1.f, 1.f, 1.f);
@@ -249,5 +250,117 @@ __kernel void PerspectiveCameraDof_GeneratePaths(
 #endif
     }
 }
+
+#define M_PI 3.14159265358979323846
+
+/// Ray generation kernel for spherical camera.
+///
+__kernel void SphericalCamera_GeneratePaths(
+	// Camera descriptor
+	__global Camera const* camera,
+	// Image resolution
+	int imgwidth,
+	int imgheight,
+	// RNG seed value
+	int randseed,
+	// Output rays
+	__global ray* rays,
+	__global SobolSampler* samplers,
+	__global uint const* sobolmat,
+	int reset
+#ifndef NO_PATH_DATA
+	, __global Path* paths
+#endif
+)
+{
+	int2 globalid;
+	globalid.x = get_global_id(0);
+	globalid.y = get_global_id(1);
+
+	// Check borders
+	if (globalid.x < imgwidth && globalid.y < imgheight)
+	{
+		// Get pointer to ray to handle
+		__global ray* myray = rays + globalid.y * imgwidth + globalid.x;
+
+#ifndef NO_PATH_DATA
+		__global Path* mypath = paths + globalid.y * imgwidth + globalid.x;
+#endif
+
+		// Prepare RNG
+		Rng rng;
+		InitRng(randseed + globalid.x * 157 + 10433 * globalid.y, &rng);
+
+#ifdef SOBOL
+		__global SobolSampler* sampler = samplers + globalid.y * imgwidth + globalid.x;
+
+		if (reset)
+		{
+			sampler->seq = 0;
+			sampler->s0 = RandUint(&rng);
+		} else
+		{
+			sampler->seq++;
+		}
+
+		float2 sample0;
+		sample0.x = SobolSampler_Sample1D(sampler->seq, kPixelX, sampler->s0, sobolmat);
+		sample0.y = SobolSampler_Sample1D(sampler->seq, kPixelY, sampler->s0, sobolmat);
+#else
+		float2 sample0 = UniformSampler_Sample2D(&rng);
+#endif
+
+		// Calculate [0..1] image plane sample
+		float2 imgsample;
+		imgsample.x = (float)globalid.x / imgwidth + sample0.x / imgwidth;
+		imgsample.y = (float)globalid.y / imgheight + sample0.y / imgheight;
+
+		// Transform into [-0.5, 0.5]
+		float2 hsample = imgsample - make_float2(0.5f, 0.5f);
+		// Transform into [-dim/2, dim/2]
+		float2 csample = hsample * camera->dim;
+
+
+		float phi = (2.0 * M_PI) * (imgsample.x);
+		float theta = (M_PI) * (imgsample.y);
+
+		float4 m1, m2, m3, m4;
+		float4 n1, n2, n3, n4;
+
+		m1 = (float4) { cos(phi), 0.0, -sin(phi), 0.0 };
+		m2 = (float4) { 0.0, 1.0, 0.0, 0.0 };
+		m3 = (float4) { sin(phi), 0.0, cos(phi), 0.0 };
+		m4 = (float4) { 0.0, 0.0, 0.0, 1.0 };
+
+
+		n1 = (float4) { cos(theta), sin(theta), 0.0, 0.0 };
+		n2 = (float4) { -sin(theta), cos(theta), 0.0, 0.0 };
+		n3 = (float4) { 0.0, 0.0, 1.0, 0.0 };
+		n4 = (float4) { 0.0, 0.0, 0.0, 1.0 };
+
+		//myray->d.xyz = normalize(camera->focal_length * transform_vector(transform_vector(-camera->up.xyz, n1, n2, n3, n4), m1, m2, m3, m4));
+		myray->d.xyz = normalize(camera->focal_length * transform_vector(transform_vector(-(float3) { 0, 1, 0 }, n1, n2, n3, n4), m1, m2, m3, m4));
+
+		// Calculate direction to image plane
+		//myray->d.xyz = normalize(camera->focal_length * camera->forward + csample.x * camera->right + csample.y * camera->up);
+		// Origin == camera position + nearz * d
+		myray->o.xyz = camera->p + camera->zcap.x * myray->d.xyz;
+		// Max T value = zfar - znear since we moved origin to znear
+		myray->o.w = camera->zcap.y - camera->zcap.x;
+		// Generate random time from 0 to 1
+		myray->d.w = sample0.x;
+		// Set ray max
+		myray->extra.x = 0xFFFFFFFF;
+		myray->extra.y = 0xFFFFFFFF;
+
+#ifndef NO_PATH_DATA
+		mypath->throughput = make_float3(1.f, 1.f, 1.f);
+		mypath->volume = -1;
+		mypath->flags = 0;
+		mypath->active = 0xFF;
+#endif
+	}
+}
+
 
 #endif // CAMERA_CL

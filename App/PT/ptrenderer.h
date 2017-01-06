@@ -59,6 +59,10 @@ namespace Baikal
         void SetNumBounces(int num_bounces);
         // Interop function
         CLWKernel GetCopyKernel();
+        // Interop function
+        CLWKernel GetDepthCopyKernel();
+		// Interop function
+		//CLWKernel GetEnvironmentCopyKernel();
         // Add function
         CLWKernel GetAccumulateKernel();
 
@@ -86,6 +90,9 @@ namespace Baikal
         void ShadeVolume(ClwScene const& scene, int pass);
         // Shade background
         void ShadeBackground(ClwScene const& scene, int pass);
+        
+        // JOSH
+        void CaptureDepths();
 
     public:
         // CL context

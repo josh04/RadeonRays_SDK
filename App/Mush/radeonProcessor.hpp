@@ -12,15 +12,19 @@
 #include <memory>
 #include <Mush Core/imageProcessor.hpp>
 #include <Mush Core/quitEventHandler.hpp>
+#include <Mush Core/timerWrapper.hpp>
 
 #include "radeonConfig.hpp"
 #include "mush-radeon-dll.hpp"
 
 class radeonProcess;
+class radeonDepthProcess;
 class radeonEventHandler;
 
 namespace mush {
+	class imageProcess;
     class timerWrapper;
+    class imageProcessor;
 }
 
 class RADEONEXPORTS_API radeonProcessor : public mush::imageProcessor {
@@ -45,7 +49,10 @@ public:
     std::vector<std::shared_ptr<azure::Eventable>> getEventables() const override;
 private:
     std::shared_ptr<radeonProcess> _radeon = nullptr;
+    std::shared_ptr<radeonDepthProcess> _depth = nullptr;
+    std::shared_ptr<radeonDepthProcess> _normals = nullptr;
     std::shared_ptr<mush::imageProcess> _copy = nullptr;
+	std::shared_ptr<mush::imageProcess> _output_copy = nullptr;
     
     
     std::shared_ptr<mush::quitEventHandler> _quit = nullptr;
@@ -54,6 +61,9 @@ private:
     std::unique_ptr<mush::timerWrapper> _timer = nullptr;
     
 	mush::radeonConfig _config;
+
+	unsigned int _tick = 0;
+	unsigned int _per_frame = 20;
 };
 
 #endif /* radeonProcessor_hpp */

@@ -39,9 +39,16 @@ namespace Baikal
         {
         }
 
+		void SetEnvironment(int w, int h, int d, int format, float envmapmul);
         void SetEnvironment(std::string const& filename, std::string const& basepath = "", float envmapmul = 1.f);
 
         void SetBackground(std::string const& filename, std::string const& basepath = "");
+
+        void AddDirectionalLight(RadeonRays::float3 const& d, RadeonRays::float3 const& e);
+        
+        void AddPointLight(RadeonRays::float3 const& p, RadeonRays::float3 const& e);
+        
+        void AddSpotLight(RadeonRays::float3 const& p, RadeonRays::float3 const& d, RadeonRays::float3 const& e, float ia, float oa);
 
         enum DirtyFlags
         {
@@ -166,17 +173,49 @@ namespace Baikal
                 RadeonRays::matrix m;
             };
 
-            // Emissive object
-            struct Emissive
+            enum LightType
             {
-                // Shape index
-                int shapeidx;
-                // Polygon index
-                int primidx;
-                // Material index
-                int m;
+                kPoint = 0x1,
+                kDirectional,
+                kSpot,
+                kArea,
+                kIbl
+            };
 
-                int padding;
+            struct Light
+            {
+                int type;
+
+                union
+                {
+                    // Area light
+                    struct
+                    {
+                        int shapeidx;
+                        int primidx;
+                        int matidx;
+                    };
+
+                    // IBL
+                    struct
+                    {
+                        int tex;
+                        int texdiffuse;
+                        float multiplier;
+                    };
+                    
+                    // Spot
+                    struct
+                    {
+                        float ia;
+                        float oa;
+                        float f;
+                    };
+                };
+
+                RadeonRays::float3 p;
+                RadeonRays::float3 d;
+                RadeonRays::float3 intensity;
             };
 
             struct Volume
@@ -205,7 +244,7 @@ namespace Baikal
             // Shapes: index which points to indices array
             std::vector<Shape> shapes_;
             // Emissive primitive indices
-            std::vector<Emissive> emissives_;
+            std::vector<Light> lights_;
             // Material indices per primitive
             std::vector<int> materialids_;
             // Material descriptions
@@ -217,6 +256,7 @@ namespace Baikal
             std::vector<std::unique_ptr<char[]>> texturedata_;
             // Camera
             std::unique_ptr<PerspectiveCamera> camera_;
+			int camera_type_;
             // Environment texture index
             int envidx_;
             // Environment low-res texture index

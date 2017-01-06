@@ -85,13 +85,13 @@ namespace RadeonRays
 #ifndef RR_EMBED_KERNELS
         if ( m_device->GetPlatform() == Calc::Platform::kOpenCL )
         {
-            m_gpudata->executable = m_device->CompileExecutable( _get_resource_path("CL/hlbvh_build.cl"), nullptr, 0 );
+            m_gpudata->executable = m_device->CompileExecutable( _get_resource_path("CL/hlbvh_build.cl"), nullptr, 0, nullptr  );
         }
 
         else
         {
             assert( m_device->GetPlatform() == Calc::Platform::kVulkan );
-            m_gpudata->executable = m_device->CompileExecutable( _get_resource_path("GLSL/hlbvh_build.comp"), nullptr, 0 );
+            m_gpudata->executable = m_device->CompileExecutable( _get_resource_path("GLSL/hlbvh_build.comp"), nullptr, 0, nullptr  );
         }
 #else
         auto& device = m_device;

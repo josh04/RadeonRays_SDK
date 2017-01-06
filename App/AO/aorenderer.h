@@ -57,6 +57,8 @@ namespace Baikal
         void SetOutput(Output* output) override;
         // Interop function
         CLWKernel GetCopyKernel();
+		// Interop function
+		CLWKernel GetDepthCopyKernel();
         // Add function
         CLWKernel GetAccumulateKernel();
 
@@ -74,6 +76,8 @@ namespace Baikal
         // Convert intersection info to compaction predicate
         void FilterPathStream();
 
+		// JOSH
+		void CaptureDepths();
     public:
         // CL context
         CLWContext m_context;
