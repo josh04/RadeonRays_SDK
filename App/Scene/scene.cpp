@@ -1286,7 +1286,42 @@ void Scene::AddSpotLight(RadeonRays::float3 const& p, RadeonRays::float3 const& 
     light.oa = oa;
     lights_.push_back(light);
 }
-    
+
+
+void Scene::SetEnvironment(int w, int h, int d, int format, float envmapmul) {
+	envmapmul_ = envmapmul;
+
+	Texture texture;
+
+	texture.w = w;
+	texture.h = h;
+	texture.d = d;
+	texture.fmt = format;
+
+	// Save old size for reading offset
+	texture.dataoffset = (int)texturedata_.size();
+
+	if (format == Scene::RGBA8) {
+		texture.size = texture.w * texture.h * texture.d * sizeof(uint8_t) * 4;
+	} else if (format == Scene::RGBA16) {
+		texture.size = texture.w * texture.h * texture.d * sizeof(float) * 2;
+	} else {
+		texture.size = texture.w * texture.h * texture.d * sizeof(float4);
+	}
+
+	// Resize storage
+	std::unique_ptr<char[]> texturedata(new char[texture.size]);
+
+	// Add to texture pool
+	texturedata_.push_back(std::move(texturedata));
+
+	// Save index
+	envidx_ = (int)textures_.size();
+
+	// Add texture desc
+	textures_.push_back(texture);
+}
+
 void Scene::SetEnvironment(std::string const& filename, std::string const& basepath, float envmapmul)
 {
     // Save multiplier

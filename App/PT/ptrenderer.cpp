@@ -203,7 +203,7 @@ namespace Baikal
             //m_api->DeleteEvent(e);
             
             if (pass == 0) {
-                CaptureDepths();
+				CaptureDepths();
             }
 
             // Apply scattering
@@ -592,7 +592,13 @@ namespace Baikal
     {
         return m_render_data->program.GetKernel("CopyDepth");
     }
-    
+	/*
+	// JOSH
+	CLWKernel PtRenderer::GetEnvironmentCopyKernel()
+	{
+		return m_render_data->program.GetKernel("CopyEnvironment");
+	}
+    */
     CLWKernel PtRenderer::GetAccumulateKernel()
     {
         return m_render_data->program.GetKernel("AccumulateData");

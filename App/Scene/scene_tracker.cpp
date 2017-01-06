@@ -82,6 +82,11 @@ namespace Baikal
                 UpdateMaterialInputs(scene, out);
             }
 
+			if (scene.dirty() & Scene::DirtyFlags::kEnvironmentLight)
+			{
+				UpdateEnvironmentMap(scene, out);
+			}
+
             if (m_current_scene != &scene)
             {
                 ReloadIntersector(scene, out);
@@ -144,6 +149,9 @@ namespace Baikal
         out.isect_shapes.clear();
 
         m_vidmem_usage = 0;
+
+		//JOSH
+		out.camera_type = (Baikal::CameraType)scene.camera_type_;
 
         // Create static buffers
         out.camera = m_context.CreateBuffer<PerspectiveCamera>(1, CL_MEM_READ_ONLY |  CL_MEM_COPY_HOST_PTR, scene.camera_.get());
@@ -331,4 +339,29 @@ namespace Baikal
             m_vidmem_usage += 1;
         }
     }
+
+	void SceneTracker::UpdateEnvironmentMap(Scene const& scene, ClwScene& out) const {
+
+		// Map both buffers
+		char* mappeddata = nullptr;
+		char* mappeddata_orig = nullptr;
+
+		m_context.MapBuffer(0, out.texturedata, CL_MAP_WRITE, &mappeddata).Wait();
+
+		// Save them for unmap
+		mappeddata_orig = mappeddata;
+
+
+		auto& env_tex = scene.textures_[scene.envidx_];
+
+		for (int i = 0; i < env_tex.dataoffset; ++i) {
+			mappeddata += scene.textures_[i].size;
+		}
+		// !
+		//mappeddata += env_tex.dataoffset;
+
+		memcpy(mappeddata, scene.texturedata_[env_tex.dataoffset].get(), env_tex.size);
+
+		m_context.UnmapBuffer(0, out.texturedata, mappeddata_orig).Wait();
+	}
 }

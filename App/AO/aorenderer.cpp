@@ -417,8 +417,39 @@ namespace Baikal
         return m_render_data->program.GetKernel("ApplyGammaAndCopyData");
     }
 
+	// JOSH
+	CLWKernel AoRenderer::GetDepthCopyKernel()
+	{
+		return m_render_data->program.GetKernel("CopyDepth");
+	}
+
     CLWKernel AoRenderer::GetAccumulateKernel()
     {
         return m_render_data->program.GetKernel("AccumulateData");
     }
+
+
+	// JOSH
+	void AoRenderer::CaptureDepths() {
+		// Fetch kernel
+		CLWKernel depthkernel = m_render_data->program.GetKernel("CaptureDepths");
+
+		//int numrays = m_output->width() * m_output->height();
+
+		m_output->increment_depth_count();
+
+		// Set kernel parameters
+		int argc = 0;
+		depthkernel.SetArg(argc++, m_render_data->intersections);
+		depthkernel.SetArg(argc++, m_render_data->hitcount);
+		depthkernel.SetArg(argc++, m_output->depth_data());
+		depthkernel.SetArg(argc++, m_output->get_depth_count());
+
+		// Run shading kernel
+		{
+			int globalsize = m_output->width() * m_output->height();
+			m_context.Launch1D(0, ((globalsize + 63) / 64) * 64, 64, depthkernel);
+		}
+
+	}
 }

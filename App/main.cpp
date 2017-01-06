@@ -77,9 +77,9 @@ using namespace RadeonRays;
 char const* kHelpMessage =
 "App [-p path_to_models][-f model_name][-b][-r][-ns number_of_shadow_rays][-ao ao_radius][-w window_width][-h window_height][-nb number_of_indirect_bounces]";
 char const* g_path =
-"../Resources/CornellBox";
+"../../../../../Resources/CornellBox";
 char const* g_modelname = "orig.objm";
-char const* g_envmapname = "../Resources/Textures/studio015.hdr";
+char const* g_envmapname = "../../../../../Resources/Textures/studio015.hdr";
 
 std::unique_ptr<ShaderManager>    g_shader_manager;
 
@@ -179,7 +179,7 @@ void Render()
             glBindBuffer(GL_ARRAY_BUFFER, g_vertex_buffer);
             glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, g_index_buffer);
 
-            GLuint program = g_shader_manager->GetProgram("../App/simple");
+            GLuint program = g_shader_manager->GetProgram("../../../App/simple");
             glUseProgram(program);
 
             GLuint texloc = glGetUniformLocation(program, "g_Texture");

@@ -22,9 +22,19 @@ radeonProcess::~radeonProcess() {
 }
 
 void radeonProcess::init(std::shared_ptr<mush::opencl> context, const std::initializer_list<std::shared_ptr<mush::ringBuffer> > &buffers) {
-    assert(buffers.size() == 0);
+    assert(buffers.size() == 0 || buffers.size() == 1);
     
-    bool success = ::init(_width, _height, _share_opencl, context->get_cl_context(), context->get_cl_device(), (*context->getQueue())());
+	unsigned int env_depth = 0;
+
+	if (buffers.size() > 0) {
+		_environment_map = castToImage(buffers.begin()[0]);
+		_environment_map->getParams(env_width, env_height, env_depth);
+
+		env_down_buffer = context->hostReadBuffer(env_width * env_height * sizeof(cl_float4));
+
+	}
+
+    bool success = ::init(_width, _height, _share_opencl, context->get_cl_context(), context->get_cl_device(), (*context->getQueue())(), env_width, env_height);
     
 	if (!success) {
 		kill();
@@ -53,6 +63,34 @@ void radeonProcess::process() {
         //up = true;
         call_once = true;
     }
+
+	up = up || _change_environment;
+
+	if (_change_environment) {
+		_change_environment = false;
+		if (_environment_map.get() != nullptr) {
+			auto ptr = _environment_map->imageOutLock();
+
+			if (ptr != nullptr) {
+				cl::Event event;
+				cl::size_t<3> origin, region;
+				origin[0] = 0; origin[1] = 0; origin[2] = 0;
+				region[0] = env_width; region[1] = env_height; region[2] = 1;
+
+				queue->enqueueReadImage(*ptr, CL_TRUE, origin, region, 0, 0, env_down_buffer, NULL, &event);
+				event.wait();
+
+				update_environment(true, env_down_buffer);
+			} else {
+				_environment_map->outUnlock();
+				release();
+				return;
+			}
+
+			_environment_map->outUnlock();
+
+		}
+	}
     
     
     inLock();
@@ -97,7 +135,7 @@ void radeonProcess::process() {
         
     }
     
-    inUnlock();
+	inUnlock();
     
 }
 

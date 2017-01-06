@@ -32783,7 +32783,7 @@ static const char g_integrator_pt_opencl[]= \
 "        DifferentialGeometry diffgeo; \n"\
 "        FillDifferentialGeometry(&scene, &isect, &diffgeo); \n"\
 " \n"\
-"		if (bounce == 0) { output_normals[globalid] += (float4)(diffgeo.n.x, diffgeo.n.y, diffgeo.n.z, 0.0f); } \n"\
+"		if (bounce == 0) { output_normals[pixelidx] += (float4)(diffgeo.n.x, diffgeo.n.y, diffgeo.n.z, 0.0f); } \n"\
 " \n"\
 "        // Check if we are hitting from the inside \n"\
 "        float ndotwi = dot(diffgeo.n, wi); \n"\

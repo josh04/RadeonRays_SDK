@@ -360,7 +360,7 @@ __kernel void ShadeSurface(
         DifferentialGeometry diffgeo;
         FillDifferentialGeometry(&scene, &isect, &diffgeo);
 
-		if (bounce == 0) { output_normals[globalid] += (float4)(diffgeo.n.x, diffgeo.n.y, diffgeo.n.z, 0.0f); }
+		if (bounce == 0) { output_normals[pixelidx] += (float4)(diffgeo.n.x, diffgeo.n.y, diffgeo.n.z, 0.0f); }
 
         // Check if we are hitting from the inside
         float ndotwi = dot(diffgeo.n, wi);
@@ -840,7 +840,30 @@ __kernel void CopyDepth(
         write_imagef(img, make_int2(gidx, gidy), (float4)(v, v, v, 1.0f));
     }
 }
+/*
+// Copy env from interop texture if supported
+__kernel void CopyEnvironment (
+	__global float4 * data,
+	int imgwidth,
+	int imgheight,
+	// Textures
+	TEXTURE_ARG_LIST,
+	read_only image2d_t img
+)
+{
+	int gid = get_global_id(0);
 
+	int gidx = gid % imgwidth;
+	int gidy = gid / imgwidth;
+
+	if (gidx < imgwidth && gidy < imgheight)
+	{
+		const sampler_t sampl = CLK_FILTER_NEAREST | CLK_NORMALIZED_COORDS_FALSE | CLK_ADDRESS_CLAMP_TO_EDGE;
+		float4 inp = read_imagef(img, sampl, make_int2(gidx, gidy));
+		data[gid] = inp;
+	}
+}
+*/
 // Copy data to interop texture if supported
 __kernel void ApplyGammaAndCopyData(
     __global float4 const* data,

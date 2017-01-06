@@ -80,6 +80,8 @@ float g_envmapmul = 1.f;
 
 const char * g_environment_map_path = "Textures";
 const char * g_environment_map_name = "studio015.hdr";
+int g_environment_width = 1280;
+int g_environment_height = 720;
 
 float g_cspeed = 100.25f;
 
@@ -102,6 +104,7 @@ ConfigManager::Mode g_mode = ConfigManager::Mode::kUseSingleGpu;
 
 using namespace tinyobj;
 
+CLWBuffer<unsigned char> g_environment_buffer;
 
 struct OutputData
 {
@@ -186,7 +189,15 @@ void init_cl(bool share_opencl, cl_context c, cl_device_id d, cl_command_queue q
         g_cfgs.push_back(cfg);
 
         for (int i = 0; i < g_cfgs.size(); ++i) {
-            g_cfgs[i].renderer = new Baikal::PtRenderer(g_cfgs[i].context, g_cfgs[i].devidx, g_num_bounces);
+			//g_cfgs[i].renderer = new Baikal::PtRenderer(g_cfgs[i].context, g_cfgs[i].devidx, g_num_bounces);
+
+			
+			if (!g_ao_enabled) {
+				g_cfgs[i].renderer = new Baikal::PtRenderer(g_cfgs[i].context, g_cfgs[i].devidx, g_num_bounces);
+			} else {
+				g_cfgs[i].renderer = (Baikal::PtRenderer *)new Baikal::AoRenderer(g_cfgs[i].context, g_cfgs[i].devidx);
+			}
+			
         }
     }
 
@@ -336,13 +347,16 @@ void InitData()
     strm << "AMD: F-Stop: " << 1.f / (g_scene->camera_->GetAperture() * 10.f) << "\n";
     strm << "AMD: Sensor size: " << g_camera_sensor_size.x * 1000.f << "x" << g_camera_sensor_size.y * 1000.f << "mm\n";
     putLog(strm.str());
-    
-    g_scene->SetEnvironment(g_environment_map_name, g_environment_map_path, g_envmapmul);
+
+	g_scene->SetEnvironment(g_environment_width, g_environment_height, 1, Baikal::Scene::RGBA32, g_envmapmul);
+    //g_scene->SetEnvironment(g_environment_map_name, g_environment_map_path, g_envmapmul);
     
 #pragma omp parallel for
     for (int i = 0; i < g_cfgs.size(); ++i)
     {
-        //g_cfgs[i].renderer->SetNumBounces(g_num_bounces);
+		if (!g_ao_enabled) {
+			((Baikal::PtRenderer *)g_cfgs[i].renderer)->SetNumBounces(g_num_bounces);
+		}
         g_cfgs[i].renderer->Preprocess(*g_scene);
         
         g_outputs[i].output = (Baikal::ClwOutput*)g_cfgs[i].renderer->CreateOutput(g_window_width, g_window_height);
@@ -358,7 +372,8 @@ void InitData()
         if (g_cfgs[i].type == ConfigManager::kPrimary)
         {
             g_outputs[i].copybuffer = g_cfgs[i].context.CreateBuffer<float3>(g_window_width * g_window_height, CL_MEM_READ_WRITE);
-        }
+		}
+
     }
     
     g_cfgs[g_primary].renderer->Clear(float3(0, 0, 0), *g_outputs[g_primary].output);
@@ -416,9 +431,13 @@ void StartRenderThreads()
     putLog(strm.str());
 }
 
-bool init(int width, int height, bool share_opencl, cl_context c, cl_device_id d, cl_command_queue q) {
+bool init(int width, int height, bool share_opencl, cl_context c, cl_device_id d, cl_command_queue q, int env_width, int env_height) {
     g_window_width = width;
     g_window_height = height;
+
+	g_environment_width = env_width;
+	g_environment_height = env_height;
+
 	bool exception_thrown = false;
     try
     {
@@ -479,7 +498,15 @@ update_return_type update(bool share_opencl, bool update, cl_mem load_image, cl_
                 //std::cout << "Finished updating acc buffer\n"; std::cout.flush();
             }
             
-            CLWKernel acckernel = g_cfgs[g_primary].renderer->GetAccumulateKernel();
+
+			CLWKernel acckernel;
+			
+			if (g_ao_enabled) {
+				acckernel = ((Baikal::AoRenderer *)g_cfgs[g_primary].renderer)->GetAccumulateKernel();
+			} else {
+				acckernel = ((Baikal::PtRenderer *)g_cfgs[g_primary].renderer)->GetAccumulateKernel();
+			}
+			
             
             int argc = 0;
             acckernel.SetArg(argc++, g_outputs[g_primary].copybuffer);
@@ -492,7 +519,14 @@ update_return_type update(bool share_opencl, bool update, cl_mem load_image, cl_
     }
     
     if (share_opencl) {
-        CLWKernel copykernel = g_cfgs[g_primary].renderer->GetCopyKernel();
+
+		CLWKernel copykernel;
+
+		if (g_ao_enabled) {
+			copykernel = ((Baikal::AoRenderer *)g_cfgs[g_primary].renderer)->GetCopyKernel();
+		} else {
+			copykernel = ((Baikal::PtRenderer *)g_cfgs[g_primary].renderer)->GetCopyKernel();
+		}
         
         int argc = 0;
         copykernel.SetArg(argc++, g_outputs[g_primary].output->data());
@@ -520,8 +554,14 @@ update_return_type update(bool share_opencl, bool update, cl_mem load_image, cl_
         g_cfgs[g_primary].context.Launch1D(0, ((globalsize + 63) / 64) * 64, 64, copykernel);
         
         //g_cfgs[g_primary].context.ReleaseGLObjects(0, objects);
-        
-        CLWKernel depthcopykernel = g_cfgs[g_primary].renderer->GetDepthCopyKernel();
+
+		CLWKernel depthcopykernel;
+
+		if (g_ao_enabled) {
+			depthcopykernel = ((Baikal::AoRenderer *)g_cfgs[g_primary].renderer)->GetDepthCopyKernel();
+		} else {
+			depthcopykernel = ((Baikal::PtRenderer *)g_cfgs[g_primary].renderer)->GetDepthCopyKernel();
+		}
         
         argc = 0;
         depthcopykernel.SetArg(argc++, g_outputs[g_primary].output->depth_data());
@@ -564,3 +604,60 @@ void close_down() {
 }
 
 
+void update_environment(bool share_opencl, unsigned char * environment_image_host) {
+	auto& env_tex = g_scene->textures_[g_scene->envidx_];
+
+	auto env_ptr = g_scene->texturedata_[env_tex.dataoffset].get();
+	memcpy(env_ptr, environment_image_host, env_tex.size);
+
+	g_scene->set_dirty(Baikal::Scene::DirtyFlags::kEnvironmentLight);
+
+	/*
+	if (share_opencl) {
+		CLWKernel envcopykernel = ((Baikal::PtRenderer *)g_cfgs[g_primary].renderer)->GetEnvironmentCopyKernel();
+		;
+		
+		int argc = 0;
+		envcopykernel.SetArg(argc++, g_scene->envidx_);
+		envcopykernel.SetArg(argc++, g_scene->textures_[g_scene->envidx_].w);
+		envcopykernel.SetArg(argc++, g_scene->textures_[g_scene->envidx_].h);
+
+		auto err = clSetKernelArg(envcopykernel, argc++, sizeof(cl_mem), &environment_image);
+
+		//copykernel.SetArg(argc++, load_image);
+
+		int globalsize = g_scene->textures_[g_scene->envidx_].w * g_scene->textures_[g_scene->envidx_].h;
+		g_cfgs[g_primary].context.Launch1D(0, ((globalsize + 63) / 64) * 64, 64, envcopykernel);
+
+		//g_cfgs[g_primary].context.ReleaseGLObjects(0, objects);
+
+		g_cfgs[g_primary].context.Finish(0);
+	} else {
+		
+		CLWKernel envcopykernel = ((Baikal::PtRenderer *)g_cfgs[g_primary].renderer)->GetEnvironmentCopyKernel();
+		;
+
+		int argc = 0;
+		envcopykernel.SetArg(argc++, g_scene->envidx_);
+		envcopykernel.SetArg(argc++, g_scene->textures_[g_scene->envidx_].w);
+		envcopykernel.SetArg(argc++, g_scene->textures_[g_scene->envidx_].h);
+
+		if (!g_environment_buffer) {
+			g_environment_buffer = g_cfgs[g_primary].context.CreateBuffer<unsigned char>(g_scene->textures_[g_scene->envidx_].size, CL_MEM_READ_WRITE);
+
+		}
+
+		auto err = clSetKernelArg(envcopykernel, argc++, sizeof(cl_mem), &g_environment_buffer);
+
+		g_cfgs[g_primary].context.WriteBuffer(0, g_environment_buffer, (unsigned char *)environment_image_host, g_scene->textures_[g_scene->envidx_].size).Wait();
+
+		int globalsize = g_scene->textures_[g_scene->envidx_].w * g_scene->textures_[g_scene->envidx_].h;
+		g_cfgs[g_primary].context.Launch1D(0, ((globalsize + 63) / 64) * 64, 64, envcopykernel);
+
+		//g_cfgs[g_primary].context.ReleaseGLObjects(0, objects);
+
+		g_cfgs[g_primary].context.Finish(0);
+		
+	}
+*/
+}

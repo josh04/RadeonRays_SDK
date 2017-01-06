@@ -32,6 +32,8 @@ namespace Baikal
         void UpdateMaterials(Scene const& scene, ClwScene& out) const;
         void UpdateMaterialInputs(Scene const& scene, ClwScene& out) const;
 
+		// JOSH
+		void UpdateEnvironmentMap(Scene const& scene, ClwScene& out) const;
 
 
     private:

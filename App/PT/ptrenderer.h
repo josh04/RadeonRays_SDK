@@ -61,6 +61,8 @@ namespace Baikal
         CLWKernel GetCopyKernel();
         // Interop function
         CLWKernel GetDepthCopyKernel();
+		// Interop function
+		//CLWKernel GetEnvironmentCopyKernel();
         // Add function
         CLWKernel GetAccumulateKernel();
 

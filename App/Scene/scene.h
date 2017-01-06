@@ -39,6 +39,7 @@ namespace Baikal
         {
         }
 
+		void SetEnvironment(int w, int h, int d, int format, float envmapmul);
         void SetEnvironment(std::string const& filename, std::string const& basepath = "", float envmapmul = 1.f);
 
         void SetBackground(std::string const& filename, std::string const& basepath = "");

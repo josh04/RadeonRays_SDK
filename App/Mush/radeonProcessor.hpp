@@ -52,6 +52,7 @@ private:
     std::shared_ptr<radeonDepthProcess> _depth = nullptr;
     std::shared_ptr<radeonDepthProcess> _normals = nullptr;
     std::shared_ptr<mush::imageProcess> _copy = nullptr;
+	std::shared_ptr<mush::imageProcess> _output_copy = nullptr;
     
     
     std::shared_ptr<mush::quitEventHandler> _quit = nullptr;
@@ -60,6 +61,9 @@ private:
     std::unique_ptr<mush::timerWrapper> _timer = nullptr;
     
 	mush::radeonConfig _config;
+
+	unsigned int _tick = 0;
+	unsigned int _per_frame = 20;
 };
 
 #endif /* radeonProcessor_hpp */

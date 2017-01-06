@@ -51,6 +51,10 @@ namespace mush {
             environment_map_mult = 1.0f;
             environment_map_path = "Textures";
             environment_map_name = "studio015.hdr";
+
+			//environment_width = 1280;
+			//environment_height = 720;
+
 			camera = camera_type::perspective;
         }
          
@@ -83,6 +87,9 @@ namespace mush {
         float environment_map_mult;
         const char * environment_map_path;
         const char * environment_map_name;
+
+		//int environment_width;
+		//int environment_height;
         
 		camera_type camera;
     };
