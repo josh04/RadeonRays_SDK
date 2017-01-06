@@ -142,7 +142,7 @@ static const char g_bxdf_opencl[]= \
 "float4 quaternion_inverse(float4 q) \n"\
 "{ \n"\
 "    float sqnorm = q.x*q.x + q.y*q.y + q.z*q.z + q.w*q.w; \n"\
-"     \n"\
+" \n"\
 "    /// Check if it is singular \n"\
 "    if (sqnorm != 0.f) \n"\
 "    { \n"\
@@ -164,7 +164,7 @@ static const char g_bxdf_opencl[]= \
 "} \n"\
 " \n"\
 "/// Linearly interpolate between two values \n"\
-"float3 lerp(float3 a, float3 b, float w) \n"\
+"float4 lerp(float4 a, float4 b, float w) \n"\
 "{ \n"\
 "    return a + w*(b-a); \n"\
 "} \n"\
@@ -183,7 +183,7 @@ static const char g_bxdf_opencl[]= \
 "float3 GetOrthoVector(float3 n) \n"\
 "{ \n"\
 "    float3 p; \n"\
-"     \n"\
+" \n"\
 "    if (fabs(n.z) > 0.f) { \n"\
 "        float k = sqrt(n.y*n.y + n.z*n.z); \n"\
 "        p.x = 0; p.y = -n.z/k; p.z = n.y/k; \n"\
@@ -426,7 +426,7 @@ static const char g_bxdf_opencl[]= \
 "float4 quaternion_inverse(float4 q) \n"\
 "{ \n"\
 "    float sqnorm = q.x*q.x + q.y*q.y + q.z*q.z + q.w*q.w; \n"\
-"     \n"\
+" \n"\
 "    /// Check if it is singular \n"\
 "    if (sqnorm != 0.f) \n"\
 "    { \n"\
@@ -448,7 +448,7 @@ static const char g_bxdf_opencl[]= \
 "} \n"\
 " \n"\
 "/// Linearly interpolate between two values \n"\
-"float3 lerp(float3 a, float3 b, float w) \n"\
+"float4 lerp(float4 a, float4 b, float w) \n"\
 "{ \n"\
 "    return a + w*(b-a); \n"\
 "} \n"\
@@ -467,7 +467,7 @@ static const char g_bxdf_opencl[]= \
 "float3 GetOrthoVector(float3 n) \n"\
 "{ \n"\
 "    float3 p; \n"\
-"     \n"\
+" \n"\
 "    if (fabs(n.z) > 0.f) { \n"\
 "        float k = sqrt(n.y*n.y + n.z*n.z); \n"\
 "        p.x = 0; p.y = -n.z/k; p.z = n.y/k; \n"\
@@ -536,88 +536,88 @@ static const char g_bxdf_opencl[]= \
 "#define TEXTURE_ARGS_IDX(x) x, textures, texturedata \n"\
 " \n"\
 "/// Sample 2D texture \n"\
-"float3 Texture_Sample2D(float2 uv, TEXTURE_ARG_LIST_IDX(texidx)) \n"\
+"float4 Texture_Sample2D(float2 uv, TEXTURE_ARG_LIST_IDX(texidx)) \n"\
 "{ \n"\
 "    // Get width and height \n"\
 "    int width = textures[texidx].w; \n"\
 "    int height = textures[texidx].h; \n"\
-"     \n"\
+" \n"\
 "    // Find the origin of the data in the pool \n"\
 "    __global char const* mydata = texturedata + textures[texidx].dataoffset; \n"\
 " \n"\
 "    // Handle UV wrap \n"\
 "    // TODO: need UV mode support \n"\
 "    uv -= floor(uv); \n"\
-"     \n"\
+" \n"\
 "    // Reverse Y: \n"\
 "    // it is needed as textures are loaded with Y axis going top to down \n"\
 "    // and our axis goes from down to top \n"\
 "    uv.y = 1.f - uv.y; \n"\
-"     \n"\
+" \n"\
 "    // Calculate integer coordinates \n"\
 "    int x0 = clamp((int)floor(uv.x * width), 0, width - 1); \n"\
 "    int y0 = clamp((int)floor(uv.y * height), 0, height - 1); \n"\
-"     \n"\
+" \n"\
 "    // Calculate samples for linear filtering \n"\
 "    int x1 = clamp(x0 + 1, 0,  width - 1); \n"\
 "    int y1 = clamp(y0 + 1, 0, height - 1); \n"\
-"     \n"\
+" \n"\
 "    // Calculate weights for linear filtering \n"\
 "    float wx = uv.x * width - floor(uv.x * width); \n"\
 "    float wy = uv.y * height - floor(uv.y * height); \n"\
-"     \n"\
+" \n"\
 "    switch (textures[texidx].fmt) \n"\
 "    { \n"\
 "        case RGBA32: \n"\
 "        { \n"\
-"            __global float3 const* mydataf = (__global float3 const*)mydata; \n"\
-"             \n"\
+"            __global float4 const* mydataf = (__global float4 const*)mydata; \n"\
+" \n"\
 "            // Get 4 values for linear filtering \n"\
-"            float3 val00 = *(mydataf + width * y0 + x0); \n"\
-"            float3 val01 = *(mydataf + width * y0 + x1); \n"\
-"            float3 val10 = *(mydataf + width * y1 + x0); \n"\
-"            float3 val11 = *(mydataf + width * y1 + x1); \n"\
-"             \n"\
+"            float4 val00 = *(mydataf + width * y0 + x0); \n"\
+"            float4 val01 = *(mydataf + width * y0 + x1); \n"\
+"            float4 val10 = *(mydataf + width * y1 + x0); \n"\
+"            float4 val11 = *(mydataf + width * y1 + x1); \n"\
+" \n"\
 "            // Filter and return the result \n"\
 "            return lerp(lerp(val00, val01, wx), lerp(val10, val11, wx), wy); \n"\
 "        } \n"\
-"             \n"\
+" \n"\
 "        case RGBA16: \n"\
 "        { \n"\
 "            __global half const* mydatah = (__global half const*)mydata; \n"\
-"             \n"\
+" \n"\
 "            // Get 4 values \n"\
-"            float3 val00 = vload_half4(width * y0 + x0, mydatah).xyz; \n"\
-"            float3 val01 = vload_half4(width * y0 + x1, mydatah).xyz; \n"\
-"            float3 val10 = vload_half4(width * y1 + x0, mydatah).xyz; \n"\
-"            float3 val11 = vload_half4(width * y1 + x1, mydatah).xyz; \n"\
-"             \n"\
+"            float4 val00 = vload_half4(width * y0 + x0, mydatah); \n"\
+"            float4 val01 = vload_half4(width * y0 + x1, mydatah); \n"\
+"            float4 val10 = vload_half4(width * y1 + x0, mydatah); \n"\
+"            float4 val11 = vload_half4(width * y1 + x1, mydatah); \n"\
+" \n"\
 "            // Filter and return the result \n"\
 "            return lerp(lerp(val00, val01, wx), lerp(val10, val11, wx), wy); \n"\
 "        } \n"\
-"             \n"\
+" \n"\
 "        case RGBA8: \n"\
 "        { \n"\
 "            __global uchar4 const* mydatac = (__global uchar4 const*)mydata; \n"\
-"             \n"\
+" \n"\
 "            // Get 4 values and convert to float \n"\
 "            uchar4 valu00 = *(mydatac + width * y0 + x0); \n"\
 "            uchar4 valu01 = *(mydatac + width * y0 + x1); \n"\
 "            uchar4 valu10 = *(mydatac + width * y1 + x0); \n"\
 "            uchar4 valu11 = *(mydatac + width * y1 + x1); \n"\
-"             \n"\
-"            float3 val00 = make_float3((float)valu00.x / 255.f, (float)valu00.y / 255.f, (float)valu00.z / 255.f); \n"\
-"            float3 val01 = make_float3((float)valu01.x / 255.f, (float)valu01.y / 255.f, (float)valu01.z / 255.f); \n"\
-"            float3 val10 = make_float3((float)valu10.x / 255.f, (float)valu10.y / 255.f, (float)valu10.z / 255.f); \n"\
-"            float3 val11 = make_float3((float)valu11.x / 255.f, (float)valu11.y / 255.f, (float)valu11.z / 255.f); \n"\
-"             \n"\
+" \n"\
+"            float4 val00 = make_float4((float)valu00.x / 255.f, (float)valu00.y / 255.f, (float)valu00.z / 255.f, (float)valu00.w / 255.f); \n"\
+"            float4 val01 = make_float4((float)valu01.x / 255.f, (float)valu01.y / 255.f, (float)valu01.z / 255.f, (float)valu01.w / 255.f); \n"\
+"            float4 val10 = make_float4((float)valu10.x / 255.f, (float)valu10.y / 255.f, (float)valu10.z / 255.f, (float)valu10.w / 255.f); \n"\
+"            float4 val11 = make_float4((float)valu11.x / 255.f, (float)valu11.y / 255.f, (float)valu11.z / 255.f, (float)valu11.w / 255.f); \n"\
+" \n"\
 "            // Filter and return the result \n"\
 "            return lerp(lerp(val00, val01, wx), lerp(val10, val11, wx), wy); \n"\
 "        } \n"\
-"             \n"\
+" \n"\
 "        default: \n"\
 "        { \n"\
-"            return make_float3(0.f, 0.f, 0.f); \n"\
+"            return make_float4(0.f, 0.f, 0.f, 0.f); \n"\
 "        } \n"\
 "    } \n"\
 "} \n"\
@@ -628,14 +628,14 @@ static const char g_bxdf_opencl[]= \
 "    // Transform to spherical coords \n"\
 "    float r, phi, theta; \n"\
 "    CartesianToSpherical(d, &r, &phi, &theta); \n"\
-"     \n"\
+" \n"\
 "    // Map to [0,1]x[0,1] range and reverse Y axis \n"\
 "    float2 uv; \n"\
 "    uv.x = phi / (2*PI); \n"\
 "    uv.y = 1.f - theta / PI; \n"\
-"     \n"\
+" \n"\
 "    // Sample the texture \n"\
-"    return native_powr(Texture_Sample2D(uv, TEXTURE_ARGS_IDX(texidx)), 1.f / 1.f); \n"\
+"    return Texture_Sample2D(uv, TEXTURE_ARGS_IDX(texidx)).xyz; \n"\
 "} \n"\
 " \n"\
 "/// Get data from parameter value or texture \n"\
@@ -652,9 +652,30 @@ static const char g_bxdf_opencl[]= \
 "    if (texidx != -1) \n"\
 "    { \n"\
 "        // Sample texture \n"\
+"        return native_powr(Texture_Sample2D(uv, TEXTURE_ARGS_IDX(texidx)).xyz, 2.2f); \n"\
+"    } \n"\
+" \n"\
+"    // Return fixed color otherwise \n"\
+"    return v; \n"\
+"} \n"\
+" \n"\
+"/// Get data from parameter value or texture \n"\
+"float4 Texture_GetValue4f( \n"\
+"                // Value \n"\
+"                float4 v, \n"\
+"                // Texture coordinate \n"\
+"                float2 uv, \n"\
+"                // Texture args \n"\
+"                TEXTURE_ARG_LIST_IDX(texidx) \n"\
+"                ) \n"\
+"{ \n"\
+"    // If texture present sample from texture \n"\
+"    if (texidx != -1) \n"\
+"    { \n"\
+"        // Sample texture \n"\
 "        return native_powr(Texture_Sample2D(uv, TEXTURE_ARGS_IDX(texidx)), 2.2f); \n"\
 "    } \n"\
-"     \n"\
+" \n"\
 "    // Return fixed color otherwise \n"\
 "    return v; \n"\
 "} \n"\
@@ -675,7 +696,7 @@ static const char g_bxdf_opencl[]= \
 "        // Sample texture \n"\
 "        return Texture_Sample2D(uv, TEXTURE_ARGS_IDX(texidx)).x; \n"\
 "    } \n"\
-"     \n"\
+" \n"\
 "    // Return fixed color otherwise \n"\
 "    return v; \n"\
 "} \n"\
@@ -710,11 +731,11 @@ static const char g_bxdf_opencl[]= \
 "        __global float3 const* mydataf = (__global float3 const*)mydata; \n"\
 " \n"\
 "        // Sobel filter \n"\
-"        const float tex00 = (*(mydataf + width * (t0 - 1) + (s0-1))).x;  \n"\
+"        const float tex00 = (*(mydataf + width * (t0 - 1) + (s0-1))).x; \n"\
 "        const float tex10 = (*(mydataf + width * (t0 - 1) + (s0))).x; \n"\
-"        const float tex20 = (*(mydataf + width * (t0 - 1) + (s0 + 1))).x;  \n"\
+"        const float tex20 = (*(mydataf + width * (t0 - 1) + (s0 + 1))).x; \n"\
 " \n"\
-"        const float tex01 = (*(mydataf + width * (t0) + (s0 - 1))).x;  \n"\
+"        const float tex01 = (*(mydataf + width * (t0) + (s0 - 1))).x; \n"\
 "        const float tex21 = (*(mydataf + width * (t0) + (s0 + 1))).x; \n"\
 " \n"\
 "        const float tex02 = (*(mydataf + width * (t0 + 1) + (s0 - 1))).x; \n"\
@@ -736,8 +757,8 @@ static const char g_bxdf_opencl[]= \
 "        const float tex10 = vload_half4(width * (t0 - 1) + (s0), mydatah).x; \n"\
 "        const float tex20 = vload_half4(width * (t0 - 1) + (s0 + 1), mydatah).x; \n"\
 " \n"\
-"        const float tex01 = vload_half4(width * (t0)+(s0 - 1), mydatah).x;  \n"\
-"        const float tex21 = vload_half4(width * (t0)+(s0 + 1), mydatah).x;  \n"\
+"        const float tex01 = vload_half4(width * (t0)+(s0 - 1), mydatah).x; \n"\
+"        const float tex21 = vload_half4(width * (t0)+(s0 + 1), mydatah).x; \n"\
 " \n"\
 "        const float tex02 = vload_half4(width * (t0 + 1) + (s0 - 1), mydatah).x; \n"\
 "        const float tex12 = vload_half4(width * (t0 + 1) + (s0), mydatah).x; \n"\
@@ -816,7 +837,7 @@ static const char g_bxdf_opencl[]= \
 "********************************************************************/ \n"\
 "#ifndef PAYLOAD_CL \n"\
 "#define PAYLOAD_CL \n"\
-"#define SOBOL \n"\
+"//#define SOBOL \n"\
 "#define MULTISCATTER \n"\
 " \n"\
 "/// Ray descriptor \n"\
@@ -828,7 +849,7 @@ static const char g_bxdf_opencl[]= \
 "    float4 d; \n"\
 "    /// x - ray mask, y - activity flag \n"\
 "    int2 extra; \n"\
-"    int2 padding; \n"\
+"    float2 padding; \n"\
 "} ray; \n"\
 " \n"\
 "/// Intersection data returned by RadeonRays \n"\
@@ -882,8 +903,6 @@ static const char g_bxdf_opencl[]= \
 "} Emissive; \n"\
 " \n"\
 " \n"\
-" \n"\
-" \n"\
 "typedef enum _PathFlags \n"\
 "{ \n"\
 "    kNone = 0x0, \n"\
@@ -933,6 +952,53 @@ static const char g_bxdf_opencl[]= \
 " \n"\
 "} Material; \n"\
 " \n"\
+" \n"\
+"enum LightType \n"\
+"{ \n"\
+"    kPoint = 0x1, \n"\
+"    kDirectional, \n"\
+"    kSpot, \n"\
+"    kArea, \n"\
+"    kIbl \n"\
+"}; \n"\
+" \n"\
+"typedef struct _Light \n"\
+"{ \n"\
+"    int type; \n"\
+" \n"\
+"    union \n"\
+"    { \n"\
+"        // Area light \n"\
+"        struct \n"\
+"        { \n"\
+"            int shapeidx; \n"\
+"            int primidx; \n"\
+"            int matidx; \n"\
+"        }; \n"\
+" \n"\
+"        // IBL \n"\
+"        struct \n"\
+"        { \n"\
+"            int tex; \n"\
+"            int texdiffuse; \n"\
+"            float multiplier; \n"\
+"        }; \n"\
+"         \n"\
+"         \n"\
+"        // Spot \n"\
+"        struct \n"\
+"        { \n"\
+"            float ia; \n"\
+"            float oa; \n"\
+"            float f; \n"\
+"        }; \n"\
+"    }; \n"\
+" \n"\
+"    float3 p; \n"\
+"    float3 d; \n"\
+"    float3 intensity; \n"\
+"} Light; \n"\
+" \n"\
 "typedef struct _Scene \n"\
 "{ \n"\
 "    // Vertices \n"\
@@ -950,13 +1016,13 @@ static const char g_bxdf_opencl[]= \
 "    // Materials \n"\
 "    __global Material const* materials; \n"\
 "    // Emissive objects \n"\
-"    __global Emissive const* emissives; \n"\
+"    __global Light const* lights; \n"\
 "    // Envmap idx \n"\
 "    int envmapidx; \n"\
 "    // Envmap multiplier \n"\
 "    float envmapmul; \n"\
 "    // Number of emissive objects \n"\
-"    int numemissives; \n"\
+"    int num_lights; \n"\
 "} Scene; \n"\
 " \n"\
 "// Hit data \n"\
@@ -974,7 +1040,7 @@ static const char g_bxdf_opencl[]= \
 "    float3 dpdu; \n"\
 "    float3 dpdv; \n"\
 "    float  area; \n"\
-"    // Material  \n"\
+"    // Material \n"\
 "    Material mat; \n"\
 "} DifferentialGeometry; \n"\
 " \n"\
@@ -1030,6 +1096,16 @@ static const char g_bxdf_opencl[]= \
 "    r->extra.y = 0; \n"\
 "} \n"\
 " \n"\
+"void Ray_SetExtra(__global ray* r, float2 extra) \n"\
+"{ \n"\
+"    r->padding = extra; \n"\
+"} \n"\
+" \n"\
+"float2 Ray_GetExtra(__global ray const* r) \n"\
+"{ \n"\
+"    return r->padding; \n"\
+"} \n"\
+" \n"\
 "void Ray_Init(__global ray* r, float3 o, float3 d, float maxt, float time, int mask) \n"\
 "{ \n"\
 "    // TODO: Check if it generates MTBUF_XYZW write \n"\
@@ -1040,6 +1116,8 @@ static const char g_bxdf_opencl[]= \
 "    r->extra.x = mask; \n"\
 "    r->extra.y = 0xFFFFFFFF; \n"\
 "} \n"\
+" \n"\
+" \n"\
 " \n"\
 "#endif // PAYLOAD_CL \n"\
 " \n"\
@@ -2505,7 +2583,7 @@ static const char g_camera_opencl[]= \
 "********************************************************************/ \n"\
 "#ifndef PAYLOAD_CL \n"\
 "#define PAYLOAD_CL \n"\
-"#define SOBOL \n"\
+"//#define SOBOL \n"\
 "#define MULTISCATTER \n"\
 " \n"\
 "/// Ray descriptor \n"\
@@ -2517,7 +2595,7 @@ static const char g_camera_opencl[]= \
 "    float4 d; \n"\
 "    /// x - ray mask, y - activity flag \n"\
 "    int2 extra; \n"\
-"    int2 padding; \n"\
+"    float2 padding; \n"\
 "} ray; \n"\
 " \n"\
 "/// Intersection data returned by RadeonRays \n"\
@@ -2571,8 +2649,6 @@ static const char g_camera_opencl[]= \
 "} Emissive; \n"\
 " \n"\
 " \n"\
-" \n"\
-" \n"\
 "typedef enum _PathFlags \n"\
 "{ \n"\
 "    kNone = 0x0, \n"\
@@ -2622,6 +2698,53 @@ static const char g_camera_opencl[]= \
 " \n"\
 "} Material; \n"\
 " \n"\
+" \n"\
+"enum LightType \n"\
+"{ \n"\
+"    kPoint = 0x1, \n"\
+"    kDirectional, \n"\
+"    kSpot, \n"\
+"    kArea, \n"\
+"    kIbl \n"\
+"}; \n"\
+" \n"\
+"typedef struct _Light \n"\
+"{ \n"\
+"    int type; \n"\
+" \n"\
+"    union \n"\
+"    { \n"\
+"        // Area light \n"\
+"        struct \n"\
+"        { \n"\
+"            int shapeidx; \n"\
+"            int primidx; \n"\
+"            int matidx; \n"\
+"        }; \n"\
+" \n"\
+"        // IBL \n"\
+"        struct \n"\
+"        { \n"\
+"            int tex; \n"\
+"            int texdiffuse; \n"\
+"            float multiplier; \n"\
+"        }; \n"\
+"         \n"\
+"         \n"\
+"        // Spot \n"\
+"        struct \n"\
+"        { \n"\
+"            float ia; \n"\
+"            float oa; \n"\
+"            float f; \n"\
+"        }; \n"\
+"    }; \n"\
+" \n"\
+"    float3 p; \n"\
+"    float3 d; \n"\
+"    float3 intensity; \n"\
+"} Light; \n"\
+" \n"\
 "typedef struct _Scene \n"\
 "{ \n"\
 "    // Vertices \n"\
@@ -2639,13 +2762,13 @@ static const char g_camera_opencl[]= \
 "    // Materials \n"\
 "    __global Material const* materials; \n"\
 "    // Emissive objects \n"\
-"    __global Emissive const* emissives; \n"\
+"    __global Light const* lights; \n"\
 "    // Envmap idx \n"\
 "    int envmapidx; \n"\
 "    // Envmap multiplier \n"\
 "    float envmapmul; \n"\
 "    // Number of emissive objects \n"\
-"    int numemissives; \n"\
+"    int num_lights; \n"\
 "} Scene; \n"\
 " \n"\
 "// Hit data \n"\
@@ -2663,7 +2786,7 @@ static const char g_camera_opencl[]= \
 "    float3 dpdu; \n"\
 "    float3 dpdv; \n"\
 "    float  area; \n"\
-"    // Material  \n"\
+"    // Material \n"\
 "    Material mat; \n"\
 "} DifferentialGeometry; \n"\
 " \n"\
@@ -2719,6 +2842,16 @@ static const char g_camera_opencl[]= \
 "    r->extra.y = 0; \n"\
 "} \n"\
 " \n"\
+"void Ray_SetExtra(__global ray* r, float2 extra) \n"\
+"{ \n"\
+"    r->padding = extra; \n"\
+"} \n"\
+" \n"\
+"float2 Ray_GetExtra(__global ray const* r) \n"\
+"{ \n"\
+"    return r->padding; \n"\
+"} \n"\
+" \n"\
 "void Ray_Init(__global ray* r, float3 o, float3 d, float maxt, float time, int mask) \n"\
 "{ \n"\
 "    // TODO: Check if it generates MTBUF_XYZW write \n"\
@@ -2729,6 +2862,8 @@ static const char g_camera_opencl[]= \
 "    r->extra.x = mask; \n"\
 "    r->extra.y = 0xFFFFFFFF; \n"\
 "} \n"\
+" \n"\
+" \n"\
 " \n"\
 "#endif // PAYLOAD_CL \n"\
 "/********************************************************************** \n"\
@@ -2937,7 +3072,7 @@ static const char g_camera_opencl[]= \
 "float4 quaternion_inverse(float4 q) \n"\
 "{ \n"\
 "    float sqnorm = q.x*q.x + q.y*q.y + q.z*q.z + q.w*q.w; \n"\
-"     \n"\
+" \n"\
 "    /// Check if it is singular \n"\
 "    if (sqnorm != 0.f) \n"\
 "    { \n"\
@@ -2959,7 +3094,7 @@ static const char g_camera_opencl[]= \
 "} \n"\
 " \n"\
 "/// Linearly interpolate between two values \n"\
-"float3 lerp(float3 a, float3 b, float w) \n"\
+"float4 lerp(float4 a, float4 b, float w) \n"\
 "{ \n"\
 "    return a + w*(b-a); \n"\
 "} \n"\
@@ -2978,7 +3113,7 @@ static const char g_camera_opencl[]= \
 "float3 GetOrthoVector(float3 n) \n"\
 "{ \n"\
 "    float3 p; \n"\
-"     \n"\
+" \n"\
 "    if (fabs(n.z) > 0.f) { \n"\
 "        float k = sqrt(n.y*n.y + n.z*n.z); \n"\
 "        p.x = 0; p.y = -n.z/k; p.z = n.y/k; \n"\
@@ -3346,7 +3481,7 @@ static const char g_camera_opencl[]= \
 "float4 quaternion_inverse(float4 q) \n"\
 "{ \n"\
 "    float sqnorm = q.x*q.x + q.y*q.y + q.z*q.z + q.w*q.w; \n"\
-"     \n"\
+" \n"\
 "    /// Check if it is singular \n"\
 "    if (sqnorm != 0.f) \n"\
 "    { \n"\
@@ -3368,7 +3503,7 @@ static const char g_camera_opencl[]= \
 "} \n"\
 " \n"\
 "/// Linearly interpolate between two values \n"\
-"float3 lerp(float3 a, float3 b, float w) \n"\
+"float4 lerp(float4 a, float4 b, float w) \n"\
 "{ \n"\
 "    return a + w*(b-a); \n"\
 "} \n"\
@@ -3387,7 +3522,7 @@ static const char g_camera_opencl[]= \
 "float3 GetOrthoVector(float3 n) \n"\
 "{ \n"\
 "    float3 p; \n"\
-"     \n"\
+" \n"\
 "    if (fabs(n.z) > 0.f) { \n"\
 "        float k = sqrt(n.y*n.y + n.z*n.z); \n"\
 "        p.x = 0; p.y = -n.z/k; p.z = n.y/k; \n"\
@@ -3471,7 +3606,7 @@ static const char g_camera_opencl[]= \
 "********************************************************************/ \n"\
 "#ifndef PAYLOAD_CL \n"\
 "#define PAYLOAD_CL \n"\
-"#define SOBOL \n"\
+"//#define SOBOL \n"\
 "#define MULTISCATTER \n"\
 " \n"\
 "/// Ray descriptor \n"\
@@ -3483,7 +3618,7 @@ static const char g_camera_opencl[]= \
 "    float4 d; \n"\
 "    /// x - ray mask, y - activity flag \n"\
 "    int2 extra; \n"\
-"    int2 padding; \n"\
+"    float2 padding; \n"\
 "} ray; \n"\
 " \n"\
 "/// Intersection data returned by RadeonRays \n"\
@@ -3537,8 +3672,6 @@ static const char g_camera_opencl[]= \
 "} Emissive; \n"\
 " \n"\
 " \n"\
-" \n"\
-" \n"\
 "typedef enum _PathFlags \n"\
 "{ \n"\
 "    kNone = 0x0, \n"\
@@ -3588,6 +3721,53 @@ static const char g_camera_opencl[]= \
 " \n"\
 "} Material; \n"\
 " \n"\
+" \n"\
+"enum LightType \n"\
+"{ \n"\
+"    kPoint = 0x1, \n"\
+"    kDirectional, \n"\
+"    kSpot, \n"\
+"    kArea, \n"\
+"    kIbl \n"\
+"}; \n"\
+" \n"\
+"typedef struct _Light \n"\
+"{ \n"\
+"    int type; \n"\
+" \n"\
+"    union \n"\
+"    { \n"\
+"        // Area light \n"\
+"        struct \n"\
+"        { \n"\
+"            int shapeidx; \n"\
+"            int primidx; \n"\
+"            int matidx; \n"\
+"        }; \n"\
+" \n"\
+"        // IBL \n"\
+"        struct \n"\
+"        { \n"\
+"            int tex; \n"\
+"            int texdiffuse; \n"\
+"            float multiplier; \n"\
+"        }; \n"\
+"         \n"\
+"         \n"\
+"        // Spot \n"\
+"        struct \n"\
+"        { \n"\
+"            float ia; \n"\
+"            float oa; \n"\
+"            float f; \n"\
+"        }; \n"\
+"    }; \n"\
+" \n"\
+"    float3 p; \n"\
+"    float3 d; \n"\
+"    float3 intensity; \n"\
+"} Light; \n"\
+" \n"\
 "typedef struct _Scene \n"\
 "{ \n"\
 "    // Vertices \n"\
@@ -3605,13 +3785,13 @@ static const char g_camera_opencl[]= \
 "    // Materials \n"\
 "    __global Material const* materials; \n"\
 "    // Emissive objects \n"\
-"    __global Emissive const* emissives; \n"\
+"    __global Light const* lights; \n"\
 "    // Envmap idx \n"\
 "    int envmapidx; \n"\
 "    // Envmap multiplier \n"\
 "    float envmapmul; \n"\
 "    // Number of emissive objects \n"\
-"    int numemissives; \n"\
+"    int num_lights; \n"\
 "} Scene; \n"\
 " \n"\
 "// Hit data \n"\
@@ -3629,7 +3809,7 @@ static const char g_camera_opencl[]= \
 "    float3 dpdu; \n"\
 "    float3 dpdv; \n"\
 "    float  area; \n"\
-"    // Material  \n"\
+"    // Material \n"\
 "    Material mat; \n"\
 "} DifferentialGeometry; \n"\
 " \n"\
@@ -3685,6 +3865,16 @@ static const char g_camera_opencl[]= \
 "    r->extra.y = 0; \n"\
 "} \n"\
 " \n"\
+"void Ray_SetExtra(__global ray* r, float2 extra) \n"\
+"{ \n"\
+"    r->padding = extra; \n"\
+"} \n"\
+" \n"\
+"float2 Ray_GetExtra(__global ray const* r) \n"\
+"{ \n"\
+"    return r->padding; \n"\
+"} \n"\
+" \n"\
 "void Ray_Init(__global ray* r, float3 o, float3 d, float maxt, float time, int mask) \n"\
 "{ \n"\
 "    // TODO: Check if it generates MTBUF_XYZW write \n"\
@@ -3695,6 +3885,8 @@ static const char g_camera_opencl[]= \
 "    r->extra.x = mask; \n"\
 "    r->extra.y = 0xFFFFFFFF; \n"\
 "} \n"\
+" \n"\
+" \n"\
 " \n"\
 "#endif // PAYLOAD_CL \n"\
 " \n"\
@@ -3789,10 +3981,10 @@ static const char g_camera_opencl[]= \
 "        float3 right; \n"\
 "        float3 up; \n"\
 "        float3 p; \n"\
-"         \n"\
+" \n"\
 "        // Image plane width & height in current units \n"\
 "        float2 dim; \n"\
-"         \n"\
+" \n"\
 "        // Near and far Z \n"\
 "        float2 zcap; \n"\
 "        // Focal lenght \n"\
@@ -3829,7 +4021,7 @@ static const char g_camera_opencl[]= \
 "    int2 globalid; \n"\
 "    globalid.x  = get_global_id(0); \n"\
 "    globalid.y  = get_global_id(1); \n"\
-"     \n"\
+" \n"\
 "    // Check borders \n"\
 "    if (globalid.x < imgwidth && globalid.y < imgheight) \n"\
 "    { \n"\
@@ -3839,7 +4031,7 @@ static const char g_camera_opencl[]= \
 "#ifndef NO_PATH_DATA \n"\
 "        __global Path* mypath = paths + globalid.y * imgwidth + globalid.x; \n"\
 "#endif \n"\
-"         \n"\
+" \n"\
 "        // Prepare RNG \n"\
 "        Rng rng; \n"\
 "        InitRng(randseed +  globalid.x * 157 + 10433 * globalid.y, &rng); \n"\
@@ -3863,17 +4055,17 @@ static const char g_camera_opencl[]= \
 "#else \n"\
 "        float2 sample0 = UniformSampler_Sample2D(&rng); \n"\
 "#endif \n"\
-"         \n"\
+" \n"\
 "        // Calculate [0..1] image plane sample \n"\
 "        float2 imgsample; \n"\
 "        imgsample.x = (float)globalid.x / imgwidth + sample0.x / imgwidth; \n"\
 "        imgsample.y = (float)globalid.y / imgheight + sample0.y / imgheight; \n"\
-"         \n"\
+" \n"\
 "        // Transform into [-0.5, 0.5] \n"\
 "        float2 hsample = imgsample - make_float2(0.5f, 0.5f); \n"\
 "        // Transform into [-dim/2, dim/2] \n"\
 "        float2 csample = hsample * camera->dim; \n"\
-"         \n"\
+" \n"\
 "        // Calculate direction to image plane \n"\
 "        myray->d.xyz = normalize(camera->focal_length * camera->forward + csample.x * camera->right + csample.y * camera->up); \n"\
 "        // Origin == camera position + nearz * d \n"\
@@ -3885,6 +4077,7 @@ static const char g_camera_opencl[]= \
 "        // Set ray max \n"\
 "        myray->extra.x = 0xFFFFFFFF; \n"\
 "        myray->extra.y = 0xFFFFFFFF; \n"\
+"        Ray_SetExtra(myray, 1.f); \n"\
 " \n"\
 "#ifndef NO_PATH_DATA \n"\
 "        mypath->throughput = make_float3(1.f, 1.f, 1.f); \n"\
@@ -4000,6 +4193,118 @@ static const char g_camera_opencl[]= \
 "#endif \n"\
 "    } \n"\
 "} \n"\
+" \n"\
+"#define M_PI 3.14159265358979323846 \n"\
+" \n"\
+"/// Ray generation kernel for spherical camera. \n"\
+"/// \n"\
+"__kernel void SphericalCamera_GeneratePaths( \n"\
+"	// Camera descriptor \n"\
+"	__global Camera const* camera, \n"\
+"	// Image resolution \n"\
+"	int imgwidth, \n"\
+"	int imgheight, \n"\
+"	// RNG seed value \n"\
+"	int randseed, \n"\
+"	// Output rays \n"\
+"	__global ray* rays, \n"\
+"	__global SobolSampler* samplers, \n"\
+"	__global uint const* sobolmat, \n"\
+"	int reset \n"\
+"#ifndef NO_PATH_DATA \n"\
+"	, __global Path* paths \n"\
+"#endif \n"\
+") \n"\
+"{ \n"\
+"	int2 globalid; \n"\
+"	globalid.x = get_global_id(0); \n"\
+"	globalid.y = get_global_id(1); \n"\
+" \n"\
+"	// Check borders \n"\
+"	if (globalid.x < imgwidth && globalid.y < imgheight) \n"\
+"	{ \n"\
+"		// Get pointer to ray to handle \n"\
+"		__global ray* myray = rays + globalid.y * imgwidth + globalid.x; \n"\
+" \n"\
+"#ifndef NO_PATH_DATA \n"\
+"		__global Path* mypath = paths + globalid.y * imgwidth + globalid.x; \n"\
+"#endif \n"\
+" \n"\
+"		// Prepare RNG \n"\
+"		Rng rng; \n"\
+"		InitRng(randseed + globalid.x * 157 + 10433 * globalid.y, &rng); \n"\
+" \n"\
+"#ifdef SOBOL \n"\
+"		__global SobolSampler* sampler = samplers + globalid.y * imgwidth + globalid.x; \n"\
+" \n"\
+"		if (reset) \n"\
+"		{ \n"\
+"			sampler->seq = 0; \n"\
+"			sampler->s0 = RandUint(&rng); \n"\
+"		} else \n"\
+"		{ \n"\
+"			sampler->seq++; \n"\
+"		} \n"\
+" \n"\
+"		float2 sample0; \n"\
+"		sample0.x = SobolSampler_Sample1D(sampler->seq, kPixelX, sampler->s0, sobolmat); \n"\
+"		sample0.y = SobolSampler_Sample1D(sampler->seq, kPixelY, sampler->s0, sobolmat); \n"\
+"#else \n"\
+"		float2 sample0 = UniformSampler_Sample2D(&rng); \n"\
+"#endif \n"\
+" \n"\
+"		// Calculate [0..1] image plane sample \n"\
+"		float2 imgsample; \n"\
+"		imgsample.x = (float)globalid.x / imgwidth + sample0.x / imgwidth; \n"\
+"		imgsample.y = (float)globalid.y / imgheight + sample0.y / imgheight; \n"\
+" \n"\
+"		// Transform into [-0.5, 0.5] \n"\
+"		float2 hsample = imgsample - make_float2(0.5f, 0.5f); \n"\
+"		// Transform into [-dim/2, dim/2] \n"\
+"		float2 csample = hsample * camera->dim; \n"\
+" \n"\
+" \n"\
+"		float phi = (2.0 * M_PI) * (imgsample.x); \n"\
+"		float theta = (M_PI) * (imgsample.y); \n"\
+" \n"\
+"		float4 m1, m2, m3, m4; \n"\
+"		float4 n1, n2, n3, n4; \n"\
+" \n"\
+"		m1 = (float4) { cos(phi), 0.0, -sin(phi), 0.0 }; \n"\
+"		m2 = (float4) { 0.0, 1.0, 0.0, 0.0 }; \n"\
+"		m3 = (float4) { sin(phi), 0.0, cos(phi), 0.0 }; \n"\
+"		m4 = (float4) { 0.0, 0.0, 0.0, 1.0 }; \n"\
+" \n"\
+" \n"\
+"		n1 = (float4) { cos(theta), sin(theta), 0.0, 0.0 }; \n"\
+"		n2 = (float4) { -sin(theta), cos(theta), 0.0, 0.0 }; \n"\
+"		n3 = (float4) { 0.0, 0.0, 1.0, 0.0 }; \n"\
+"		n4 = (float4) { 0.0, 0.0, 0.0, 1.0 }; \n"\
+" \n"\
+"		//myray->d.xyz = normalize(camera->focal_length * transform_vector(transform_vector(-camera->up.xyz, n1, n2, n3, n4), m1, m2, m3, m4)); \n"\
+"		myray->d.xyz = normalize(camera->focal_length * transform_vector(transform_vector(-(float3) { 0, 1, 0 }, n1, n2, n3, n4), m1, m2, m3, m4)); \n"\
+" \n"\
+"		// Calculate direction to image plane \n"\
+"		//myray->d.xyz = normalize(camera->focal_length * camera->forward + csample.x * camera->right + csample.y * camera->up); \n"\
+"		// Origin == camera position + nearz * d \n"\
+"		myray->o.xyz = camera->p + camera->zcap.x * myray->d.xyz; \n"\
+"		// Max T value = zfar - znear since we moved origin to znear \n"\
+"		myray->o.w = camera->zcap.y - camera->zcap.x; \n"\
+"		// Generate random time from 0 to 1 \n"\
+"		myray->d.w = sample0.x; \n"\
+"		// Set ray max \n"\
+"		myray->extra.x = 0xFFFFFFFF; \n"\
+"		myray->extra.y = 0xFFFFFFFF; \n"\
+" \n"\
+"#ifndef NO_PATH_DATA \n"\
+"		mypath->throughput = make_float3(1.f, 1.f, 1.f); \n"\
+"		mypath->volume = -1; \n"\
+"		mypath->flags = 0; \n"\
+"		mypath->active = 0xFF; \n"\
+"#endif \n"\
+"	} \n"\
+"} \n"\
+" \n"\
 " \n"\
 "#endif // CAMERA_CL \n"\
 ;
@@ -4121,7 +4426,7 @@ static const char g_integrator_ao_opencl[]= \
 "float4 quaternion_inverse(float4 q) \n"\
 "{ \n"\
 "    float sqnorm = q.x*q.x + q.y*q.y + q.z*q.z + q.w*q.w; \n"\
-"     \n"\
+" \n"\
 "    /// Check if it is singular \n"\
 "    if (sqnorm != 0.f) \n"\
 "    { \n"\
@@ -4143,7 +4448,7 @@ static const char g_integrator_ao_opencl[]= \
 "} \n"\
 " \n"\
 "/// Linearly interpolate between two values \n"\
-"float3 lerp(float3 a, float3 b, float w) \n"\
+"float4 lerp(float4 a, float4 b, float w) \n"\
 "{ \n"\
 "    return a + w*(b-a); \n"\
 "} \n"\
@@ -4162,7 +4467,7 @@ static const char g_integrator_ao_opencl[]= \
 "float3 GetOrthoVector(float3 n) \n"\
 "{ \n"\
 "    float3 p; \n"\
-"     \n"\
+" \n"\
 "    if (fabs(n.z) > 0.f) { \n"\
 "        float k = sqrt(n.y*n.y + n.z*n.z); \n"\
 "        p.x = 0; p.y = -n.z/k; p.z = n.y/k; \n"\
@@ -4287,7 +4592,7 @@ static const char g_integrator_ao_opencl[]= \
 "********************************************************************/ \n"\
 "#ifndef PAYLOAD_CL \n"\
 "#define PAYLOAD_CL \n"\
-"#define SOBOL \n"\
+"//#define SOBOL \n"\
 "#define MULTISCATTER \n"\
 " \n"\
 "/// Ray descriptor \n"\
@@ -4299,7 +4604,7 @@ static const char g_integrator_ao_opencl[]= \
 "    float4 d; \n"\
 "    /// x - ray mask, y - activity flag \n"\
 "    int2 extra; \n"\
-"    int2 padding; \n"\
+"    float2 padding; \n"\
 "} ray; \n"\
 " \n"\
 "/// Intersection data returned by RadeonRays \n"\
@@ -4353,8 +4658,6 @@ static const char g_integrator_ao_opencl[]= \
 "} Emissive; \n"\
 " \n"\
 " \n"\
-" \n"\
-" \n"\
 "typedef enum _PathFlags \n"\
 "{ \n"\
 "    kNone = 0x0, \n"\
@@ -4404,6 +4707,53 @@ static const char g_integrator_ao_opencl[]= \
 " \n"\
 "} Material; \n"\
 " \n"\
+" \n"\
+"enum LightType \n"\
+"{ \n"\
+"    kPoint = 0x1, \n"\
+"    kDirectional, \n"\
+"    kSpot, \n"\
+"    kArea, \n"\
+"    kIbl \n"\
+"}; \n"\
+" \n"\
+"typedef struct _Light \n"\
+"{ \n"\
+"    int type; \n"\
+" \n"\
+"    union \n"\
+"    { \n"\
+"        // Area light \n"\
+"        struct \n"\
+"        { \n"\
+"            int shapeidx; \n"\
+"            int primidx; \n"\
+"            int matidx; \n"\
+"        }; \n"\
+" \n"\
+"        // IBL \n"\
+"        struct \n"\
+"        { \n"\
+"            int tex; \n"\
+"            int texdiffuse; \n"\
+"            float multiplier; \n"\
+"        }; \n"\
+"         \n"\
+"         \n"\
+"        // Spot \n"\
+"        struct \n"\
+"        { \n"\
+"            float ia; \n"\
+"            float oa; \n"\
+"            float f; \n"\
+"        }; \n"\
+"    }; \n"\
+" \n"\
+"    float3 p; \n"\
+"    float3 d; \n"\
+"    float3 intensity; \n"\
+"} Light; \n"\
+" \n"\
 "typedef struct _Scene \n"\
 "{ \n"\
 "    // Vertices \n"\
@@ -4421,13 +4771,13 @@ static const char g_integrator_ao_opencl[]= \
 "    // Materials \n"\
 "    __global Material const* materials; \n"\
 "    // Emissive objects \n"\
-"    __global Emissive const* emissives; \n"\
+"    __global Light const* lights; \n"\
 "    // Envmap idx \n"\
 "    int envmapidx; \n"\
 "    // Envmap multiplier \n"\
 "    float envmapmul; \n"\
 "    // Number of emissive objects \n"\
-"    int numemissives; \n"\
+"    int num_lights; \n"\
 "} Scene; \n"\
 " \n"\
 "// Hit data \n"\
@@ -4445,7 +4795,7 @@ static const char g_integrator_ao_opencl[]= \
 "    float3 dpdu; \n"\
 "    float3 dpdv; \n"\
 "    float  area; \n"\
-"    // Material  \n"\
+"    // Material \n"\
 "    Material mat; \n"\
 "} DifferentialGeometry; \n"\
 " \n"\
@@ -4501,6 +4851,16 @@ static const char g_integrator_ao_opencl[]= \
 "    r->extra.y = 0; \n"\
 "} \n"\
 " \n"\
+"void Ray_SetExtra(__global ray* r, float2 extra) \n"\
+"{ \n"\
+"    r->padding = extra; \n"\
+"} \n"\
+" \n"\
+"float2 Ray_GetExtra(__global ray const* r) \n"\
+"{ \n"\
+"    return r->padding; \n"\
+"} \n"\
+" \n"\
 "void Ray_Init(__global ray* r, float3 o, float3 d, float maxt, float time, int mask) \n"\
 "{ \n"\
 "    // TODO: Check if it generates MTBUF_XYZW write \n"\
@@ -4511,6 +4871,8 @@ static const char g_integrator_ao_opencl[]= \
 "    r->extra.x = mask; \n"\
 "    r->extra.y = 0xFFFFFFFF; \n"\
 "} \n"\
+" \n"\
+" \n"\
 " \n"\
 "#endif // PAYLOAD_CL \n"\
 "/********************************************************************** \n"\
@@ -4654,7 +5016,7 @@ static const char g_integrator_ao_opencl[]= \
 "float4 quaternion_inverse(float4 q) \n"\
 "{ \n"\
 "    float sqnorm = q.x*q.x + q.y*q.y + q.z*q.z + q.w*q.w; \n"\
-"     \n"\
+" \n"\
 "    /// Check if it is singular \n"\
 "    if (sqnorm != 0.f) \n"\
 "    { \n"\
@@ -4676,7 +5038,7 @@ static const char g_integrator_ao_opencl[]= \
 "} \n"\
 " \n"\
 "/// Linearly interpolate between two values \n"\
-"float3 lerp(float3 a, float3 b, float w) \n"\
+"float4 lerp(float4 a, float4 b, float w) \n"\
 "{ \n"\
 "    return a + w*(b-a); \n"\
 "} \n"\
@@ -4695,7 +5057,7 @@ static const char g_integrator_ao_opencl[]= \
 "float3 GetOrthoVector(float3 n) \n"\
 "{ \n"\
 "    float3 p; \n"\
-"     \n"\
+" \n"\
 "    if (fabs(n.z) > 0.f) { \n"\
 "        float k = sqrt(n.y*n.y + n.z*n.z); \n"\
 "        p.x = 0; p.y = -n.z/k; p.z = n.y/k; \n"\
@@ -4764,88 +5126,88 @@ static const char g_integrator_ao_opencl[]= \
 "#define TEXTURE_ARGS_IDX(x) x, textures, texturedata \n"\
 " \n"\
 "/// Sample 2D texture \n"\
-"float3 Texture_Sample2D(float2 uv, TEXTURE_ARG_LIST_IDX(texidx)) \n"\
+"float4 Texture_Sample2D(float2 uv, TEXTURE_ARG_LIST_IDX(texidx)) \n"\
 "{ \n"\
 "    // Get width and height \n"\
 "    int width = textures[texidx].w; \n"\
 "    int height = textures[texidx].h; \n"\
-"     \n"\
+" \n"\
 "    // Find the origin of the data in the pool \n"\
 "    __global char const* mydata = texturedata + textures[texidx].dataoffset; \n"\
 " \n"\
 "    // Handle UV wrap \n"\
 "    // TODO: need UV mode support \n"\
 "    uv -= floor(uv); \n"\
-"     \n"\
+" \n"\
 "    // Reverse Y: \n"\
 "    // it is needed as textures are loaded with Y axis going top to down \n"\
 "    // and our axis goes from down to top \n"\
 "    uv.y = 1.f - uv.y; \n"\
-"     \n"\
+" \n"\
 "    // Calculate integer coordinates \n"\
 "    int x0 = clamp((int)floor(uv.x * width), 0, width - 1); \n"\
 "    int y0 = clamp((int)floor(uv.y * height), 0, height - 1); \n"\
-"     \n"\
+" \n"\
 "    // Calculate samples for linear filtering \n"\
 "    int x1 = clamp(x0 + 1, 0,  width - 1); \n"\
 "    int y1 = clamp(y0 + 1, 0, height - 1); \n"\
-"     \n"\
+" \n"\
 "    // Calculate weights for linear filtering \n"\
 "    float wx = uv.x * width - floor(uv.x * width); \n"\
 "    float wy = uv.y * height - floor(uv.y * height); \n"\
-"     \n"\
+" \n"\
 "    switch (textures[texidx].fmt) \n"\
 "    { \n"\
 "        case RGBA32: \n"\
 "        { \n"\
-"            __global float3 const* mydataf = (__global float3 const*)mydata; \n"\
-"             \n"\
+"            __global float4 const* mydataf = (__global float4 const*)mydata; \n"\
+" \n"\
 "            // Get 4 values for linear filtering \n"\
-"            float3 val00 = *(mydataf + width * y0 + x0); \n"\
-"            float3 val01 = *(mydataf + width * y0 + x1); \n"\
-"            float3 val10 = *(mydataf + width * y1 + x0); \n"\
-"            float3 val11 = *(mydataf + width * y1 + x1); \n"\
-"             \n"\
+"            float4 val00 = *(mydataf + width * y0 + x0); \n"\
+"            float4 val01 = *(mydataf + width * y0 + x1); \n"\
+"            float4 val10 = *(mydataf + width * y1 + x0); \n"\
+"            float4 val11 = *(mydataf + width * y1 + x1); \n"\
+" \n"\
 "            // Filter and return the result \n"\
 "            return lerp(lerp(val00, val01, wx), lerp(val10, val11, wx), wy); \n"\
 "        } \n"\
-"             \n"\
+" \n"\
 "        case RGBA16: \n"\
 "        { \n"\
 "            __global half const* mydatah = (__global half const*)mydata; \n"\
-"             \n"\
+" \n"\
 "            // Get 4 values \n"\
-"            float3 val00 = vload_half4(width * y0 + x0, mydatah).xyz; \n"\
-"            float3 val01 = vload_half4(width * y0 + x1, mydatah).xyz; \n"\
-"            float3 val10 = vload_half4(width * y1 + x0, mydatah).xyz; \n"\
-"            float3 val11 = vload_half4(width * y1 + x1, mydatah).xyz; \n"\
-"             \n"\
+"            float4 val00 = vload_half4(width * y0 + x0, mydatah); \n"\
+"            float4 val01 = vload_half4(width * y0 + x1, mydatah); \n"\
+"            float4 val10 = vload_half4(width * y1 + x0, mydatah); \n"\
+"            float4 val11 = vload_half4(width * y1 + x1, mydatah); \n"\
+" \n"\
 "            // Filter and return the result \n"\
 "            return lerp(lerp(val00, val01, wx), lerp(val10, val11, wx), wy); \n"\
 "        } \n"\
-"             \n"\
+" \n"\
 "        case RGBA8: \n"\
 "        { \n"\
 "            __global uchar4 const* mydatac = (__global uchar4 const*)mydata; \n"\
-"             \n"\
+" \n"\
 "            // Get 4 values and convert to float \n"\
 "            uchar4 valu00 = *(mydatac + width * y0 + x0); \n"\
 "            uchar4 valu01 = *(mydatac + width * y0 + x1); \n"\
 "            uchar4 valu10 = *(mydatac + width * y1 + x0); \n"\
 "            uchar4 valu11 = *(mydatac + width * y1 + x1); \n"\
-"             \n"\
-"            float3 val00 = make_float3((float)valu00.x / 255.f, (float)valu00.y / 255.f, (float)valu00.z / 255.f); \n"\
-"            float3 val01 = make_float3((float)valu01.x / 255.f, (float)valu01.y / 255.f, (float)valu01.z / 255.f); \n"\
-"            float3 val10 = make_float3((float)valu10.x / 255.f, (float)valu10.y / 255.f, (float)valu10.z / 255.f); \n"\
-"            float3 val11 = make_float3((float)valu11.x / 255.f, (float)valu11.y / 255.f, (float)valu11.z / 255.f); \n"\
-"             \n"\
+" \n"\
+"            float4 val00 = make_float4((float)valu00.x / 255.f, (float)valu00.y / 255.f, (float)valu00.z / 255.f, (float)valu00.w / 255.f); \n"\
+"            float4 val01 = make_float4((float)valu01.x / 255.f, (float)valu01.y / 255.f, (float)valu01.z / 255.f, (float)valu01.w / 255.f); \n"\
+"            float4 val10 = make_float4((float)valu10.x / 255.f, (float)valu10.y / 255.f, (float)valu10.z / 255.f, (float)valu10.w / 255.f); \n"\
+"            float4 val11 = make_float4((float)valu11.x / 255.f, (float)valu11.y / 255.f, (float)valu11.z / 255.f, (float)valu11.w / 255.f); \n"\
+" \n"\
 "            // Filter and return the result \n"\
 "            return lerp(lerp(val00, val01, wx), lerp(val10, val11, wx), wy); \n"\
 "        } \n"\
-"             \n"\
+" \n"\
 "        default: \n"\
 "        { \n"\
-"            return make_float3(0.f, 0.f, 0.f); \n"\
+"            return make_float4(0.f, 0.f, 0.f, 0.f); \n"\
 "        } \n"\
 "    } \n"\
 "} \n"\
@@ -4856,14 +5218,14 @@ static const char g_integrator_ao_opencl[]= \
 "    // Transform to spherical coords \n"\
 "    float r, phi, theta; \n"\
 "    CartesianToSpherical(d, &r, &phi, &theta); \n"\
-"     \n"\
+" \n"\
 "    // Map to [0,1]x[0,1] range and reverse Y axis \n"\
 "    float2 uv; \n"\
 "    uv.x = phi / (2*PI); \n"\
 "    uv.y = 1.f - theta / PI; \n"\
-"     \n"\
+" \n"\
 "    // Sample the texture \n"\
-"    return native_powr(Texture_Sample2D(uv, TEXTURE_ARGS_IDX(texidx)), 1.f / 1.f); \n"\
+"    return Texture_Sample2D(uv, TEXTURE_ARGS_IDX(texidx)).xyz; \n"\
 "} \n"\
 " \n"\
 "/// Get data from parameter value or texture \n"\
@@ -4880,9 +5242,30 @@ static const char g_integrator_ao_opencl[]= \
 "    if (texidx != -1) \n"\
 "    { \n"\
 "        // Sample texture \n"\
+"        return native_powr(Texture_Sample2D(uv, TEXTURE_ARGS_IDX(texidx)).xyz, 2.2f); \n"\
+"    } \n"\
+" \n"\
+"    // Return fixed color otherwise \n"\
+"    return v; \n"\
+"} \n"\
+" \n"\
+"/// Get data from parameter value or texture \n"\
+"float4 Texture_GetValue4f( \n"\
+"                // Value \n"\
+"                float4 v, \n"\
+"                // Texture coordinate \n"\
+"                float2 uv, \n"\
+"                // Texture args \n"\
+"                TEXTURE_ARG_LIST_IDX(texidx) \n"\
+"                ) \n"\
+"{ \n"\
+"    // If texture present sample from texture \n"\
+"    if (texidx != -1) \n"\
+"    { \n"\
+"        // Sample texture \n"\
 "        return native_powr(Texture_Sample2D(uv, TEXTURE_ARGS_IDX(texidx)), 2.2f); \n"\
 "    } \n"\
-"     \n"\
+" \n"\
 "    // Return fixed color otherwise \n"\
 "    return v; \n"\
 "} \n"\
@@ -4903,7 +5286,7 @@ static const char g_integrator_ao_opencl[]= \
 "        // Sample texture \n"\
 "        return Texture_Sample2D(uv, TEXTURE_ARGS_IDX(texidx)).x; \n"\
 "    } \n"\
-"     \n"\
+" \n"\
 "    // Return fixed color otherwise \n"\
 "    return v; \n"\
 "} \n"\
@@ -4938,11 +5321,11 @@ static const char g_integrator_ao_opencl[]= \
 "        __global float3 const* mydataf = (__global float3 const*)mydata; \n"\
 " \n"\
 "        // Sobel filter \n"\
-"        const float tex00 = (*(mydataf + width * (t0 - 1) + (s0-1))).x;  \n"\
+"        const float tex00 = (*(mydataf + width * (t0 - 1) + (s0-1))).x; \n"\
 "        const float tex10 = (*(mydataf + width * (t0 - 1) + (s0))).x; \n"\
-"        const float tex20 = (*(mydataf + width * (t0 - 1) + (s0 + 1))).x;  \n"\
+"        const float tex20 = (*(mydataf + width * (t0 - 1) + (s0 + 1))).x; \n"\
 " \n"\
-"        const float tex01 = (*(mydataf + width * (t0) + (s0 - 1))).x;  \n"\
+"        const float tex01 = (*(mydataf + width * (t0) + (s0 - 1))).x; \n"\
 "        const float tex21 = (*(mydataf + width * (t0) + (s0 + 1))).x; \n"\
 " \n"\
 "        const float tex02 = (*(mydataf + width * (t0 + 1) + (s0 - 1))).x; \n"\
@@ -4964,8 +5347,8 @@ static const char g_integrator_ao_opencl[]= \
 "        const float tex10 = vload_half4(width * (t0 - 1) + (s0), mydatah).x; \n"\
 "        const float tex20 = vload_half4(width * (t0 - 1) + (s0 + 1), mydatah).x; \n"\
 " \n"\
-"        const float tex01 = vload_half4(width * (t0)+(s0 - 1), mydatah).x;  \n"\
-"        const float tex21 = vload_half4(width * (t0)+(s0 + 1), mydatah).x;  \n"\
+"        const float tex01 = vload_half4(width * (t0)+(s0 - 1), mydatah).x; \n"\
+"        const float tex21 = vload_half4(width * (t0)+(s0 + 1), mydatah).x; \n"\
 " \n"\
 "        const float tex02 = vload_half4(width * (t0 + 1) + (s0 - 1), mydatah).x; \n"\
 "        const float tex12 = vload_half4(width * (t0 + 1) + (s0), mydatah).x; \n"\
@@ -5162,7 +5545,7 @@ static const char g_integrator_ao_opencl[]= \
 "float4 quaternion_inverse(float4 q) \n"\
 "{ \n"\
 "    float sqnorm = q.x*q.x + q.y*q.y + q.z*q.z + q.w*q.w; \n"\
-"     \n"\
+" \n"\
 "    /// Check if it is singular \n"\
 "    if (sqnorm != 0.f) \n"\
 "    { \n"\
@@ -5184,7 +5567,7 @@ static const char g_integrator_ao_opencl[]= \
 "} \n"\
 " \n"\
 "/// Linearly interpolate between two values \n"\
-"float3 lerp(float3 a, float3 b, float w) \n"\
+"float4 lerp(float4 a, float4 b, float w) \n"\
 "{ \n"\
 "    return a + w*(b-a); \n"\
 "} \n"\
@@ -5203,7 +5586,7 @@ static const char g_integrator_ao_opencl[]= \
 "float3 GetOrthoVector(float3 n) \n"\
 "{ \n"\
 "    float3 p; \n"\
-"     \n"\
+" \n"\
 "    if (fabs(n.z) > 0.f) { \n"\
 "        float k = sqrt(n.y*n.y + n.z*n.z); \n"\
 "        p.x = 0; p.y = -n.z/k; p.z = n.y/k; \n"\
@@ -5595,7 +5978,7 @@ static const char g_integrator_ao_opencl[]= \
 "float4 quaternion_inverse(float4 q) \n"\
 "{ \n"\
 "    float sqnorm = q.x*q.x + q.y*q.y + q.z*q.z + q.w*q.w; \n"\
-"     \n"\
+" \n"\
 "    /// Check if it is singular \n"\
 "    if (sqnorm != 0.f) \n"\
 "    { \n"\
@@ -5617,7 +6000,7 @@ static const char g_integrator_ao_opencl[]= \
 "} \n"\
 " \n"\
 "/// Linearly interpolate between two values \n"\
-"float3 lerp(float3 a, float3 b, float w) \n"\
+"float4 lerp(float4 a, float4 b, float w) \n"\
 "{ \n"\
 "    return a + w*(b-a); \n"\
 "} \n"\
@@ -5636,7 +6019,7 @@ static const char g_integrator_ao_opencl[]= \
 "float3 GetOrthoVector(float3 n) \n"\
 "{ \n"\
 "    float3 p; \n"\
-"     \n"\
+" \n"\
 "    if (fabs(n.z) > 0.f) { \n"\
 "        float k = sqrt(n.y*n.y + n.z*n.z); \n"\
 "        p.x = 0; p.y = -n.z/k; p.z = n.y/k; \n"\
@@ -5814,7 +6197,7 @@ static const char g_integrator_ao_opencl[]= \
 "float4 quaternion_inverse(float4 q) \n"\
 "{ \n"\
 "    float sqnorm = q.x*q.x + q.y*q.y + q.z*q.z + q.w*q.w; \n"\
-"     \n"\
+" \n"\
 "    /// Check if it is singular \n"\
 "    if (sqnorm != 0.f) \n"\
 "    { \n"\
@@ -5836,7 +6219,7 @@ static const char g_integrator_ao_opencl[]= \
 "} \n"\
 " \n"\
 "/// Linearly interpolate between two values \n"\
-"float3 lerp(float3 a, float3 b, float w) \n"\
+"float4 lerp(float4 a, float4 b, float w) \n"\
 "{ \n"\
 "    return a + w*(b-a); \n"\
 "} \n"\
@@ -5855,7 +6238,7 @@ static const char g_integrator_ao_opencl[]= \
 "float3 GetOrthoVector(float3 n) \n"\
 "{ \n"\
 "    float3 p; \n"\
-"     \n"\
+" \n"\
 "    if (fabs(n.z) > 0.f) { \n"\
 "        float k = sqrt(n.y*n.y + n.z*n.z); \n"\
 "        p.x = 0; p.y = -n.z/k; p.z = n.y/k; \n"\
@@ -5924,88 +6307,88 @@ static const char g_integrator_ao_opencl[]= \
 "#define TEXTURE_ARGS_IDX(x) x, textures, texturedata \n"\
 " \n"\
 "/// Sample 2D texture \n"\
-"float3 Texture_Sample2D(float2 uv, TEXTURE_ARG_LIST_IDX(texidx)) \n"\
+"float4 Texture_Sample2D(float2 uv, TEXTURE_ARG_LIST_IDX(texidx)) \n"\
 "{ \n"\
 "    // Get width and height \n"\
 "    int width = textures[texidx].w; \n"\
 "    int height = textures[texidx].h; \n"\
-"     \n"\
+" \n"\
 "    // Find the origin of the data in the pool \n"\
 "    __global char const* mydata = texturedata + textures[texidx].dataoffset; \n"\
 " \n"\
 "    // Handle UV wrap \n"\
 "    // TODO: need UV mode support \n"\
 "    uv -= floor(uv); \n"\
-"     \n"\
+" \n"\
 "    // Reverse Y: \n"\
 "    // it is needed as textures are loaded with Y axis going top to down \n"\
 "    // and our axis goes from down to top \n"\
 "    uv.y = 1.f - uv.y; \n"\
-"     \n"\
+" \n"\
 "    // Calculate integer coordinates \n"\
 "    int x0 = clamp((int)floor(uv.x * width), 0, width - 1); \n"\
 "    int y0 = clamp((int)floor(uv.y * height), 0, height - 1); \n"\
-"     \n"\
+" \n"\
 "    // Calculate samples for linear filtering \n"\
 "    int x1 = clamp(x0 + 1, 0,  width - 1); \n"\
 "    int y1 = clamp(y0 + 1, 0, height - 1); \n"\
-"     \n"\
+" \n"\
 "    // Calculate weights for linear filtering \n"\
 "    float wx = uv.x * width - floor(uv.x * width); \n"\
 "    float wy = uv.y * height - floor(uv.y * height); \n"\
-"     \n"\
+" \n"\
 "    switch (textures[texidx].fmt) \n"\
 "    { \n"\
 "        case RGBA32: \n"\
 "        { \n"\
-"            __global float3 const* mydataf = (__global float3 const*)mydata; \n"\
-"             \n"\
+"            __global float4 const* mydataf = (__global float4 const*)mydata; \n"\
+" \n"\
 "            // Get 4 values for linear filtering \n"\
-"            float3 val00 = *(mydataf + width * y0 + x0); \n"\
-"            float3 val01 = *(mydataf + width * y0 + x1); \n"\
-"            float3 val10 = *(mydataf + width * y1 + x0); \n"\
-"            float3 val11 = *(mydataf + width * y1 + x1); \n"\
-"             \n"\
+"            float4 val00 = *(mydataf + width * y0 + x0); \n"\
+"            float4 val01 = *(mydataf + width * y0 + x1); \n"\
+"            float4 val10 = *(mydataf + width * y1 + x0); \n"\
+"            float4 val11 = *(mydataf + width * y1 + x1); \n"\
+" \n"\
 "            // Filter and return the result \n"\
 "            return lerp(lerp(val00, val01, wx), lerp(val10, val11, wx), wy); \n"\
 "        } \n"\
-"             \n"\
+" \n"\
 "        case RGBA16: \n"\
 "        { \n"\
 "            __global half const* mydatah = (__global half const*)mydata; \n"\
-"             \n"\
+" \n"\
 "            // Get 4 values \n"\
-"            float3 val00 = vload_half4(width * y0 + x0, mydatah).xyz; \n"\
-"            float3 val01 = vload_half4(width * y0 + x1, mydatah).xyz; \n"\
-"            float3 val10 = vload_half4(width * y1 + x0, mydatah).xyz; \n"\
-"            float3 val11 = vload_half4(width * y1 + x1, mydatah).xyz; \n"\
-"             \n"\
+"            float4 val00 = vload_half4(width * y0 + x0, mydatah); \n"\
+"            float4 val01 = vload_half4(width * y0 + x1, mydatah); \n"\
+"            float4 val10 = vload_half4(width * y1 + x0, mydatah); \n"\
+"            float4 val11 = vload_half4(width * y1 + x1, mydatah); \n"\
+" \n"\
 "            // Filter and return the result \n"\
 "            return lerp(lerp(val00, val01, wx), lerp(val10, val11, wx), wy); \n"\
 "        } \n"\
-"             \n"\
+" \n"\
 "        case RGBA8: \n"\
 "        { \n"\
 "            __global uchar4 const* mydatac = (__global uchar4 const*)mydata; \n"\
-"             \n"\
+" \n"\
 "            // Get 4 values and convert to float \n"\
 "            uchar4 valu00 = *(mydatac + width * y0 + x0); \n"\
 "            uchar4 valu01 = *(mydatac + width * y0 + x1); \n"\
 "            uchar4 valu10 = *(mydatac + width * y1 + x0); \n"\
 "            uchar4 valu11 = *(mydatac + width * y1 + x1); \n"\
-"             \n"\
-"            float3 val00 = make_float3((float)valu00.x / 255.f, (float)valu00.y / 255.f, (float)valu00.z / 255.f); \n"\
-"            float3 val01 = make_float3((float)valu01.x / 255.f, (float)valu01.y / 255.f, (float)valu01.z / 255.f); \n"\
-"            float3 val10 = make_float3((float)valu10.x / 255.f, (float)valu10.y / 255.f, (float)valu10.z / 255.f); \n"\
-"            float3 val11 = make_float3((float)valu11.x / 255.f, (float)valu11.y / 255.f, (float)valu11.z / 255.f); \n"\
-"             \n"\
+" \n"\
+"            float4 val00 = make_float4((float)valu00.x / 255.f, (float)valu00.y / 255.f, (float)valu00.z / 255.f, (float)valu00.w / 255.f); \n"\
+"            float4 val01 = make_float4((float)valu01.x / 255.f, (float)valu01.y / 255.f, (float)valu01.z / 255.f, (float)valu01.w / 255.f); \n"\
+"            float4 val10 = make_float4((float)valu10.x / 255.f, (float)valu10.y / 255.f, (float)valu10.z / 255.f, (float)valu10.w / 255.f); \n"\
+"            float4 val11 = make_float4((float)valu11.x / 255.f, (float)valu11.y / 255.f, (float)valu11.z / 255.f, (float)valu11.w / 255.f); \n"\
+" \n"\
 "            // Filter and return the result \n"\
 "            return lerp(lerp(val00, val01, wx), lerp(val10, val11, wx), wy); \n"\
 "        } \n"\
-"             \n"\
+" \n"\
 "        default: \n"\
 "        { \n"\
-"            return make_float3(0.f, 0.f, 0.f); \n"\
+"            return make_float4(0.f, 0.f, 0.f, 0.f); \n"\
 "        } \n"\
 "    } \n"\
 "} \n"\
@@ -6016,14 +6399,14 @@ static const char g_integrator_ao_opencl[]= \
 "    // Transform to spherical coords \n"\
 "    float r, phi, theta; \n"\
 "    CartesianToSpherical(d, &r, &phi, &theta); \n"\
-"     \n"\
+" \n"\
 "    // Map to [0,1]x[0,1] range and reverse Y axis \n"\
 "    float2 uv; \n"\
 "    uv.x = phi / (2*PI); \n"\
 "    uv.y = 1.f - theta / PI; \n"\
-"     \n"\
+" \n"\
 "    // Sample the texture \n"\
-"    return native_powr(Texture_Sample2D(uv, TEXTURE_ARGS_IDX(texidx)), 1.f / 1.f); \n"\
+"    return Texture_Sample2D(uv, TEXTURE_ARGS_IDX(texidx)).xyz; \n"\
 "} \n"\
 " \n"\
 "/// Get data from parameter value or texture \n"\
@@ -6040,9 +6423,30 @@ static const char g_integrator_ao_opencl[]= \
 "    if (texidx != -1) \n"\
 "    { \n"\
 "        // Sample texture \n"\
+"        return native_powr(Texture_Sample2D(uv, TEXTURE_ARGS_IDX(texidx)).xyz, 2.2f); \n"\
+"    } \n"\
+" \n"\
+"    // Return fixed color otherwise \n"\
+"    return v; \n"\
+"} \n"\
+" \n"\
+"/// Get data from parameter value or texture \n"\
+"float4 Texture_GetValue4f( \n"\
+"                // Value \n"\
+"                float4 v, \n"\
+"                // Texture coordinate \n"\
+"                float2 uv, \n"\
+"                // Texture args \n"\
+"                TEXTURE_ARG_LIST_IDX(texidx) \n"\
+"                ) \n"\
+"{ \n"\
+"    // If texture present sample from texture \n"\
+"    if (texidx != -1) \n"\
+"    { \n"\
+"        // Sample texture \n"\
 "        return native_powr(Texture_Sample2D(uv, TEXTURE_ARGS_IDX(texidx)), 2.2f); \n"\
 "    } \n"\
-"     \n"\
+" \n"\
 "    // Return fixed color otherwise \n"\
 "    return v; \n"\
 "} \n"\
@@ -6063,7 +6467,7 @@ static const char g_integrator_ao_opencl[]= \
 "        // Sample texture \n"\
 "        return Texture_Sample2D(uv, TEXTURE_ARGS_IDX(texidx)).x; \n"\
 "    } \n"\
-"     \n"\
+" \n"\
 "    // Return fixed color otherwise \n"\
 "    return v; \n"\
 "} \n"\
@@ -6098,11 +6502,11 @@ static const char g_integrator_ao_opencl[]= \
 "        __global float3 const* mydataf = (__global float3 const*)mydata; \n"\
 " \n"\
 "        // Sobel filter \n"\
-"        const float tex00 = (*(mydataf + width * (t0 - 1) + (s0-1))).x;  \n"\
+"        const float tex00 = (*(mydataf + width * (t0 - 1) + (s0-1))).x; \n"\
 "        const float tex10 = (*(mydataf + width * (t0 - 1) + (s0))).x; \n"\
-"        const float tex20 = (*(mydataf + width * (t0 - 1) + (s0 + 1))).x;  \n"\
+"        const float tex20 = (*(mydataf + width * (t0 - 1) + (s0 + 1))).x; \n"\
 " \n"\
-"        const float tex01 = (*(mydataf + width * (t0) + (s0 - 1))).x;  \n"\
+"        const float tex01 = (*(mydataf + width * (t0) + (s0 - 1))).x; \n"\
 "        const float tex21 = (*(mydataf + width * (t0) + (s0 + 1))).x; \n"\
 " \n"\
 "        const float tex02 = (*(mydataf + width * (t0 + 1) + (s0 - 1))).x; \n"\
@@ -6124,8 +6528,8 @@ static const char g_integrator_ao_opencl[]= \
 "        const float tex10 = vload_half4(width * (t0 - 1) + (s0), mydatah).x; \n"\
 "        const float tex20 = vload_half4(width * (t0 - 1) + (s0 + 1), mydatah).x; \n"\
 " \n"\
-"        const float tex01 = vload_half4(width * (t0)+(s0 - 1), mydatah).x;  \n"\
-"        const float tex21 = vload_half4(width * (t0)+(s0 + 1), mydatah).x;  \n"\
+"        const float tex01 = vload_half4(width * (t0)+(s0 - 1), mydatah).x; \n"\
+"        const float tex21 = vload_half4(width * (t0)+(s0 + 1), mydatah).x; \n"\
 " \n"\
 "        const float tex02 = vload_half4(width * (t0 + 1) + (s0 - 1), mydatah).x; \n"\
 "        const float tex12 = vload_half4(width * (t0 + 1) + (s0), mydatah).x; \n"\
@@ -6204,7 +6608,7 @@ static const char g_integrator_ao_opencl[]= \
 "********************************************************************/ \n"\
 "#ifndef PAYLOAD_CL \n"\
 "#define PAYLOAD_CL \n"\
-"#define SOBOL \n"\
+"//#define SOBOL \n"\
 "#define MULTISCATTER \n"\
 " \n"\
 "/// Ray descriptor \n"\
@@ -6216,7 +6620,7 @@ static const char g_integrator_ao_opencl[]= \
 "    float4 d; \n"\
 "    /// x - ray mask, y - activity flag \n"\
 "    int2 extra; \n"\
-"    int2 padding; \n"\
+"    float2 padding; \n"\
 "} ray; \n"\
 " \n"\
 "/// Intersection data returned by RadeonRays \n"\
@@ -6270,8 +6674,6 @@ static const char g_integrator_ao_opencl[]= \
 "} Emissive; \n"\
 " \n"\
 " \n"\
-" \n"\
-" \n"\
 "typedef enum _PathFlags \n"\
 "{ \n"\
 "    kNone = 0x0, \n"\
@@ -6321,6 +6723,53 @@ static const char g_integrator_ao_opencl[]= \
 " \n"\
 "} Material; \n"\
 " \n"\
+" \n"\
+"enum LightType \n"\
+"{ \n"\
+"    kPoint = 0x1, \n"\
+"    kDirectional, \n"\
+"    kSpot, \n"\
+"    kArea, \n"\
+"    kIbl \n"\
+"}; \n"\
+" \n"\
+"typedef struct _Light \n"\
+"{ \n"\
+"    int type; \n"\
+" \n"\
+"    union \n"\
+"    { \n"\
+"        // Area light \n"\
+"        struct \n"\
+"        { \n"\
+"            int shapeidx; \n"\
+"            int primidx; \n"\
+"            int matidx; \n"\
+"        }; \n"\
+" \n"\
+"        // IBL \n"\
+"        struct \n"\
+"        { \n"\
+"            int tex; \n"\
+"            int texdiffuse; \n"\
+"            float multiplier; \n"\
+"        }; \n"\
+"         \n"\
+"         \n"\
+"        // Spot \n"\
+"        struct \n"\
+"        { \n"\
+"            float ia; \n"\
+"            float oa; \n"\
+"            float f; \n"\
+"        }; \n"\
+"    }; \n"\
+" \n"\
+"    float3 p; \n"\
+"    float3 d; \n"\
+"    float3 intensity; \n"\
+"} Light; \n"\
+" \n"\
 "typedef struct _Scene \n"\
 "{ \n"\
 "    // Vertices \n"\
@@ -6338,13 +6787,13 @@ static const char g_integrator_ao_opencl[]= \
 "    // Materials \n"\
 "    __global Material const* materials; \n"\
 "    // Emissive objects \n"\
-"    __global Emissive const* emissives; \n"\
+"    __global Light const* lights; \n"\
 "    // Envmap idx \n"\
 "    int envmapidx; \n"\
 "    // Envmap multiplier \n"\
 "    float envmapmul; \n"\
 "    // Number of emissive objects \n"\
-"    int numemissives; \n"\
+"    int num_lights; \n"\
 "} Scene; \n"\
 " \n"\
 "// Hit data \n"\
@@ -6362,7 +6811,7 @@ static const char g_integrator_ao_opencl[]= \
 "    float3 dpdu; \n"\
 "    float3 dpdv; \n"\
 "    float  area; \n"\
-"    // Material  \n"\
+"    // Material \n"\
 "    Material mat; \n"\
 "} DifferentialGeometry; \n"\
 " \n"\
@@ -6418,6 +6867,16 @@ static const char g_integrator_ao_opencl[]= \
 "    r->extra.y = 0; \n"\
 "} \n"\
 " \n"\
+"void Ray_SetExtra(__global ray* r, float2 extra) \n"\
+"{ \n"\
+"    r->padding = extra; \n"\
+"} \n"\
+" \n"\
+"float2 Ray_GetExtra(__global ray const* r) \n"\
+"{ \n"\
+"    return r->padding; \n"\
+"} \n"\
+" \n"\
 "void Ray_Init(__global ray* r, float3 o, float3 d, float maxt, float time, int mask) \n"\
 "{ \n"\
 "    // TODO: Check if it generates MTBUF_XYZW write \n"\
@@ -6429,6 +6888,8 @@ static const char g_integrator_ao_opencl[]= \
 "    r->extra.y = 0xFFFFFFFF; \n"\
 "} \n"\
 " \n"\
+" \n"\
+" \n"\
 "#endif // PAYLOAD_CL \n"\
 " \n"\
 "void ApplyNormalMap(DifferentialGeometry* dg, TEXTURE_ARG_LIST) \n"\
@@ -6437,8 +6898,8 @@ static const char g_integrator_ao_opencl[]= \
 "    if (nmapidx != -1) \n"\
 "    { \n"\
 "        // Now n, dpdu, dpdv is orthonormal basis \n"\
-"        float3 mappednormal = 2.f * Texture_Sample2D(dg->uv, TEXTURE_ARGS_IDX(nmapidx)) - make_float3(1.f, 1.f, 1.f); \n"\
-"     \n"\
+"        float3 mappednormal = 2.f * Texture_Sample2D(dg->uv, TEXTURE_ARGS_IDX(nmapidx)).xyz - make_float3(1.f, 1.f, 1.f); \n"\
+" \n"\
 "        // Return mapped version \n"\
 "        dg->n = normalize(mappednormal.z *  dg->n * 0.5f + mappednormal.x * dg->dpdu + mappednormal.y * dg->dpdv); \n"\
 "    } \n"\
@@ -6599,7 +7060,7 @@ static const char g_integrator_ao_opencl[]= \
 "float4 quaternion_inverse(float4 q) \n"\
 "{ \n"\
 "    float sqnorm = q.x*q.x + q.y*q.y + q.z*q.z + q.w*q.w; \n"\
-"     \n"\
+" \n"\
 "    /// Check if it is singular \n"\
 "    if (sqnorm != 0.f) \n"\
 "    { \n"\
@@ -6621,7 +7082,7 @@ static const char g_integrator_ao_opencl[]= \
 "} \n"\
 " \n"\
 "/// Linearly interpolate between two values \n"\
-"float3 lerp(float3 a, float3 b, float w) \n"\
+"float4 lerp(float4 a, float4 b, float w) \n"\
 "{ \n"\
 "    return a + w*(b-a); \n"\
 "} \n"\
@@ -6640,7 +7101,7 @@ static const char g_integrator_ao_opencl[]= \
 "float3 GetOrthoVector(float3 n) \n"\
 "{ \n"\
 "    float3 p; \n"\
-"     \n"\
+" \n"\
 "    if (fabs(n.z) > 0.f) { \n"\
 "        float k = sqrt(n.y*n.y + n.z*n.z); \n"\
 "        p.x = 0; p.y = -n.z/k; p.z = n.y/k; \n"\
@@ -6883,7 +7344,7 @@ static const char g_integrator_ao_opencl[]= \
 "float4 quaternion_inverse(float4 q) \n"\
 "{ \n"\
 "    float sqnorm = q.x*q.x + q.y*q.y + q.z*q.z + q.w*q.w; \n"\
-"     \n"\
+" \n"\
 "    /// Check if it is singular \n"\
 "    if (sqnorm != 0.f) \n"\
 "    { \n"\
@@ -6905,7 +7366,7 @@ static const char g_integrator_ao_opencl[]= \
 "} \n"\
 " \n"\
 "/// Linearly interpolate between two values \n"\
-"float3 lerp(float3 a, float3 b, float w) \n"\
+"float4 lerp(float4 a, float4 b, float w) \n"\
 "{ \n"\
 "    return a + w*(b-a); \n"\
 "} \n"\
@@ -6924,7 +7385,7 @@ static const char g_integrator_ao_opencl[]= \
 "float3 GetOrthoVector(float3 n) \n"\
 "{ \n"\
 "    float3 p; \n"\
-"     \n"\
+" \n"\
 "    if (fabs(n.z) > 0.f) { \n"\
 "        float k = sqrt(n.y*n.y + n.z*n.z); \n"\
 "        p.x = 0; p.y = -n.z/k; p.z = n.y/k; \n"\
@@ -6993,88 +7454,88 @@ static const char g_integrator_ao_opencl[]= \
 "#define TEXTURE_ARGS_IDX(x) x, textures, texturedata \n"\
 " \n"\
 "/// Sample 2D texture \n"\
-"float3 Texture_Sample2D(float2 uv, TEXTURE_ARG_LIST_IDX(texidx)) \n"\
+"float4 Texture_Sample2D(float2 uv, TEXTURE_ARG_LIST_IDX(texidx)) \n"\
 "{ \n"\
 "    // Get width and height \n"\
 "    int width = textures[texidx].w; \n"\
 "    int height = textures[texidx].h; \n"\
-"     \n"\
+" \n"\
 "    // Find the origin of the data in the pool \n"\
 "    __global char const* mydata = texturedata + textures[texidx].dataoffset; \n"\
 " \n"\
 "    // Handle UV wrap \n"\
 "    // TODO: need UV mode support \n"\
 "    uv -= floor(uv); \n"\
-"     \n"\
+" \n"\
 "    // Reverse Y: \n"\
 "    // it is needed as textures are loaded with Y axis going top to down \n"\
 "    // and our axis goes from down to top \n"\
 "    uv.y = 1.f - uv.y; \n"\
-"     \n"\
+" \n"\
 "    // Calculate integer coordinates \n"\
 "    int x0 = clamp((int)floor(uv.x * width), 0, width - 1); \n"\
 "    int y0 = clamp((int)floor(uv.y * height), 0, height - 1); \n"\
-"     \n"\
+" \n"\
 "    // Calculate samples for linear filtering \n"\
 "    int x1 = clamp(x0 + 1, 0,  width - 1); \n"\
 "    int y1 = clamp(y0 + 1, 0, height - 1); \n"\
-"     \n"\
+" \n"\
 "    // Calculate weights for linear filtering \n"\
 "    float wx = uv.x * width - floor(uv.x * width); \n"\
 "    float wy = uv.y * height - floor(uv.y * height); \n"\
-"     \n"\
+" \n"\
 "    switch (textures[texidx].fmt) \n"\
 "    { \n"\
 "        case RGBA32: \n"\
 "        { \n"\
-"            __global float3 const* mydataf = (__global float3 const*)mydata; \n"\
-"             \n"\
+"            __global float4 const* mydataf = (__global float4 const*)mydata; \n"\
+" \n"\
 "            // Get 4 values for linear filtering \n"\
-"            float3 val00 = *(mydataf + width * y0 + x0); \n"\
-"            float3 val01 = *(mydataf + width * y0 + x1); \n"\
-"            float3 val10 = *(mydataf + width * y1 + x0); \n"\
-"            float3 val11 = *(mydataf + width * y1 + x1); \n"\
-"             \n"\
+"            float4 val00 = *(mydataf + width * y0 + x0); \n"\
+"            float4 val01 = *(mydataf + width * y0 + x1); \n"\
+"            float4 val10 = *(mydataf + width * y1 + x0); \n"\
+"            float4 val11 = *(mydataf + width * y1 + x1); \n"\
+" \n"\
 "            // Filter and return the result \n"\
 "            return lerp(lerp(val00, val01, wx), lerp(val10, val11, wx), wy); \n"\
 "        } \n"\
-"             \n"\
+" \n"\
 "        case RGBA16: \n"\
 "        { \n"\
 "            __global half const* mydatah = (__global half const*)mydata; \n"\
-"             \n"\
+" \n"\
 "            // Get 4 values \n"\
-"            float3 val00 = vload_half4(width * y0 + x0, mydatah).xyz; \n"\
-"            float3 val01 = vload_half4(width * y0 + x1, mydatah).xyz; \n"\
-"            float3 val10 = vload_half4(width * y1 + x0, mydatah).xyz; \n"\
-"            float3 val11 = vload_half4(width * y1 + x1, mydatah).xyz; \n"\
-"             \n"\
+"            float4 val00 = vload_half4(width * y0 + x0, mydatah); \n"\
+"            float4 val01 = vload_half4(width * y0 + x1, mydatah); \n"\
+"            float4 val10 = vload_half4(width * y1 + x0, mydatah); \n"\
+"            float4 val11 = vload_half4(width * y1 + x1, mydatah); \n"\
+" \n"\
 "            // Filter and return the result \n"\
 "            return lerp(lerp(val00, val01, wx), lerp(val10, val11, wx), wy); \n"\
 "        } \n"\
-"             \n"\
+" \n"\
 "        case RGBA8: \n"\
 "        { \n"\
 "            __global uchar4 const* mydatac = (__global uchar4 const*)mydata; \n"\
-"             \n"\
+" \n"\
 "            // Get 4 values and convert to float \n"\
 "            uchar4 valu00 = *(mydatac + width * y0 + x0); \n"\
 "            uchar4 valu01 = *(mydatac + width * y0 + x1); \n"\
 "            uchar4 valu10 = *(mydatac + width * y1 + x0); \n"\
 "            uchar4 valu11 = *(mydatac + width * y1 + x1); \n"\
-"             \n"\
-"            float3 val00 = make_float3((float)valu00.x / 255.f, (float)valu00.y / 255.f, (float)valu00.z / 255.f); \n"\
-"            float3 val01 = make_float3((float)valu01.x / 255.f, (float)valu01.y / 255.f, (float)valu01.z / 255.f); \n"\
-"            float3 val10 = make_float3((float)valu10.x / 255.f, (float)valu10.y / 255.f, (float)valu10.z / 255.f); \n"\
-"            float3 val11 = make_float3((float)valu11.x / 255.f, (float)valu11.y / 255.f, (float)valu11.z / 255.f); \n"\
-"             \n"\
+" \n"\
+"            float4 val00 = make_float4((float)valu00.x / 255.f, (float)valu00.y / 255.f, (float)valu00.z / 255.f, (float)valu00.w / 255.f); \n"\
+"            float4 val01 = make_float4((float)valu01.x / 255.f, (float)valu01.y / 255.f, (float)valu01.z / 255.f, (float)valu01.w / 255.f); \n"\
+"            float4 val10 = make_float4((float)valu10.x / 255.f, (float)valu10.y / 255.f, (float)valu10.z / 255.f, (float)valu10.w / 255.f); \n"\
+"            float4 val11 = make_float4((float)valu11.x / 255.f, (float)valu11.y / 255.f, (float)valu11.z / 255.f, (float)valu11.w / 255.f); \n"\
+" \n"\
 "            // Filter and return the result \n"\
 "            return lerp(lerp(val00, val01, wx), lerp(val10, val11, wx), wy); \n"\
 "        } \n"\
-"             \n"\
+" \n"\
 "        default: \n"\
 "        { \n"\
-"            return make_float3(0.f, 0.f, 0.f); \n"\
+"            return make_float4(0.f, 0.f, 0.f, 0.f); \n"\
 "        } \n"\
 "    } \n"\
 "} \n"\
@@ -7085,14 +7546,14 @@ static const char g_integrator_ao_opencl[]= \
 "    // Transform to spherical coords \n"\
 "    float r, phi, theta; \n"\
 "    CartesianToSpherical(d, &r, &phi, &theta); \n"\
-"     \n"\
+" \n"\
 "    // Map to [0,1]x[0,1] range and reverse Y axis \n"\
 "    float2 uv; \n"\
 "    uv.x = phi / (2*PI); \n"\
 "    uv.y = 1.f - theta / PI; \n"\
-"     \n"\
+" \n"\
 "    // Sample the texture \n"\
-"    return native_powr(Texture_Sample2D(uv, TEXTURE_ARGS_IDX(texidx)), 1.f / 1.f); \n"\
+"    return Texture_Sample2D(uv, TEXTURE_ARGS_IDX(texidx)).xyz; \n"\
 "} \n"\
 " \n"\
 "/// Get data from parameter value or texture \n"\
@@ -7109,9 +7570,30 @@ static const char g_integrator_ao_opencl[]= \
 "    if (texidx != -1) \n"\
 "    { \n"\
 "        // Sample texture \n"\
+"        return native_powr(Texture_Sample2D(uv, TEXTURE_ARGS_IDX(texidx)).xyz, 2.2f); \n"\
+"    } \n"\
+" \n"\
+"    // Return fixed color otherwise \n"\
+"    return v; \n"\
+"} \n"\
+" \n"\
+"/// Get data from parameter value or texture \n"\
+"float4 Texture_GetValue4f( \n"\
+"                // Value \n"\
+"                float4 v, \n"\
+"                // Texture coordinate \n"\
+"                float2 uv, \n"\
+"                // Texture args \n"\
+"                TEXTURE_ARG_LIST_IDX(texidx) \n"\
+"                ) \n"\
+"{ \n"\
+"    // If texture present sample from texture \n"\
+"    if (texidx != -1) \n"\
+"    { \n"\
+"        // Sample texture \n"\
 "        return native_powr(Texture_Sample2D(uv, TEXTURE_ARGS_IDX(texidx)), 2.2f); \n"\
 "    } \n"\
-"     \n"\
+" \n"\
 "    // Return fixed color otherwise \n"\
 "    return v; \n"\
 "} \n"\
@@ -7132,7 +7614,7 @@ static const char g_integrator_ao_opencl[]= \
 "        // Sample texture \n"\
 "        return Texture_Sample2D(uv, TEXTURE_ARGS_IDX(texidx)).x; \n"\
 "    } \n"\
-"     \n"\
+" \n"\
 "    // Return fixed color otherwise \n"\
 "    return v; \n"\
 "} \n"\
@@ -7167,11 +7649,11 @@ static const char g_integrator_ao_opencl[]= \
 "        __global float3 const* mydataf = (__global float3 const*)mydata; \n"\
 " \n"\
 "        // Sobel filter \n"\
-"        const float tex00 = (*(mydataf + width * (t0 - 1) + (s0-1))).x;  \n"\
+"        const float tex00 = (*(mydataf + width * (t0 - 1) + (s0-1))).x; \n"\
 "        const float tex10 = (*(mydataf + width * (t0 - 1) + (s0))).x; \n"\
-"        const float tex20 = (*(mydataf + width * (t0 - 1) + (s0 + 1))).x;  \n"\
+"        const float tex20 = (*(mydataf + width * (t0 - 1) + (s0 + 1))).x; \n"\
 " \n"\
-"        const float tex01 = (*(mydataf + width * (t0) + (s0 - 1))).x;  \n"\
+"        const float tex01 = (*(mydataf + width * (t0) + (s0 - 1))).x; \n"\
 "        const float tex21 = (*(mydataf + width * (t0) + (s0 + 1))).x; \n"\
 " \n"\
 "        const float tex02 = (*(mydataf + width * (t0 + 1) + (s0 - 1))).x; \n"\
@@ -7193,8 +7675,8 @@ static const char g_integrator_ao_opencl[]= \
 "        const float tex10 = vload_half4(width * (t0 - 1) + (s0), mydatah).x; \n"\
 "        const float tex20 = vload_half4(width * (t0 - 1) + (s0 + 1), mydatah).x; \n"\
 " \n"\
-"        const float tex01 = vload_half4(width * (t0)+(s0 - 1), mydatah).x;  \n"\
-"        const float tex21 = vload_half4(width * (t0)+(s0 + 1), mydatah).x;  \n"\
+"        const float tex01 = vload_half4(width * (t0)+(s0 - 1), mydatah).x; \n"\
+"        const float tex21 = vload_half4(width * (t0)+(s0 + 1), mydatah).x; \n"\
 " \n"\
 "        const float tex02 = vload_half4(width * (t0 + 1) + (s0 - 1), mydatah).x; \n"\
 "        const float tex12 = vload_half4(width * (t0 + 1) + (s0), mydatah).x; \n"\
@@ -7273,7 +7755,7 @@ static const char g_integrator_ao_opencl[]= \
 "********************************************************************/ \n"\
 "#ifndef PAYLOAD_CL \n"\
 "#define PAYLOAD_CL \n"\
-"#define SOBOL \n"\
+"//#define SOBOL \n"\
 "#define MULTISCATTER \n"\
 " \n"\
 "/// Ray descriptor \n"\
@@ -7285,7 +7767,7 @@ static const char g_integrator_ao_opencl[]= \
 "    float4 d; \n"\
 "    /// x - ray mask, y - activity flag \n"\
 "    int2 extra; \n"\
-"    int2 padding; \n"\
+"    float2 padding; \n"\
 "} ray; \n"\
 " \n"\
 "/// Intersection data returned by RadeonRays \n"\
@@ -7339,8 +7821,6 @@ static const char g_integrator_ao_opencl[]= \
 "} Emissive; \n"\
 " \n"\
 " \n"\
-" \n"\
-" \n"\
 "typedef enum _PathFlags \n"\
 "{ \n"\
 "    kNone = 0x0, \n"\
@@ -7390,6 +7870,53 @@ static const char g_integrator_ao_opencl[]= \
 " \n"\
 "} Material; \n"\
 " \n"\
+" \n"\
+"enum LightType \n"\
+"{ \n"\
+"    kPoint = 0x1, \n"\
+"    kDirectional, \n"\
+"    kSpot, \n"\
+"    kArea, \n"\
+"    kIbl \n"\
+"}; \n"\
+" \n"\
+"typedef struct _Light \n"\
+"{ \n"\
+"    int type; \n"\
+" \n"\
+"    union \n"\
+"    { \n"\
+"        // Area light \n"\
+"        struct \n"\
+"        { \n"\
+"            int shapeidx; \n"\
+"            int primidx; \n"\
+"            int matidx; \n"\
+"        }; \n"\
+" \n"\
+"        // IBL \n"\
+"        struct \n"\
+"        { \n"\
+"            int tex; \n"\
+"            int texdiffuse; \n"\
+"            float multiplier; \n"\
+"        }; \n"\
+"         \n"\
+"         \n"\
+"        // Spot \n"\
+"        struct \n"\
+"        { \n"\
+"            float ia; \n"\
+"            float oa; \n"\
+"            float f; \n"\
+"        }; \n"\
+"    }; \n"\
+" \n"\
+"    float3 p; \n"\
+"    float3 d; \n"\
+"    float3 intensity; \n"\
+"} Light; \n"\
+" \n"\
 "typedef struct _Scene \n"\
 "{ \n"\
 "    // Vertices \n"\
@@ -7407,13 +7934,13 @@ static const char g_integrator_ao_opencl[]= \
 "    // Materials \n"\
 "    __global Material const* materials; \n"\
 "    // Emissive objects \n"\
-"    __global Emissive const* emissives; \n"\
+"    __global Light const* lights; \n"\
 "    // Envmap idx \n"\
 "    int envmapidx; \n"\
 "    // Envmap multiplier \n"\
 "    float envmapmul; \n"\
 "    // Number of emissive objects \n"\
-"    int numemissives; \n"\
+"    int num_lights; \n"\
 "} Scene; \n"\
 " \n"\
 "// Hit data \n"\
@@ -7431,7 +7958,7 @@ static const char g_integrator_ao_opencl[]= \
 "    float3 dpdu; \n"\
 "    float3 dpdv; \n"\
 "    float  area; \n"\
-"    // Material  \n"\
+"    // Material \n"\
 "    Material mat; \n"\
 "} DifferentialGeometry; \n"\
 " \n"\
@@ -7487,6 +8014,16 @@ static const char g_integrator_ao_opencl[]= \
 "    r->extra.y = 0; \n"\
 "} \n"\
 " \n"\
+"void Ray_SetExtra(__global ray* r, float2 extra) \n"\
+"{ \n"\
+"    r->padding = extra; \n"\
+"} \n"\
+" \n"\
+"float2 Ray_GetExtra(__global ray const* r) \n"\
+"{ \n"\
+"    return r->padding; \n"\
+"} \n"\
+" \n"\
 "void Ray_Init(__global ray* r, float3 o, float3 d, float maxt, float time, int mask) \n"\
 "{ \n"\
 "    // TODO: Check if it generates MTBUF_XYZW write \n"\
@@ -7497,6 +8034,8 @@ static const char g_integrator_ao_opencl[]= \
 "    r->extra.x = mask; \n"\
 "    r->extra.y = 0xFFFFFFFF; \n"\
 "} \n"\
+" \n"\
+" \n"\
 " \n"\
 "#endif // PAYLOAD_CL \n"\
 " \n"\
@@ -9054,7 +9593,7 @@ static const char g_integrator_ao_opencl[]= \
 "float4 quaternion_inverse(float4 q) \n"\
 "{ \n"\
 "    float sqnorm = q.x*q.x + q.y*q.y + q.z*q.z + q.w*q.w; \n"\
-"     \n"\
+" \n"\
 "    /// Check if it is singular \n"\
 "    if (sqnorm != 0.f) \n"\
 "    { \n"\
@@ -9076,7 +9615,7 @@ static const char g_integrator_ao_opencl[]= \
 "} \n"\
 " \n"\
 "/// Linearly interpolate between two values \n"\
-"float3 lerp(float3 a, float3 b, float w) \n"\
+"float4 lerp(float4 a, float4 b, float w) \n"\
 "{ \n"\
 "    return a + w*(b-a); \n"\
 "} \n"\
@@ -9095,7 +9634,7 @@ static const char g_integrator_ao_opencl[]= \
 "float3 GetOrthoVector(float3 n) \n"\
 "{ \n"\
 "    float3 p; \n"\
-"     \n"\
+" \n"\
 "    if (fabs(n.z) > 0.f) { \n"\
 "        float k = sqrt(n.y*n.y + n.z*n.z); \n"\
 "        p.x = 0; p.y = -n.z/k; p.z = n.y/k; \n"\
@@ -9155,7 +9694,7 @@ static const char g_integrator_ao_opencl[]= \
 "********************************************************************/ \n"\
 "#ifndef PAYLOAD_CL \n"\
 "#define PAYLOAD_CL \n"\
-"#define SOBOL \n"\
+"//#define SOBOL \n"\
 "#define MULTISCATTER \n"\
 " \n"\
 "/// Ray descriptor \n"\
@@ -9167,7 +9706,7 @@ static const char g_integrator_ao_opencl[]= \
 "    float4 d; \n"\
 "    /// x - ray mask, y - activity flag \n"\
 "    int2 extra; \n"\
-"    int2 padding; \n"\
+"    float2 padding; \n"\
 "} ray; \n"\
 " \n"\
 "/// Intersection data returned by RadeonRays \n"\
@@ -9221,8 +9760,6 @@ static const char g_integrator_ao_opencl[]= \
 "} Emissive; \n"\
 " \n"\
 " \n"\
-" \n"\
-" \n"\
 "typedef enum _PathFlags \n"\
 "{ \n"\
 "    kNone = 0x0, \n"\
@@ -9272,6 +9809,53 @@ static const char g_integrator_ao_opencl[]= \
 " \n"\
 "} Material; \n"\
 " \n"\
+" \n"\
+"enum LightType \n"\
+"{ \n"\
+"    kPoint = 0x1, \n"\
+"    kDirectional, \n"\
+"    kSpot, \n"\
+"    kArea, \n"\
+"    kIbl \n"\
+"}; \n"\
+" \n"\
+"typedef struct _Light \n"\
+"{ \n"\
+"    int type; \n"\
+" \n"\
+"    union \n"\
+"    { \n"\
+"        // Area light \n"\
+"        struct \n"\
+"        { \n"\
+"            int shapeidx; \n"\
+"            int primidx; \n"\
+"            int matidx; \n"\
+"        }; \n"\
+" \n"\
+"        // IBL \n"\
+"        struct \n"\
+"        { \n"\
+"            int tex; \n"\
+"            int texdiffuse; \n"\
+"            float multiplier; \n"\
+"        }; \n"\
+"         \n"\
+"         \n"\
+"        // Spot \n"\
+"        struct \n"\
+"        { \n"\
+"            float ia; \n"\
+"            float oa; \n"\
+"            float f; \n"\
+"        }; \n"\
+"    }; \n"\
+" \n"\
+"    float3 p; \n"\
+"    float3 d; \n"\
+"    float3 intensity; \n"\
+"} Light; \n"\
+" \n"\
 "typedef struct _Scene \n"\
 "{ \n"\
 "    // Vertices \n"\
@@ -9289,13 +9873,13 @@ static const char g_integrator_ao_opencl[]= \
 "    // Materials \n"\
 "    __global Material const* materials; \n"\
 "    // Emissive objects \n"\
-"    __global Emissive const* emissives; \n"\
+"    __global Light const* lights; \n"\
 "    // Envmap idx \n"\
 "    int envmapidx; \n"\
 "    // Envmap multiplier \n"\
 "    float envmapmul; \n"\
 "    // Number of emissive objects \n"\
-"    int numemissives; \n"\
+"    int num_lights; \n"\
 "} Scene; \n"\
 " \n"\
 "// Hit data \n"\
@@ -9313,7 +9897,7 @@ static const char g_integrator_ao_opencl[]= \
 "    float3 dpdu; \n"\
 "    float3 dpdv; \n"\
 "    float  area; \n"\
-"    // Material  \n"\
+"    // Material \n"\
 "    Material mat; \n"\
 "} DifferentialGeometry; \n"\
 " \n"\
@@ -9369,6 +9953,16 @@ static const char g_integrator_ao_opencl[]= \
 "    r->extra.y = 0; \n"\
 "} \n"\
 " \n"\
+"void Ray_SetExtra(__global ray* r, float2 extra) \n"\
+"{ \n"\
+"    r->padding = extra; \n"\
+"} \n"\
+" \n"\
+"float2 Ray_GetExtra(__global ray const* r) \n"\
+"{ \n"\
+"    return r->padding; \n"\
+"} \n"\
+" \n"\
 "void Ray_Init(__global ray* r, float3 o, float3 d, float maxt, float time, int mask) \n"\
 "{ \n"\
 "    // TODO: Check if it generates MTBUF_XYZW write \n"\
@@ -9379,6 +9973,8 @@ static const char g_integrator_ao_opencl[]= \
 "    r->extra.x = mask; \n"\
 "    r->extra.y = 0xFFFFFFFF; \n"\
 "} \n"\
+" \n"\
+" \n"\
 " \n"\
 "#endif // PAYLOAD_CL \n"\
 "/********************************************************************** \n"\
@@ -9587,7 +10183,7 @@ static const char g_integrator_ao_opencl[]= \
 "float4 quaternion_inverse(float4 q) \n"\
 "{ \n"\
 "    float sqnorm = q.x*q.x + q.y*q.y + q.z*q.z + q.w*q.w; \n"\
-"     \n"\
+" \n"\
 "    /// Check if it is singular \n"\
 "    if (sqnorm != 0.f) \n"\
 "    { \n"\
@@ -9609,7 +10205,7 @@ static const char g_integrator_ao_opencl[]= \
 "} \n"\
 " \n"\
 "/// Linearly interpolate between two values \n"\
-"float3 lerp(float3 a, float3 b, float w) \n"\
+"float4 lerp(float4 a, float4 b, float w) \n"\
 "{ \n"\
 "    return a + w*(b-a); \n"\
 "} \n"\
@@ -9628,7 +10224,7 @@ static const char g_integrator_ao_opencl[]= \
 "float3 GetOrthoVector(float3 n) \n"\
 "{ \n"\
 "    float3 p; \n"\
-"     \n"\
+" \n"\
 "    if (fabs(n.z) > 0.f) { \n"\
 "        float k = sqrt(n.y*n.y + n.z*n.z); \n"\
 "        p.x = 0; p.y = -n.z/k; p.z = n.y/k; \n"\
@@ -9697,88 +10293,88 @@ static const char g_integrator_ao_opencl[]= \
 "#define TEXTURE_ARGS_IDX(x) x, textures, texturedata \n"\
 " \n"\
 "/// Sample 2D texture \n"\
-"float3 Texture_Sample2D(float2 uv, TEXTURE_ARG_LIST_IDX(texidx)) \n"\
+"float4 Texture_Sample2D(float2 uv, TEXTURE_ARG_LIST_IDX(texidx)) \n"\
 "{ \n"\
 "    // Get width and height \n"\
 "    int width = textures[texidx].w; \n"\
 "    int height = textures[texidx].h; \n"\
-"     \n"\
+" \n"\
 "    // Find the origin of the data in the pool \n"\
 "    __global char const* mydata = texturedata + textures[texidx].dataoffset; \n"\
 " \n"\
 "    // Handle UV wrap \n"\
 "    // TODO: need UV mode support \n"\
 "    uv -= floor(uv); \n"\
-"     \n"\
+" \n"\
 "    // Reverse Y: \n"\
 "    // it is needed as textures are loaded with Y axis going top to down \n"\
 "    // and our axis goes from down to top \n"\
 "    uv.y = 1.f - uv.y; \n"\
-"     \n"\
+" \n"\
 "    // Calculate integer coordinates \n"\
 "    int x0 = clamp((int)floor(uv.x * width), 0, width - 1); \n"\
 "    int y0 = clamp((int)floor(uv.y * height), 0, height - 1); \n"\
-"     \n"\
+" \n"\
 "    // Calculate samples for linear filtering \n"\
 "    int x1 = clamp(x0 + 1, 0,  width - 1); \n"\
 "    int y1 = clamp(y0 + 1, 0, height - 1); \n"\
-"     \n"\
+" \n"\
 "    // Calculate weights for linear filtering \n"\
 "    float wx = uv.x * width - floor(uv.x * width); \n"\
 "    float wy = uv.y * height - floor(uv.y * height); \n"\
-"     \n"\
+" \n"\
 "    switch (textures[texidx].fmt) \n"\
 "    { \n"\
 "        case RGBA32: \n"\
 "        { \n"\
-"            __global float3 const* mydataf = (__global float3 const*)mydata; \n"\
-"             \n"\
+"            __global float4 const* mydataf = (__global float4 const*)mydata; \n"\
+" \n"\
 "            // Get 4 values for linear filtering \n"\
-"            float3 val00 = *(mydataf + width * y0 + x0); \n"\
-"            float3 val01 = *(mydataf + width * y0 + x1); \n"\
-"            float3 val10 = *(mydataf + width * y1 + x0); \n"\
-"            float3 val11 = *(mydataf + width * y1 + x1); \n"\
-"             \n"\
+"            float4 val00 = *(mydataf + width * y0 + x0); \n"\
+"            float4 val01 = *(mydataf + width * y0 + x1); \n"\
+"            float4 val10 = *(mydataf + width * y1 + x0); \n"\
+"            float4 val11 = *(mydataf + width * y1 + x1); \n"\
+" \n"\
 "            // Filter and return the result \n"\
 "            return lerp(lerp(val00, val01, wx), lerp(val10, val11, wx), wy); \n"\
 "        } \n"\
-"             \n"\
+" \n"\
 "        case RGBA16: \n"\
 "        { \n"\
 "            __global half const* mydatah = (__global half const*)mydata; \n"\
-"             \n"\
+" \n"\
 "            // Get 4 values \n"\
-"            float3 val00 = vload_half4(width * y0 + x0, mydatah).xyz; \n"\
-"            float3 val01 = vload_half4(width * y0 + x1, mydatah).xyz; \n"\
-"            float3 val10 = vload_half4(width * y1 + x0, mydatah).xyz; \n"\
-"            float3 val11 = vload_half4(width * y1 + x1, mydatah).xyz; \n"\
-"             \n"\
+"            float4 val00 = vload_half4(width * y0 + x0, mydatah); \n"\
+"            float4 val01 = vload_half4(width * y0 + x1, mydatah); \n"\
+"            float4 val10 = vload_half4(width * y1 + x0, mydatah); \n"\
+"            float4 val11 = vload_half4(width * y1 + x1, mydatah); \n"\
+" \n"\
 "            // Filter and return the result \n"\
 "            return lerp(lerp(val00, val01, wx), lerp(val10, val11, wx), wy); \n"\
 "        } \n"\
-"             \n"\
+" \n"\
 "        case RGBA8: \n"\
 "        { \n"\
 "            __global uchar4 const* mydatac = (__global uchar4 const*)mydata; \n"\
-"             \n"\
+" \n"\
 "            // Get 4 values and convert to float \n"\
 "            uchar4 valu00 = *(mydatac + width * y0 + x0); \n"\
 "            uchar4 valu01 = *(mydatac + width * y0 + x1); \n"\
 "            uchar4 valu10 = *(mydatac + width * y1 + x0); \n"\
 "            uchar4 valu11 = *(mydatac + width * y1 + x1); \n"\
-"             \n"\
-"            float3 val00 = make_float3((float)valu00.x / 255.f, (float)valu00.y / 255.f, (float)valu00.z / 255.f); \n"\
-"            float3 val01 = make_float3((float)valu01.x / 255.f, (float)valu01.y / 255.f, (float)valu01.z / 255.f); \n"\
-"            float3 val10 = make_float3((float)valu10.x / 255.f, (float)valu10.y / 255.f, (float)valu10.z / 255.f); \n"\
-"            float3 val11 = make_float3((float)valu11.x / 255.f, (float)valu11.y / 255.f, (float)valu11.z / 255.f); \n"\
-"             \n"\
+" \n"\
+"            float4 val00 = make_float4((float)valu00.x / 255.f, (float)valu00.y / 255.f, (float)valu00.z / 255.f, (float)valu00.w / 255.f); \n"\
+"            float4 val01 = make_float4((float)valu01.x / 255.f, (float)valu01.y / 255.f, (float)valu01.z / 255.f, (float)valu01.w / 255.f); \n"\
+"            float4 val10 = make_float4((float)valu10.x / 255.f, (float)valu10.y / 255.f, (float)valu10.z / 255.f, (float)valu10.w / 255.f); \n"\
+"            float4 val11 = make_float4((float)valu11.x / 255.f, (float)valu11.y / 255.f, (float)valu11.z / 255.f, (float)valu11.w / 255.f); \n"\
+" \n"\
 "            // Filter and return the result \n"\
 "            return lerp(lerp(val00, val01, wx), lerp(val10, val11, wx), wy); \n"\
 "        } \n"\
-"             \n"\
+" \n"\
 "        default: \n"\
 "        { \n"\
-"            return make_float3(0.f, 0.f, 0.f); \n"\
+"            return make_float4(0.f, 0.f, 0.f, 0.f); \n"\
 "        } \n"\
 "    } \n"\
 "} \n"\
@@ -9789,14 +10385,14 @@ static const char g_integrator_ao_opencl[]= \
 "    // Transform to spherical coords \n"\
 "    float r, phi, theta; \n"\
 "    CartesianToSpherical(d, &r, &phi, &theta); \n"\
-"     \n"\
+" \n"\
 "    // Map to [0,1]x[0,1] range and reverse Y axis \n"\
 "    float2 uv; \n"\
 "    uv.x = phi / (2*PI); \n"\
 "    uv.y = 1.f - theta / PI; \n"\
-"     \n"\
+" \n"\
 "    // Sample the texture \n"\
-"    return native_powr(Texture_Sample2D(uv, TEXTURE_ARGS_IDX(texidx)), 1.f / 1.f); \n"\
+"    return Texture_Sample2D(uv, TEXTURE_ARGS_IDX(texidx)).xyz; \n"\
 "} \n"\
 " \n"\
 "/// Get data from parameter value or texture \n"\
@@ -9813,9 +10409,30 @@ static const char g_integrator_ao_opencl[]= \
 "    if (texidx != -1) \n"\
 "    { \n"\
 "        // Sample texture \n"\
+"        return native_powr(Texture_Sample2D(uv, TEXTURE_ARGS_IDX(texidx)).xyz, 2.2f); \n"\
+"    } \n"\
+" \n"\
+"    // Return fixed color otherwise \n"\
+"    return v; \n"\
+"} \n"\
+" \n"\
+"/// Get data from parameter value or texture \n"\
+"float4 Texture_GetValue4f( \n"\
+"                // Value \n"\
+"                float4 v, \n"\
+"                // Texture coordinate \n"\
+"                float2 uv, \n"\
+"                // Texture args \n"\
+"                TEXTURE_ARG_LIST_IDX(texidx) \n"\
+"                ) \n"\
+"{ \n"\
+"    // If texture present sample from texture \n"\
+"    if (texidx != -1) \n"\
+"    { \n"\
+"        // Sample texture \n"\
 "        return native_powr(Texture_Sample2D(uv, TEXTURE_ARGS_IDX(texidx)), 2.2f); \n"\
 "    } \n"\
-"     \n"\
+" \n"\
 "    // Return fixed color otherwise \n"\
 "    return v; \n"\
 "} \n"\
@@ -9836,7 +10453,7 @@ static const char g_integrator_ao_opencl[]= \
 "        // Sample texture \n"\
 "        return Texture_Sample2D(uv, TEXTURE_ARGS_IDX(texidx)).x; \n"\
 "    } \n"\
-"     \n"\
+" \n"\
 "    // Return fixed color otherwise \n"\
 "    return v; \n"\
 "} \n"\
@@ -9871,11 +10488,11 @@ static const char g_integrator_ao_opencl[]= \
 "        __global float3 const* mydataf = (__global float3 const*)mydata; \n"\
 " \n"\
 "        // Sobel filter \n"\
-"        const float tex00 = (*(mydataf + width * (t0 - 1) + (s0-1))).x;  \n"\
+"        const float tex00 = (*(mydataf + width * (t0 - 1) + (s0-1))).x; \n"\
 "        const float tex10 = (*(mydataf + width * (t0 - 1) + (s0))).x; \n"\
-"        const float tex20 = (*(mydataf + width * (t0 - 1) + (s0 + 1))).x;  \n"\
+"        const float tex20 = (*(mydataf + width * (t0 - 1) + (s0 + 1))).x; \n"\
 " \n"\
-"        const float tex01 = (*(mydataf + width * (t0) + (s0 - 1))).x;  \n"\
+"        const float tex01 = (*(mydataf + width * (t0) + (s0 - 1))).x; \n"\
 "        const float tex21 = (*(mydataf + width * (t0) + (s0 + 1))).x; \n"\
 " \n"\
 "        const float tex02 = (*(mydataf + width * (t0 + 1) + (s0 - 1))).x; \n"\
@@ -9897,8 +10514,8 @@ static const char g_integrator_ao_opencl[]= \
 "        const float tex10 = vload_half4(width * (t0 - 1) + (s0), mydatah).x; \n"\
 "        const float tex20 = vload_half4(width * (t0 - 1) + (s0 + 1), mydatah).x; \n"\
 " \n"\
-"        const float tex01 = vload_half4(width * (t0)+(s0 - 1), mydatah).x;  \n"\
-"        const float tex21 = vload_half4(width * (t0)+(s0 + 1), mydatah).x;  \n"\
+"        const float tex01 = vload_half4(width * (t0)+(s0 - 1), mydatah).x; \n"\
+"        const float tex21 = vload_half4(width * (t0)+(s0 + 1), mydatah).x; \n"\
 " \n"\
 "        const float tex02 = vload_half4(width * (t0 + 1) + (s0 - 1), mydatah).x; \n"\
 "        const float tex12 = vload_half4(width * (t0 + 1) + (s0), mydatah).x; \n"\
@@ -9955,7 +10572,8 @@ static const char g_integrator_ao_opencl[]= \
 " \n"\
 "#endif // TEXTURE_CL \n"\
 " \n"\
-"int IntersectTriangle(ray const* r, float3 v1, float3 v2, float3 v3, float* a, float* b) \n"\
+" \n"\
+"bool IntersectTriangle(ray const* r, float3 v1, float3 v2, float3 v3, float* a, float* b) \n"\
 "{ \n"\
 "    const float3 e1 = v2 - v1; \n"\
 "    const float3 e2 = v3 - v1; \n"\
@@ -9967,15 +10585,15 @@ static const char g_integrator_ao_opencl[]= \
 "    const float  b2 = dot(r->d.xyz, s2) * invd; \n"\
 "    const float temp = dot(e2, s2) * invd; \n"\
 " \n"\
-"    if (b1 < 0.f || b1 > 1.f || b2 < 0.f || b1 + b2 > 1.f || temp < 0.f || temp > r->o.w) \n"\
+"    if (b1 < 0.f || b1 > 1.f || b2 < 0.f || b1 + b2 > 1.f) \n"\
 "    { \n"\
-"        return 0; \n"\
+"        return false; \n"\
 "    } \n"\
 "    else \n"\
 "    { \n"\
 "        *a = b1; \n"\
 "        *b = b2; \n"\
-"        return 1; \n"\
+"        return true; \n"\
 "    } \n"\
 "} \n"\
 " \n"\
@@ -9983,7 +10601,8 @@ static const char g_integrator_ao_opencl[]= \
 " Environment light \n"\
 " */ \n"\
 "/// Get intensity for a given direction \n"\
-"float3 EnvironmentLight_GetLe( \n"\
+"float3 EnvironmentLight_GetLe(// Light \n"\
+"                              Light const* light, \n"\
 "                              // Scene \n"\
 "                              Scene const* scene, \n"\
 "                              // Geometry \n"\
@@ -9996,12 +10615,14 @@ static const char g_integrator_ao_opencl[]= \
 "{ \n"\
 "    // Sample envmap \n"\
 "    *wo *= 100000.f; \n"\
-"    //  \n"\
+"    // \n"\
 "    return scene->envmapmul * Texture_SampleEnvMap(normalize(*wo), TEXTURE_ARGS_IDX(scene->envmapidx)); \n"\
 "} \n"\
 " \n"\
 "/// Sample direction to the light \n"\
-"float3 EnvironmentLight_Sample(// Scene \n"\
+"float3 EnvironmentLight_Sample(// Light \n"\
+"                               Light const* light, \n"\
+"                               // Scene \n"\
 "                               Scene const* scene, \n"\
 "                               // Geometry \n"\
 "                               DifferentialGeometry const* dg, \n"\
@@ -10019,16 +10640,19 @@ static const char g_integrator_ao_opencl[]= \
 " \n"\
 "    // Generate direction \n"\
 "    *wo = 100000.f * d; \n"\
-"     \n"\
+" \n"\
 "    // Envmap PDF \n"\
 "    *pdf = fabs(dot(dg->n, normalize(d))) / PI; \n"\
-"     \n"\
+" \n"\
 "    // Sample envmap \n"\
 "    return scene->envmapmul * Texture_SampleEnvMap(d, TEXTURE_ARGS_IDX(scene->envmapidx)); \n"\
 "} \n"\
 " \n"\
 "/// Get PDF for a given direction \n"\
-"float EnvironmentLight_GetPdf(// Scene \n"\
+"float EnvironmentLight_GetPdf( \n"\
+"                              // Light \n"\
+"                              Light const* light, \n"\
+"                              // Scene \n"\
 "                              Scene const* scene, \n"\
 "                              // Geometry \n"\
 "                              DifferentialGeometry const* dg, \n"\
@@ -10047,7 +10671,7 @@ static const char g_integrator_ao_opencl[]= \
 " */ \n"\
 "// Get intensity for a given direction \n"\
 "float3 AreaLight_GetLe(// Emissive object \n"\
-"                       Emissive const* light, \n"\
+"                       Light const* light, \n"\
 "                       // Scene \n"\
 "                       Scene const* scene, \n"\
 "                       // Geometry \n"\
@@ -10059,8 +10683,8 @@ static const char g_integrator_ao_opencl[]= \
 "                       ) \n"\
 "{ \n"\
 "    ray r; \n"\
-"    r.o.xyz = dg->p + normalize(*wo) * 0.01f; \n"\
-"    r.d.xyz = *wo; \n"\
+"    r.o.xyz = dg->p; \n"\
+"    r.d.xyz = normalize(*wo); \n"\
 " \n"\
 "    int shapeidx = light->shapeidx; \n"\
 "    int primidx = light->primidx; \n"\
@@ -10088,8 +10712,9 @@ static const char g_integrator_ao_opencl[]= \
 "    float2 uv1 = scene->uvs[shape.startvtx + i1]; \n"\
 "    float2 uv2 = scene->uvs[shape.startvtx + i2]; \n"\
 " \n"\
-"     \n"\
+" \n"\
 "    // Intersect ray against this area light \n"\
+" \n"\
 "    float a, b; \n"\
 "    if (IntersectTriangle(&r, v0, v1, v2, &a, &b)) \n"\
 "    { \n"\
@@ -10099,23 +10724,14 @@ static const char g_integrator_ao_opencl[]= \
 " \n"\
 "        float3 d = p - dg->p; \n"\
 "        float  ld = length(d); \n"\
+"        *wo = p - dg->p; \n"\
 " \n"\
 "        int matidx = scene->materialids[shape.startidx / 3 + primidx]; \n"\
 "        Material mat = scene->materials[matidx]; \n"\
 " \n"\
 "        const float3 ke = Texture_GetValue3f(mat.kx.xyz, tx, TEXTURE_ARGS_IDX(mat.kxmapidx)); \n"\
 "        float ndotv = dot(n, -(normalize(d))); \n"\
-" \n"\
-"        if (ndotv > 0.f) \n"\
-"        { \n"\
-"            *wo = d; \n"\
-"            float denom = ld * ld; \n"\
-"            return  denom > 0.f ? ke * ndotv / denom : 0.f; \n"\
-"        } \n"\
-"        else \n"\
-"        { \n"\
-"            return 0.f; \n"\
-"        } \n"\
+"        return  ke; \n"\
 "    } \n"\
 "    else \n"\
 "    { \n"\
@@ -10125,7 +10741,7 @@ static const char g_integrator_ao_opencl[]= \
 " \n"\
 "/// Sample direction to the light \n"\
 "float3 AreaLight_Sample(// Emissive object \n"\
-"                        Emissive const* light, \n"\
+"                        Light const* light, \n"\
 "                        // Scene \n"\
 "                        Scene const* scene, \n"\
 "                        // Geometry \n"\
@@ -10141,7 +10757,7 @@ static const char g_integrator_ao_opencl[]= \
 "{ \n"\
 "    int shapeidx = light->shapeidx; \n"\
 "    int primidx = light->primidx; \n"\
-"    \n"\
+" \n"\
 "    // Extract shape data \n"\
 "    Shape shape = scene->shapes[shapeidx]; \n"\
 " \n"\
@@ -10186,9 +10802,9 @@ static const char g_integrator_ao_opencl[]= \
 "    Material mat = scene->materials[matidx]; \n"\
 " \n"\
 "    const float3 ke = Texture_GetValue3f(mat.kx.xyz, tx, TEXTURE_ARGS_IDX(mat.kxmapidx)); \n"\
-"  \n"\
+" \n"\
 "    float3 v = -normalize(*wo); \n"\
-"     \n"\
+" \n"\
 "    float ndotv = dot(n, v); \n"\
 " \n"\
 "    if (ndotv > 0.f) \n"\
@@ -10205,7 +10821,7 @@ static const char g_integrator_ao_opencl[]= \
 " \n"\
 "/// Get PDF for a given direction \n"\
 "float AreaLight_GetPdf(// Emissive object \n"\
-"                       Emissive const* light, \n"\
+"                       Light const* light, \n"\
 "                       // Scene \n"\
 "                       Scene const* scene, \n"\
 "                       // Geometry \n"\
@@ -10217,7 +10833,7 @@ static const char g_integrator_ao_opencl[]= \
 "                       ) \n"\
 "{ \n"\
 "    ray r; \n"\
-"    r.o.xyz = dg->p + normalize(wo) * 0.001f; \n"\
+"    r.o.xyz = dg->p; \n"\
 "    r.d.xyz = wo; \n"\
 " \n"\
 "    int shapeidx = light->shapeidx; \n"\
@@ -10265,6 +10881,185 @@ static const char g_integrator_ao_opencl[]= \
 "    } \n"\
 "} \n"\
 " \n"\
+"/* \n"\
+"Directional light \n"\
+"*/ \n"\
+"// Get intensity for a given direction \n"\
+"float3 DirectionalLight_GetLe(// Emissive object \n"\
+"    Light const* light, \n"\
+"    // Scene \n"\
+"    Scene const* scene, \n"\
+"    // Geometry \n"\
+"    DifferentialGeometry const* dg, \n"\
+"    // Direction to light source \n"\
+"    float3* wo, \n"\
+"    // Textures \n"\
+"    TEXTURE_ARG_LIST \n"\
+") \n"\
+"{ \n"\
+"    return 0.f; \n"\
+"} \n"\
+" \n"\
+"/// Sample direction to the light \n"\
+"float3 DirectionalLight_Sample(// Emissive object \n"\
+"    Light const* light, \n"\
+"    // Scene \n"\
+"    Scene const* scene, \n"\
+"    // Geometry \n"\
+"    DifferentialGeometry const* dg, \n"\
+"    // Textures \n"\
+"    TEXTURE_ARG_LIST, \n"\
+"    // Sample \n"\
+"    float2 sample, \n"\
+"    // Direction to light source \n"\
+"    float3* wo, \n"\
+"    // PDF \n"\
+"    float* pdf) \n"\
+"{ \n"\
+"    *wo = 100000.f * -light->d; \n"\
+"    *pdf = 1.f; \n"\
+"    return light->intensity; \n"\
+"} \n"\
+" \n"\
+"/// Get PDF for a given direction \n"\
+"float DirectionalLight_GetPdf(// Emissive object \n"\
+"    Light const* light, \n"\
+"    // Scene \n"\
+"    Scene const* scene, \n"\
+"    // Geometry \n"\
+"    DifferentialGeometry const* dg, \n"\
+"    // Direction to light source \n"\
+"    float3 wo, \n"\
+"    // Textures \n"\
+"    TEXTURE_ARG_LIST \n"\
+") \n"\
+"{ \n"\
+"    return 0.f; \n"\
+"} \n"\
+" \n"\
+"/* \n"\
+" Point light \n"\
+" */ \n"\
+"// Get intensity for a given direction \n"\
+"float3 PointLight_GetLe(// Emissive object \n"\
+"                              Light const* light, \n"\
+"                              // Scene \n"\
+"                              Scene const* scene, \n"\
+"                              // Geometry \n"\
+"                              DifferentialGeometry const* dg, \n"\
+"                              // Direction to light source \n"\
+"                              float3* wo, \n"\
+"                              // Textures \n"\
+"                              TEXTURE_ARG_LIST \n"\
+"                              ) \n"\
+"{ \n"\
+"    return 0.f; \n"\
+"} \n"\
+" \n"\
+"/// Sample direction to the light \n"\
+"float3 PointLight_Sample(// Emissive object \n"\
+"                               Light const* light, \n"\
+"                               // Scene \n"\
+"                               Scene const* scene, \n"\
+"                               // Geometry \n"\
+"                               DifferentialGeometry const* dg, \n"\
+"                               // Textures \n"\
+"                               TEXTURE_ARG_LIST, \n"\
+"                               // Sample \n"\
+"                               float2 sample, \n"\
+"                               // Direction to light source \n"\
+"                               float3* wo, \n"\
+"                               // PDF \n"\
+"                               float* pdf) \n"\
+"{ \n"\
+"    *wo = light->p - dg->p; \n"\
+"    *pdf = 1.f; \n"\
+"    return light->intensity; \n"\
+"} \n"\
+" \n"\
+"/// Get PDF for a given direction \n"\
+"float PointLight_GetPdf(// Emissive object \n"\
+"                              Light const* light, \n"\
+"                              // Scene \n"\
+"                              Scene const* scene, \n"\
+"                              // Geometry \n"\
+"                              DifferentialGeometry const* dg, \n"\
+"                              // Direction to light source \n"\
+"                              float3 wo, \n"\
+"                              // Textures \n"\
+"                              TEXTURE_ARG_LIST \n"\
+"                              ) \n"\
+"{ \n"\
+"    return 0.f; \n"\
+"} \n"\
+" \n"\
+"/* \n"\
+" Spot light \n"\
+" */ \n"\
+"// Get intensity for a given direction \n"\
+"float3 SpotLight_GetLe(// Emissive object \n"\
+"                        Light const* light, \n"\
+"                        // Scene \n"\
+"                        Scene const* scene, \n"\
+"                        // Geometry \n"\
+"                        DifferentialGeometry const* dg, \n"\
+"                        // Direction to light source \n"\
+"                        float3* wo, \n"\
+"                        // Textures \n"\
+"                        TEXTURE_ARG_LIST \n"\
+"                        ) \n"\
+"{ \n"\
+"    return 0.f; \n"\
+"} \n"\
+" \n"\
+"/// Sample direction to the light \n"\
+"float3 SpotLight_Sample(// Emissive object \n"\
+"                         Light const* light, \n"\
+"                         // Scene \n"\
+"                         Scene const* scene, \n"\
+"                         // Geometry \n"\
+"                         DifferentialGeometry const* dg, \n"\
+"                         // Textures \n"\
+"                         TEXTURE_ARG_LIST, \n"\
+"                         // Sample \n"\
+"                         float2 sample, \n"\
+"                         // Direction to light source \n"\
+"                         float3* wo, \n"\
+"                         // PDF \n"\
+"                         float* pdf) \n"\
+"{ \n"\
+"    *wo = light->p - dg->p; \n"\
+"    float ddotwo = dot(-normalize(*wo), light->d); \n"\
+"     \n"\
+"    if (ddotwo > light->oa) \n"\
+"    { \n"\
+"        *pdf = 1.f; \n"\
+"        return ddotwo > light->ia ? light->intensity : light->intensity * (1.f - (light->ia - ddotwo) / (light->ia - light->oa)); \n"\
+"    } \n"\
+"    else \n"\
+"    { \n"\
+"        *pdf = 0.f; \n"\
+"        return 0.f; \n"\
+"    } \n"\
+"} \n"\
+" \n"\
+"/// Get PDF for a given direction \n"\
+"float SpotLight_GetPdf(// Emissive object \n"\
+"                        Light const* light, \n"\
+"                        // Scene \n"\
+"                        Scene const* scene, \n"\
+"                        // Geometry \n"\
+"                        DifferentialGeometry const* dg, \n"\
+"                        // Direction to light source \n"\
+"                        float3 wo, \n"\
+"                        // Textures \n"\
+"                        TEXTURE_ARG_LIST \n"\
+"                        ) \n"\
+"{ \n"\
+"    return 0.f; \n"\
+"} \n"\
+" \n"\
+" \n"\
 " \n"\
 " \n"\
 "/* \n"\
@@ -10284,16 +11079,23 @@ static const char g_integrator_ao_opencl[]= \
 "                   TEXTURE_ARG_LIST \n"\
 "                   ) \n"\
 "{ \n"\
-"    int numemissives = scene->numemissives; \n"\
-"    if (idx == numemissives) \n"\
+"    Light light = scene->lights[idx]; \n"\
+" \n"\
+"    switch(light.type) \n"\
 "    { \n"\
-"        return EnvironmentLight_GetLe(scene, dg, wo, TEXTURE_ARGS); \n"\
+"        case kIbl: \n"\
+"            return EnvironmentLight_GetLe(&light, scene, dg, wo, TEXTURE_ARGS); \n"\
+"        case kArea: \n"\
+"            return AreaLight_GetLe(&light, scene, dg, wo, TEXTURE_ARGS); \n"\
+"        case kDirectional: \n"\
+"            return DirectionalLight_GetLe(&light, scene, dg, wo, TEXTURE_ARGS); \n"\
+"        case kPoint: \n"\
+"            return PointLight_GetLe(&light, scene, dg, wo, TEXTURE_ARGS); \n"\
+"        case kSpot: \n"\
+"            return SpotLight_GetLe(&light, scene, dg, wo, TEXTURE_ARGS); \n"\
 "    } \n"\
-"    else \n"\
-"    { \n"\
-"        Emissive emissive = scene->emissives[idx]; \n"\
-"        return AreaLight_GetLe(&emissive, scene, dg, wo, TEXTURE_ARGS); \n"\
-"    } \n"\
+" \n"\
+"    return make_float3(0.f, 0.f, 0.f); \n"\
 "} \n"\
 " \n"\
 "/// Sample direction to the light \n"\
@@ -10312,16 +11114,24 @@ static const char g_integrator_ao_opencl[]= \
 "                    // PDF \n"\
 "                    float* pdf) \n"\
 "{ \n"\
-"    int numemissives = scene->numemissives; \n"\
-"    if (idx == numemissives) \n"\
+"    Light light = scene->lights[idx]; \n"\
+" \n"\
+"    switch(light.type) \n"\
 "    { \n"\
-"        return EnvironmentLight_Sample(scene, dg, TEXTURE_ARGS, sample, wo, pdf); \n"\
+"        case kIbl: \n"\
+"            return EnvironmentLight_Sample(&light, scene, dg, TEXTURE_ARGS, sample, wo, pdf); \n"\
+"        case kArea: \n"\
+"            return AreaLight_Sample(&light, scene, dg, TEXTURE_ARGS, sample, wo, pdf); \n"\
+"        case kDirectional: \n"\
+"            return DirectionalLight_Sample(&light, scene, dg, TEXTURE_ARGS, sample, wo, pdf); \n"\
+"        case kPoint: \n"\
+"            return PointLight_Sample(&light, scene, dg, TEXTURE_ARGS, sample, wo, pdf); \n"\
+"        case kSpot: \n"\
+"            return SpotLight_Sample(&light, scene, dg, TEXTURE_ARGS, sample, wo, pdf); \n"\
 "    } \n"\
-"    else \n"\
-"    { \n"\
-"        Emissive emissive = scene->emissives[idx]; \n"\
-"        return AreaLight_Sample(&emissive, scene, dg, TEXTURE_ARGS, sample, wo, pdf); \n"\
-"    } \n"\
+" \n"\
+"    *pdf = 0.f; \n"\
+"    return make_float3(0.f, 0.f, 0.f); \n"\
 "} \n"\
 " \n"\
 "/// Get PDF for a given direction \n"\
@@ -10337,16 +11147,31 @@ static const char g_integrator_ao_opencl[]= \
 "                   TEXTURE_ARG_LIST \n"\
 "                   ) \n"\
 "{ \n"\
-"    int numemissives = scene->numemissives; \n"\
-"    if (idx == numemissives) \n"\
+"    Light light = scene->lights[idx]; \n"\
+" \n"\
+"    switch(light.type) \n"\
 "    { \n"\
-"        return EnvironmentLight_GetPdf(scene, dg, wo, TEXTURE_ARGS); \n"\
+"        case kIbl: \n"\
+"            return EnvironmentLight_GetPdf(&light, scene, dg, wo, TEXTURE_ARGS); \n"\
+"        case kArea: \n"\
+"            return AreaLight_GetPdf(&light, scene, dg, wo, TEXTURE_ARGS); \n"\
+"        case kDirectional: \n"\
+"            return DirectionalLight_GetPdf(&light, scene, dg, wo, TEXTURE_ARGS); \n"\
+"        case kPoint: \n"\
+"            return PointLight_GetPdf(&light, scene, dg, wo, TEXTURE_ARGS); \n"\
+"        case kSpot: \n"\
+"            return SpotLight_GetPdf(&light, scene, dg, wo, TEXTURE_ARGS); \n"\
 "    } \n"\
-"    else \n"\
-"    { \n"\
-"        Emissive emissive = scene->emissives[idx]; \n"\
-"        return AreaLight_GetPdf(&emissive, scene, dg, wo, TEXTURE_ARGS); \n"\
-"    } \n"\
+" \n"\
+"    return 0.f; \n"\
+"} \n"\
+" \n"\
+"/// Check if the light is singular \n"\
+"bool Light_IsSingular(__global Light const* light) \n"\
+"{ \n"\
+"    return light->type == kPoint || \n"\
+"        light->type == kSpot || \n"\
+"        light->type == kDirectional; \n"\
 "} \n"\
 " \n"\
 "#endif // LIGHT_CLnv \n"\
@@ -10399,7 +11224,7 @@ static const char g_integrator_ao_opencl[]= \
 "********************************************************************/ \n"\
 "#ifndef PAYLOAD_CL \n"\
 "#define PAYLOAD_CL \n"\
-"#define SOBOL \n"\
+"//#define SOBOL \n"\
 "#define MULTISCATTER \n"\
 " \n"\
 "/// Ray descriptor \n"\
@@ -10411,7 +11236,7 @@ static const char g_integrator_ao_opencl[]= \
 "    float4 d; \n"\
 "    /// x - ray mask, y - activity flag \n"\
 "    int2 extra; \n"\
-"    int2 padding; \n"\
+"    float2 padding; \n"\
 "} ray; \n"\
 " \n"\
 "/// Intersection data returned by RadeonRays \n"\
@@ -10465,8 +11290,6 @@ static const char g_integrator_ao_opencl[]= \
 "} Emissive; \n"\
 " \n"\
 " \n"\
-" \n"\
-" \n"\
 "typedef enum _PathFlags \n"\
 "{ \n"\
 "    kNone = 0x0, \n"\
@@ -10516,6 +11339,53 @@ static const char g_integrator_ao_opencl[]= \
 " \n"\
 "} Material; \n"\
 " \n"\
+" \n"\
+"enum LightType \n"\
+"{ \n"\
+"    kPoint = 0x1, \n"\
+"    kDirectional, \n"\
+"    kSpot, \n"\
+"    kArea, \n"\
+"    kIbl \n"\
+"}; \n"\
+" \n"\
+"typedef struct _Light \n"\
+"{ \n"\
+"    int type; \n"\
+" \n"\
+"    union \n"\
+"    { \n"\
+"        // Area light \n"\
+"        struct \n"\
+"        { \n"\
+"            int shapeidx; \n"\
+"            int primidx; \n"\
+"            int matidx; \n"\
+"        }; \n"\
+" \n"\
+"        // IBL \n"\
+"        struct \n"\
+"        { \n"\
+"            int tex; \n"\
+"            int texdiffuse; \n"\
+"            float multiplier; \n"\
+"        }; \n"\
+"         \n"\
+"         \n"\
+"        // Spot \n"\
+"        struct \n"\
+"        { \n"\
+"            float ia; \n"\
+"            float oa; \n"\
+"            float f; \n"\
+"        }; \n"\
+"    }; \n"\
+" \n"\
+"    float3 p; \n"\
+"    float3 d; \n"\
+"    float3 intensity; \n"\
+"} Light; \n"\
+" \n"\
 "typedef struct _Scene \n"\
 "{ \n"\
 "    // Vertices \n"\
@@ -10533,13 +11403,13 @@ static const char g_integrator_ao_opencl[]= \
 "    // Materials \n"\
 "    __global Material const* materials; \n"\
 "    // Emissive objects \n"\
-"    __global Emissive const* emissives; \n"\
+"    __global Light const* lights; \n"\
 "    // Envmap idx \n"\
 "    int envmapidx; \n"\
 "    // Envmap multiplier \n"\
 "    float envmapmul; \n"\
 "    // Number of emissive objects \n"\
-"    int numemissives; \n"\
+"    int num_lights; \n"\
 "} Scene; \n"\
 " \n"\
 "// Hit data \n"\
@@ -10557,7 +11427,7 @@ static const char g_integrator_ao_opencl[]= \
 "    float3 dpdu; \n"\
 "    float3 dpdv; \n"\
 "    float  area; \n"\
-"    // Material  \n"\
+"    // Material \n"\
 "    Material mat; \n"\
 "} DifferentialGeometry; \n"\
 " \n"\
@@ -10613,6 +11483,16 @@ static const char g_integrator_ao_opencl[]= \
 "    r->extra.y = 0; \n"\
 "} \n"\
 " \n"\
+"void Ray_SetExtra(__global ray* r, float2 extra) \n"\
+"{ \n"\
+"    r->padding = extra; \n"\
+"} \n"\
+" \n"\
+"float2 Ray_GetExtra(__global ray const* r) \n"\
+"{ \n"\
+"    return r->padding; \n"\
+"} \n"\
+" \n"\
 "void Ray_Init(__global ray* r, float3 o, float3 d, float maxt, float time, int mask) \n"\
 "{ \n"\
 "    // TODO: Check if it generates MTBUF_XYZW write \n"\
@@ -10623,6 +11503,8 @@ static const char g_integrator_ao_opencl[]= \
 "    r->extra.x = mask; \n"\
 "    r->extra.y = 0xFFFFFFFF; \n"\
 "} \n"\
+" \n"\
+" \n"\
 " \n"\
 "#endif // PAYLOAD_CL \n"\
 "/********************************************************************** \n"\
@@ -10831,7 +11713,7 @@ static const char g_integrator_ao_opencl[]= \
 "float4 quaternion_inverse(float4 q) \n"\
 "{ \n"\
 "    float sqnorm = q.x*q.x + q.y*q.y + q.z*q.z + q.w*q.w; \n"\
-"     \n"\
+" \n"\
 "    /// Check if it is singular \n"\
 "    if (sqnorm != 0.f) \n"\
 "    { \n"\
@@ -10853,7 +11735,7 @@ static const char g_integrator_ao_opencl[]= \
 "} \n"\
 " \n"\
 "/// Linearly interpolate between two values \n"\
-"float3 lerp(float3 a, float3 b, float w) \n"\
+"float4 lerp(float4 a, float4 b, float w) \n"\
 "{ \n"\
 "    return a + w*(b-a); \n"\
 "} \n"\
@@ -10872,7 +11754,7 @@ static const char g_integrator_ao_opencl[]= \
 "float3 GetOrthoVector(float3 n) \n"\
 "{ \n"\
 "    float3 p; \n"\
-"     \n"\
+" \n"\
 "    if (fabs(n.z) > 0.f) { \n"\
 "        float k = sqrt(n.y*n.y + n.z*n.z); \n"\
 "        p.x = 0; p.y = -n.z/k; p.z = n.y/k; \n"\
@@ -11240,7 +12122,7 @@ static const char g_integrator_ao_opencl[]= \
 "float4 quaternion_inverse(float4 q) \n"\
 "{ \n"\
 "    float sqnorm = q.x*q.x + q.y*q.y + q.z*q.z + q.w*q.w; \n"\
-"     \n"\
+" \n"\
 "    /// Check if it is singular \n"\
 "    if (sqnorm != 0.f) \n"\
 "    { \n"\
@@ -11262,7 +12144,7 @@ static const char g_integrator_ao_opencl[]= \
 "} \n"\
 " \n"\
 "/// Linearly interpolate between two values \n"\
-"float3 lerp(float3 a, float3 b, float w) \n"\
+"float4 lerp(float4 a, float4 b, float w) \n"\
 "{ \n"\
 "    return a + w*(b-a); \n"\
 "} \n"\
@@ -11281,7 +12163,7 @@ static const char g_integrator_ao_opencl[]= \
 "float3 GetOrthoVector(float3 n) \n"\
 "{ \n"\
 "    float3 p; \n"\
-"     \n"\
+" \n"\
 "    if (fabs(n.z) > 0.f) { \n"\
 "        float k = sqrt(n.y*n.y + n.z*n.z); \n"\
 "        p.x = 0; p.y = -n.z/k; p.z = n.y/k; \n"\
@@ -11365,7 +12247,7 @@ static const char g_integrator_ao_opencl[]= \
 "********************************************************************/ \n"\
 "#ifndef PAYLOAD_CL \n"\
 "#define PAYLOAD_CL \n"\
-"#define SOBOL \n"\
+"//#define SOBOL \n"\
 "#define MULTISCATTER \n"\
 " \n"\
 "/// Ray descriptor \n"\
@@ -11377,7 +12259,7 @@ static const char g_integrator_ao_opencl[]= \
 "    float4 d; \n"\
 "    /// x - ray mask, y - activity flag \n"\
 "    int2 extra; \n"\
-"    int2 padding; \n"\
+"    float2 padding; \n"\
 "} ray; \n"\
 " \n"\
 "/// Intersection data returned by RadeonRays \n"\
@@ -11431,8 +12313,6 @@ static const char g_integrator_ao_opencl[]= \
 "} Emissive; \n"\
 " \n"\
 " \n"\
-" \n"\
-" \n"\
 "typedef enum _PathFlags \n"\
 "{ \n"\
 "    kNone = 0x0, \n"\
@@ -11482,6 +12362,53 @@ static const char g_integrator_ao_opencl[]= \
 " \n"\
 "} Material; \n"\
 " \n"\
+" \n"\
+"enum LightType \n"\
+"{ \n"\
+"    kPoint = 0x1, \n"\
+"    kDirectional, \n"\
+"    kSpot, \n"\
+"    kArea, \n"\
+"    kIbl \n"\
+"}; \n"\
+" \n"\
+"typedef struct _Light \n"\
+"{ \n"\
+"    int type; \n"\
+" \n"\
+"    union \n"\
+"    { \n"\
+"        // Area light \n"\
+"        struct \n"\
+"        { \n"\
+"            int shapeidx; \n"\
+"            int primidx; \n"\
+"            int matidx; \n"\
+"        }; \n"\
+" \n"\
+"        // IBL \n"\
+"        struct \n"\
+"        { \n"\
+"            int tex; \n"\
+"            int texdiffuse; \n"\
+"            float multiplier; \n"\
+"        }; \n"\
+"         \n"\
+"         \n"\
+"        // Spot \n"\
+"        struct \n"\
+"        { \n"\
+"            float ia; \n"\
+"            float oa; \n"\
+"            float f; \n"\
+"        }; \n"\
+"    }; \n"\
+" \n"\
+"    float3 p; \n"\
+"    float3 d; \n"\
+"    float3 intensity; \n"\
+"} Light; \n"\
+" \n"\
 "typedef struct _Scene \n"\
 "{ \n"\
 "    // Vertices \n"\
@@ -11499,13 +12426,13 @@ static const char g_integrator_ao_opencl[]= \
 "    // Materials \n"\
 "    __global Material const* materials; \n"\
 "    // Emissive objects \n"\
-"    __global Emissive const* emissives; \n"\
+"    __global Light const* lights; \n"\
 "    // Envmap idx \n"\
 "    int envmapidx; \n"\
 "    // Envmap multiplier \n"\
 "    float envmapmul; \n"\
 "    // Number of emissive objects \n"\
-"    int numemissives; \n"\
+"    int num_lights; \n"\
 "} Scene; \n"\
 " \n"\
 "// Hit data \n"\
@@ -11523,7 +12450,7 @@ static const char g_integrator_ao_opencl[]= \
 "    float3 dpdu; \n"\
 "    float3 dpdv; \n"\
 "    float  area; \n"\
-"    // Material  \n"\
+"    // Material \n"\
 "    Material mat; \n"\
 "} DifferentialGeometry; \n"\
 " \n"\
@@ -11579,6 +12506,16 @@ static const char g_integrator_ao_opencl[]= \
 "    r->extra.y = 0; \n"\
 "} \n"\
 " \n"\
+"void Ray_SetExtra(__global ray* r, float2 extra) \n"\
+"{ \n"\
+"    r->padding = extra; \n"\
+"} \n"\
+" \n"\
+"float2 Ray_GetExtra(__global ray const* r) \n"\
+"{ \n"\
+"    return r->padding; \n"\
+"} \n"\
+" \n"\
 "void Ray_Init(__global ray* r, float3 o, float3 d, float maxt, float time, int mask) \n"\
 "{ \n"\
 "    // TODO: Check if it generates MTBUF_XYZW write \n"\
@@ -11589,6 +12526,8 @@ static const char g_integrator_ao_opencl[]= \
 "    r->extra.x = mask; \n"\
 "    r->extra.y = 0xFFFFFFFF; \n"\
 "} \n"\
+" \n"\
+" \n"\
 " \n"\
 "#endif // PAYLOAD_CL \n"\
 " \n"\
@@ -11683,10 +12622,10 @@ static const char g_integrator_ao_opencl[]= \
 "        float3 right; \n"\
 "        float3 up; \n"\
 "        float3 p; \n"\
-"         \n"\
+" \n"\
 "        // Image plane width & height in current units \n"\
 "        float2 dim; \n"\
-"         \n"\
+" \n"\
 "        // Near and far Z \n"\
 "        float2 zcap; \n"\
 "        // Focal lenght \n"\
@@ -11723,7 +12662,7 @@ static const char g_integrator_ao_opencl[]= \
 "    int2 globalid; \n"\
 "    globalid.x  = get_global_id(0); \n"\
 "    globalid.y  = get_global_id(1); \n"\
-"     \n"\
+" \n"\
 "    // Check borders \n"\
 "    if (globalid.x < imgwidth && globalid.y < imgheight) \n"\
 "    { \n"\
@@ -11733,7 +12672,7 @@ static const char g_integrator_ao_opencl[]= \
 "#ifndef NO_PATH_DATA \n"\
 "        __global Path* mypath = paths + globalid.y * imgwidth + globalid.x; \n"\
 "#endif \n"\
-"         \n"\
+" \n"\
 "        // Prepare RNG \n"\
 "        Rng rng; \n"\
 "        InitRng(randseed +  globalid.x * 157 + 10433 * globalid.y, &rng); \n"\
@@ -11757,17 +12696,17 @@ static const char g_integrator_ao_opencl[]= \
 "#else \n"\
 "        float2 sample0 = UniformSampler_Sample2D(&rng); \n"\
 "#endif \n"\
-"         \n"\
+" \n"\
 "        // Calculate [0..1] image plane sample \n"\
 "        float2 imgsample; \n"\
 "        imgsample.x = (float)globalid.x / imgwidth + sample0.x / imgwidth; \n"\
 "        imgsample.y = (float)globalid.y / imgheight + sample0.y / imgheight; \n"\
-"         \n"\
+" \n"\
 "        // Transform into [-0.5, 0.5] \n"\
 "        float2 hsample = imgsample - make_float2(0.5f, 0.5f); \n"\
 "        // Transform into [-dim/2, dim/2] \n"\
 "        float2 csample = hsample * camera->dim; \n"\
-"         \n"\
+" \n"\
 "        // Calculate direction to image plane \n"\
 "        myray->d.xyz = normalize(camera->focal_length * camera->forward + csample.x * camera->right + csample.y * camera->up); \n"\
 "        // Origin == camera position + nearz * d \n"\
@@ -11779,6 +12718,7 @@ static const char g_integrator_ao_opencl[]= \
 "        // Set ray max \n"\
 "        myray->extra.x = 0xFFFFFFFF; \n"\
 "        myray->extra.y = 0xFFFFFFFF; \n"\
+"        Ray_SetExtra(myray, 1.f); \n"\
 " \n"\
 "#ifndef NO_PATH_DATA \n"\
 "        mypath->throughput = make_float3(1.f, 1.f, 1.f); \n"\
@@ -11895,6 +12835,118 @@ static const char g_integrator_ao_opencl[]= \
 "    } \n"\
 "} \n"\
 " \n"\
+"#define M_PI 3.14159265358979323846 \n"\
+" \n"\
+"/// Ray generation kernel for spherical camera. \n"\
+"/// \n"\
+"__kernel void SphericalCamera_GeneratePaths( \n"\
+"	// Camera descriptor \n"\
+"	__global Camera const* camera, \n"\
+"	// Image resolution \n"\
+"	int imgwidth, \n"\
+"	int imgheight, \n"\
+"	// RNG seed value \n"\
+"	int randseed, \n"\
+"	// Output rays \n"\
+"	__global ray* rays, \n"\
+"	__global SobolSampler* samplers, \n"\
+"	__global uint const* sobolmat, \n"\
+"	int reset \n"\
+"#ifndef NO_PATH_DATA \n"\
+"	, __global Path* paths \n"\
+"#endif \n"\
+") \n"\
+"{ \n"\
+"	int2 globalid; \n"\
+"	globalid.x = get_global_id(0); \n"\
+"	globalid.y = get_global_id(1); \n"\
+" \n"\
+"	// Check borders \n"\
+"	if (globalid.x < imgwidth && globalid.y < imgheight) \n"\
+"	{ \n"\
+"		// Get pointer to ray to handle \n"\
+"		__global ray* myray = rays + globalid.y * imgwidth + globalid.x; \n"\
+" \n"\
+"#ifndef NO_PATH_DATA \n"\
+"		__global Path* mypath = paths + globalid.y * imgwidth + globalid.x; \n"\
+"#endif \n"\
+" \n"\
+"		// Prepare RNG \n"\
+"		Rng rng; \n"\
+"		InitRng(randseed + globalid.x * 157 + 10433 * globalid.y, &rng); \n"\
+" \n"\
+"#ifdef SOBOL \n"\
+"		__global SobolSampler* sampler = samplers + globalid.y * imgwidth + globalid.x; \n"\
+" \n"\
+"		if (reset) \n"\
+"		{ \n"\
+"			sampler->seq = 0; \n"\
+"			sampler->s0 = RandUint(&rng); \n"\
+"		} else \n"\
+"		{ \n"\
+"			sampler->seq++; \n"\
+"		} \n"\
+" \n"\
+"		float2 sample0; \n"\
+"		sample0.x = SobolSampler_Sample1D(sampler->seq, kPixelX, sampler->s0, sobolmat); \n"\
+"		sample0.y = SobolSampler_Sample1D(sampler->seq, kPixelY, sampler->s0, sobolmat); \n"\
+"#else \n"\
+"		float2 sample0 = UniformSampler_Sample2D(&rng); \n"\
+"#endif \n"\
+" \n"\
+"		// Calculate [0..1] image plane sample \n"\
+"		float2 imgsample; \n"\
+"		imgsample.x = (float)globalid.x / imgwidth + sample0.x / imgwidth; \n"\
+"		imgsample.y = (float)globalid.y / imgheight + sample0.y / imgheight; \n"\
+" \n"\
+"		// Transform into [-0.5, 0.5] \n"\
+"		float2 hsample = imgsample - make_float2(0.5f, 0.5f); \n"\
+"		// Transform into [-dim/2, dim/2] \n"\
+"		float2 csample = hsample * camera->dim; \n"\
+" \n"\
+" \n"\
+"		float phi = (2.0 * M_PI) * (imgsample.x); \n"\
+"		float theta = (M_PI) * (imgsample.y); \n"\
+" \n"\
+"		float4 m1, m2, m3, m4; \n"\
+"		float4 n1, n2, n3, n4; \n"\
+" \n"\
+"		m1 = (float4) { cos(phi), 0.0, -sin(phi), 0.0 }; \n"\
+"		m2 = (float4) { 0.0, 1.0, 0.0, 0.0 }; \n"\
+"		m3 = (float4) { sin(phi), 0.0, cos(phi), 0.0 }; \n"\
+"		m4 = (float4) { 0.0, 0.0, 0.0, 1.0 }; \n"\
+" \n"\
+" \n"\
+"		n1 = (float4) { cos(theta), sin(theta), 0.0, 0.0 }; \n"\
+"		n2 = (float4) { -sin(theta), cos(theta), 0.0, 0.0 }; \n"\
+"		n3 = (float4) { 0.0, 0.0, 1.0, 0.0 }; \n"\
+"		n4 = (float4) { 0.0, 0.0, 0.0, 1.0 }; \n"\
+" \n"\
+"		//myray->d.xyz = normalize(camera->focal_length * transform_vector(transform_vector(-camera->up.xyz, n1, n2, n3, n4), m1, m2, m3, m4)); \n"\
+"		myray->d.xyz = normalize(camera->focal_length * transform_vector(transform_vector(-(float3) { 0, 1, 0 }, n1, n2, n3, n4), m1, m2, m3, m4)); \n"\
+" \n"\
+"		// Calculate direction to image plane \n"\
+"		//myray->d.xyz = normalize(camera->focal_length * camera->forward + csample.x * camera->right + csample.y * camera->up); \n"\
+"		// Origin == camera position + nearz * d \n"\
+"		myray->o.xyz = camera->p + camera->zcap.x * myray->d.xyz; \n"\
+"		// Max T value = zfar - znear since we moved origin to znear \n"\
+"		myray->o.w = camera->zcap.y - camera->zcap.x; \n"\
+"		// Generate random time from 0 to 1 \n"\
+"		myray->d.w = sample0.x; \n"\
+"		// Set ray max \n"\
+"		myray->extra.x = 0xFFFFFFFF; \n"\
+"		myray->extra.y = 0xFFFFFFFF; \n"\
+" \n"\
+"#ifndef NO_PATH_DATA \n"\
+"		mypath->throughput = make_float3(1.f, 1.f, 1.f); \n"\
+"		mypath->volume = -1; \n"\
+"		mypath->flags = 0; \n"\
+"		mypath->active = 0xFF; \n"\
+"#endif \n"\
+"	} \n"\
+"} \n"\
+" \n"\
+" \n"\
 "#endif // CAMERA_CL \n"\
 "/********************************************************************** \n"\
 "Copyright (c) 2016 Advanced Micro Devices, Inc. All rights reserved. \n"\
@@ -11920,8 +12972,6 @@ static const char g_integrator_ao_opencl[]= \
 "#ifndef SCENE_CL \n"\
 "#define SCENE_CL \n"\
 " \n"\
-"//#include \"../App/CL/utils.cl\" \n"\
-"//#include \"../App/CL/payload.cl\" \n"\
 " \n"\
 "/// Fill DifferentialGeometry structure based on intersection info from RadeonRays \n"\
 "void FillDifferentialGeometry(// Scene \n"\
@@ -12020,10 +13070,10 @@ static const char g_integrator_ao_opencl[]= \
 " \n"\
 "int Scene_SampleLight(Scene const* scene, float sample, float* pdf) \n"\
 "{ \n"\
-"    int numlights = scene->numemissives; \n"\
-"    int lightidx = clamp((int)(sample * numlights), 0, numlights - 1); \n"\
-"    *pdf = 1.f / numlights; \n"\
-"    return lightidx; \n"\
+"    int num_lights = scene->num_lights; \n"\
+"    int light_idx = clamp((int)(sample * num_lights), 0, num_lights - 1); \n"\
+"    *pdf = 1.f / num_lights; \n"\
+"    return light_idx; \n"\
 "} \n"\
 " \n"\
 " \n"\
@@ -12169,7 +13219,7 @@ static const char g_integrator_ao_opencl[]= \
 "float4 quaternion_inverse(float4 q) \n"\
 "{ \n"\
 "    float sqnorm = q.x*q.x + q.y*q.y + q.z*q.z + q.w*q.w; \n"\
-"     \n"\
+" \n"\
 "    /// Check if it is singular \n"\
 "    if (sqnorm != 0.f) \n"\
 "    { \n"\
@@ -12191,7 +13241,7 @@ static const char g_integrator_ao_opencl[]= \
 "} \n"\
 " \n"\
 "/// Linearly interpolate between two values \n"\
-"float3 lerp(float3 a, float3 b, float w) \n"\
+"float4 lerp(float4 a, float4 b, float w) \n"\
 "{ \n"\
 "    return a + w*(b-a); \n"\
 "} \n"\
@@ -12210,7 +13260,7 @@ static const char g_integrator_ao_opencl[]= \
 "float3 GetOrthoVector(float3 n) \n"\
 "{ \n"\
 "    float3 p; \n"\
-"     \n"\
+" \n"\
 "    if (fabs(n.z) > 0.f) { \n"\
 "        float k = sqrt(n.y*n.y + n.z*n.z); \n"\
 "        p.x = 0; p.y = -n.z/k; p.z = n.y/k; \n"\
@@ -12453,7 +13503,7 @@ static const char g_integrator_ao_opencl[]= \
 "float4 quaternion_inverse(float4 q) \n"\
 "{ \n"\
 "    float sqnorm = q.x*q.x + q.y*q.y + q.z*q.z + q.w*q.w; \n"\
-"     \n"\
+" \n"\
 "    /// Check if it is singular \n"\
 "    if (sqnorm != 0.f) \n"\
 "    { \n"\
@@ -12475,7 +13525,7 @@ static const char g_integrator_ao_opencl[]= \
 "} \n"\
 " \n"\
 "/// Linearly interpolate between two values \n"\
-"float3 lerp(float3 a, float3 b, float w) \n"\
+"float4 lerp(float4 a, float4 b, float w) \n"\
 "{ \n"\
 "    return a + w*(b-a); \n"\
 "} \n"\
@@ -12494,7 +13544,7 @@ static const char g_integrator_ao_opencl[]= \
 "float3 GetOrthoVector(float3 n) \n"\
 "{ \n"\
 "    float3 p; \n"\
-"     \n"\
+" \n"\
 "    if (fabs(n.z) > 0.f) { \n"\
 "        float k = sqrt(n.y*n.y + n.z*n.z); \n"\
 "        p.x = 0; p.y = -n.z/k; p.z = n.y/k; \n"\
@@ -12563,88 +13613,88 @@ static const char g_integrator_ao_opencl[]= \
 "#define TEXTURE_ARGS_IDX(x) x, textures, texturedata \n"\
 " \n"\
 "/// Sample 2D texture \n"\
-"float3 Texture_Sample2D(float2 uv, TEXTURE_ARG_LIST_IDX(texidx)) \n"\
+"float4 Texture_Sample2D(float2 uv, TEXTURE_ARG_LIST_IDX(texidx)) \n"\
 "{ \n"\
 "    // Get width and height \n"\
 "    int width = textures[texidx].w; \n"\
 "    int height = textures[texidx].h; \n"\
-"     \n"\
+" \n"\
 "    // Find the origin of the data in the pool \n"\
 "    __global char const* mydata = texturedata + textures[texidx].dataoffset; \n"\
 " \n"\
 "    // Handle UV wrap \n"\
 "    // TODO: need UV mode support \n"\
 "    uv -= floor(uv); \n"\
-"     \n"\
+" \n"\
 "    // Reverse Y: \n"\
 "    // it is needed as textures are loaded with Y axis going top to down \n"\
 "    // and our axis goes from down to top \n"\
 "    uv.y = 1.f - uv.y; \n"\
-"     \n"\
+" \n"\
 "    // Calculate integer coordinates \n"\
 "    int x0 = clamp((int)floor(uv.x * width), 0, width - 1); \n"\
 "    int y0 = clamp((int)floor(uv.y * height), 0, height - 1); \n"\
-"     \n"\
+" \n"\
 "    // Calculate samples for linear filtering \n"\
 "    int x1 = clamp(x0 + 1, 0,  width - 1); \n"\
 "    int y1 = clamp(y0 + 1, 0, height - 1); \n"\
-"     \n"\
+" \n"\
 "    // Calculate weights for linear filtering \n"\
 "    float wx = uv.x * width - floor(uv.x * width); \n"\
 "    float wy = uv.y * height - floor(uv.y * height); \n"\
-"     \n"\
+" \n"\
 "    switch (textures[texidx].fmt) \n"\
 "    { \n"\
 "        case RGBA32: \n"\
 "        { \n"\
-"            __global float3 const* mydataf = (__global float3 const*)mydata; \n"\
-"             \n"\
+"            __global float4 const* mydataf = (__global float4 const*)mydata; \n"\
+" \n"\
 "            // Get 4 values for linear filtering \n"\
-"            float3 val00 = *(mydataf + width * y0 + x0); \n"\
-"            float3 val01 = *(mydataf + width * y0 + x1); \n"\
-"            float3 val10 = *(mydataf + width * y1 + x0); \n"\
-"            float3 val11 = *(mydataf + width * y1 + x1); \n"\
-"             \n"\
+"            float4 val00 = *(mydataf + width * y0 + x0); \n"\
+"            float4 val01 = *(mydataf + width * y0 + x1); \n"\
+"            float4 val10 = *(mydataf + width * y1 + x0); \n"\
+"            float4 val11 = *(mydataf + width * y1 + x1); \n"\
+" \n"\
 "            // Filter and return the result \n"\
 "            return lerp(lerp(val00, val01, wx), lerp(val10, val11, wx), wy); \n"\
 "        } \n"\
-"             \n"\
+" \n"\
 "        case RGBA16: \n"\
 "        { \n"\
 "            __global half const* mydatah = (__global half const*)mydata; \n"\
-"             \n"\
+" \n"\
 "            // Get 4 values \n"\
-"            float3 val00 = vload_half4(width * y0 + x0, mydatah).xyz; \n"\
-"            float3 val01 = vload_half4(width * y0 + x1, mydatah).xyz; \n"\
-"            float3 val10 = vload_half4(width * y1 + x0, mydatah).xyz; \n"\
-"            float3 val11 = vload_half4(width * y1 + x1, mydatah).xyz; \n"\
-"             \n"\
+"            float4 val00 = vload_half4(width * y0 + x0, mydatah); \n"\
+"            float4 val01 = vload_half4(width * y0 + x1, mydatah); \n"\
+"            float4 val10 = vload_half4(width * y1 + x0, mydatah); \n"\
+"            float4 val11 = vload_half4(width * y1 + x1, mydatah); \n"\
+" \n"\
 "            // Filter and return the result \n"\
 "            return lerp(lerp(val00, val01, wx), lerp(val10, val11, wx), wy); \n"\
 "        } \n"\
-"             \n"\
+" \n"\
 "        case RGBA8: \n"\
 "        { \n"\
 "            __global uchar4 const* mydatac = (__global uchar4 const*)mydata; \n"\
-"             \n"\
+" \n"\
 "            // Get 4 values and convert to float \n"\
 "            uchar4 valu00 = *(mydatac + width * y0 + x0); \n"\
 "            uchar4 valu01 = *(mydatac + width * y0 + x1); \n"\
 "            uchar4 valu10 = *(mydatac + width * y1 + x0); \n"\
 "            uchar4 valu11 = *(mydatac + width * y1 + x1); \n"\
-"             \n"\
-"            float3 val00 = make_float3((float)valu00.x / 255.f, (float)valu00.y / 255.f, (float)valu00.z / 255.f); \n"\
-"            float3 val01 = make_float3((float)valu01.x / 255.f, (float)valu01.y / 255.f, (float)valu01.z / 255.f); \n"\
-"            float3 val10 = make_float3((float)valu10.x / 255.f, (float)valu10.y / 255.f, (float)valu10.z / 255.f); \n"\
-"            float3 val11 = make_float3((float)valu11.x / 255.f, (float)valu11.y / 255.f, (float)valu11.z / 255.f); \n"\
-"             \n"\
+" \n"\
+"            float4 val00 = make_float4((float)valu00.x / 255.f, (float)valu00.y / 255.f, (float)valu00.z / 255.f, (float)valu00.w / 255.f); \n"\
+"            float4 val01 = make_float4((float)valu01.x / 255.f, (float)valu01.y / 255.f, (float)valu01.z / 255.f, (float)valu01.w / 255.f); \n"\
+"            float4 val10 = make_float4((float)valu10.x / 255.f, (float)valu10.y / 255.f, (float)valu10.z / 255.f, (float)valu10.w / 255.f); \n"\
+"            float4 val11 = make_float4((float)valu11.x / 255.f, (float)valu11.y / 255.f, (float)valu11.z / 255.f, (float)valu11.w / 255.f); \n"\
+" \n"\
 "            // Filter and return the result \n"\
 "            return lerp(lerp(val00, val01, wx), lerp(val10, val11, wx), wy); \n"\
 "        } \n"\
-"             \n"\
+" \n"\
 "        default: \n"\
 "        { \n"\
-"            return make_float3(0.f, 0.f, 0.f); \n"\
+"            return make_float4(0.f, 0.f, 0.f, 0.f); \n"\
 "        } \n"\
 "    } \n"\
 "} \n"\
@@ -12655,14 +13705,14 @@ static const char g_integrator_ao_opencl[]= \
 "    // Transform to spherical coords \n"\
 "    float r, phi, theta; \n"\
 "    CartesianToSpherical(d, &r, &phi, &theta); \n"\
-"     \n"\
+" \n"\
 "    // Map to [0,1]x[0,1] range and reverse Y axis \n"\
 "    float2 uv; \n"\
 "    uv.x = phi / (2*PI); \n"\
 "    uv.y = 1.f - theta / PI; \n"\
-"     \n"\
+" \n"\
 "    // Sample the texture \n"\
-"    return native_powr(Texture_Sample2D(uv, TEXTURE_ARGS_IDX(texidx)), 1.f / 1.f); \n"\
+"    return Texture_Sample2D(uv, TEXTURE_ARGS_IDX(texidx)).xyz; \n"\
 "} \n"\
 " \n"\
 "/// Get data from parameter value or texture \n"\
@@ -12679,9 +13729,30 @@ static const char g_integrator_ao_opencl[]= \
 "    if (texidx != -1) \n"\
 "    { \n"\
 "        // Sample texture \n"\
+"        return native_powr(Texture_Sample2D(uv, TEXTURE_ARGS_IDX(texidx)).xyz, 2.2f); \n"\
+"    } \n"\
+" \n"\
+"    // Return fixed color otherwise \n"\
+"    return v; \n"\
+"} \n"\
+" \n"\
+"/// Get data from parameter value or texture \n"\
+"float4 Texture_GetValue4f( \n"\
+"                // Value \n"\
+"                float4 v, \n"\
+"                // Texture coordinate \n"\
+"                float2 uv, \n"\
+"                // Texture args \n"\
+"                TEXTURE_ARG_LIST_IDX(texidx) \n"\
+"                ) \n"\
+"{ \n"\
+"    // If texture present sample from texture \n"\
+"    if (texidx != -1) \n"\
+"    { \n"\
+"        // Sample texture \n"\
 "        return native_powr(Texture_Sample2D(uv, TEXTURE_ARGS_IDX(texidx)), 2.2f); \n"\
 "    } \n"\
-"     \n"\
+" \n"\
 "    // Return fixed color otherwise \n"\
 "    return v; \n"\
 "} \n"\
@@ -12702,7 +13773,7 @@ static const char g_integrator_ao_opencl[]= \
 "        // Sample texture \n"\
 "        return Texture_Sample2D(uv, TEXTURE_ARGS_IDX(texidx)).x; \n"\
 "    } \n"\
-"     \n"\
+" \n"\
 "    // Return fixed color otherwise \n"\
 "    return v; \n"\
 "} \n"\
@@ -12737,11 +13808,11 @@ static const char g_integrator_ao_opencl[]= \
 "        __global float3 const* mydataf = (__global float3 const*)mydata; \n"\
 " \n"\
 "        // Sobel filter \n"\
-"        const float tex00 = (*(mydataf + width * (t0 - 1) + (s0-1))).x;  \n"\
+"        const float tex00 = (*(mydataf + width * (t0 - 1) + (s0-1))).x; \n"\
 "        const float tex10 = (*(mydataf + width * (t0 - 1) + (s0))).x; \n"\
-"        const float tex20 = (*(mydataf + width * (t0 - 1) + (s0 + 1))).x;  \n"\
+"        const float tex20 = (*(mydataf + width * (t0 - 1) + (s0 + 1))).x; \n"\
 " \n"\
-"        const float tex01 = (*(mydataf + width * (t0) + (s0 - 1))).x;  \n"\
+"        const float tex01 = (*(mydataf + width * (t0) + (s0 - 1))).x; \n"\
 "        const float tex21 = (*(mydataf + width * (t0) + (s0 + 1))).x; \n"\
 " \n"\
 "        const float tex02 = (*(mydataf + width * (t0 + 1) + (s0 - 1))).x; \n"\
@@ -12763,8 +13834,8 @@ static const char g_integrator_ao_opencl[]= \
 "        const float tex10 = vload_half4(width * (t0 - 1) + (s0), mydatah).x; \n"\
 "        const float tex20 = vload_half4(width * (t0 - 1) + (s0 + 1), mydatah).x; \n"\
 " \n"\
-"        const float tex01 = vload_half4(width * (t0)+(s0 - 1), mydatah).x;  \n"\
-"        const float tex21 = vload_half4(width * (t0)+(s0 + 1), mydatah).x;  \n"\
+"        const float tex01 = vload_half4(width * (t0)+(s0 - 1), mydatah).x; \n"\
+"        const float tex21 = vload_half4(width * (t0)+(s0 + 1), mydatah).x; \n"\
 " \n"\
 "        const float tex02 = vload_half4(width * (t0 + 1) + (s0 - 1), mydatah).x; \n"\
 "        const float tex12 = vload_half4(width * (t0 + 1) + (s0), mydatah).x; \n"\
@@ -12843,7 +13914,7 @@ static const char g_integrator_ao_opencl[]= \
 "********************************************************************/ \n"\
 "#ifndef PAYLOAD_CL \n"\
 "#define PAYLOAD_CL \n"\
-"#define SOBOL \n"\
+"//#define SOBOL \n"\
 "#define MULTISCATTER \n"\
 " \n"\
 "/// Ray descriptor \n"\
@@ -12855,7 +13926,7 @@ static const char g_integrator_ao_opencl[]= \
 "    float4 d; \n"\
 "    /// x - ray mask, y - activity flag \n"\
 "    int2 extra; \n"\
-"    int2 padding; \n"\
+"    float2 padding; \n"\
 "} ray; \n"\
 " \n"\
 "/// Intersection data returned by RadeonRays \n"\
@@ -12909,8 +13980,6 @@ static const char g_integrator_ao_opencl[]= \
 "} Emissive; \n"\
 " \n"\
 " \n"\
-" \n"\
-" \n"\
 "typedef enum _PathFlags \n"\
 "{ \n"\
 "    kNone = 0x0, \n"\
@@ -12960,6 +14029,53 @@ static const char g_integrator_ao_opencl[]= \
 " \n"\
 "} Material; \n"\
 " \n"\
+" \n"\
+"enum LightType \n"\
+"{ \n"\
+"    kPoint = 0x1, \n"\
+"    kDirectional, \n"\
+"    kSpot, \n"\
+"    kArea, \n"\
+"    kIbl \n"\
+"}; \n"\
+" \n"\
+"typedef struct _Light \n"\
+"{ \n"\
+"    int type; \n"\
+" \n"\
+"    union \n"\
+"    { \n"\
+"        // Area light \n"\
+"        struct \n"\
+"        { \n"\
+"            int shapeidx; \n"\
+"            int primidx; \n"\
+"            int matidx; \n"\
+"        }; \n"\
+" \n"\
+"        // IBL \n"\
+"        struct \n"\
+"        { \n"\
+"            int tex; \n"\
+"            int texdiffuse; \n"\
+"            float multiplier; \n"\
+"        }; \n"\
+"         \n"\
+"         \n"\
+"        // Spot \n"\
+"        struct \n"\
+"        { \n"\
+"            float ia; \n"\
+"            float oa; \n"\
+"            float f; \n"\
+"        }; \n"\
+"    }; \n"\
+" \n"\
+"    float3 p; \n"\
+"    float3 d; \n"\
+"    float3 intensity; \n"\
+"} Light; \n"\
+" \n"\
 "typedef struct _Scene \n"\
 "{ \n"\
 "    // Vertices \n"\
@@ -12977,13 +14093,13 @@ static const char g_integrator_ao_opencl[]= \
 "    // Materials \n"\
 "    __global Material const* materials; \n"\
 "    // Emissive objects \n"\
-"    __global Emissive const* emissives; \n"\
+"    __global Light const* lights; \n"\
 "    // Envmap idx \n"\
 "    int envmapidx; \n"\
 "    // Envmap multiplier \n"\
 "    float envmapmul; \n"\
 "    // Number of emissive objects \n"\
-"    int numemissives; \n"\
+"    int num_lights; \n"\
 "} Scene; \n"\
 " \n"\
 "// Hit data \n"\
@@ -13001,7 +14117,7 @@ static const char g_integrator_ao_opencl[]= \
 "    float3 dpdu; \n"\
 "    float3 dpdv; \n"\
 "    float  area; \n"\
-"    // Material  \n"\
+"    // Material \n"\
 "    Material mat; \n"\
 "} DifferentialGeometry; \n"\
 " \n"\
@@ -13057,6 +14173,16 @@ static const char g_integrator_ao_opencl[]= \
 "    r->extra.y = 0; \n"\
 "} \n"\
 " \n"\
+"void Ray_SetExtra(__global ray* r, float2 extra) \n"\
+"{ \n"\
+"    r->padding = extra; \n"\
+"} \n"\
+" \n"\
+"float2 Ray_GetExtra(__global ray const* r) \n"\
+"{ \n"\
+"    return r->padding; \n"\
+"} \n"\
+" \n"\
 "void Ray_Init(__global ray* r, float3 o, float3 d, float maxt, float time, int mask) \n"\
 "{ \n"\
 "    // TODO: Check if it generates MTBUF_XYZW write \n"\
@@ -13067,6 +14193,8 @@ static const char g_integrator_ao_opencl[]= \
 "    r->extra.x = mask; \n"\
 "    r->extra.y = 0xFFFFFFFF; \n"\
 "} \n"\
+" \n"\
+" \n"\
 " \n"\
 "#endif // PAYLOAD_CL \n"\
 "/********************************************************************** \n"\
@@ -13210,7 +14338,7 @@ static const char g_integrator_ao_opencl[]= \
 "float4 quaternion_inverse(float4 q) \n"\
 "{ \n"\
 "    float sqnorm = q.x*q.x + q.y*q.y + q.z*q.z + q.w*q.w; \n"\
-"     \n"\
+" \n"\
 "    /// Check if it is singular \n"\
 "    if (sqnorm != 0.f) \n"\
 "    { \n"\
@@ -13232,7 +14360,7 @@ static const char g_integrator_ao_opencl[]= \
 "} \n"\
 " \n"\
 "/// Linearly interpolate between two values \n"\
-"float3 lerp(float3 a, float3 b, float w) \n"\
+"float4 lerp(float4 a, float4 b, float w) \n"\
 "{ \n"\
 "    return a + w*(b-a); \n"\
 "} \n"\
@@ -13251,7 +14379,7 @@ static const char g_integrator_ao_opencl[]= \
 "float3 GetOrthoVector(float3 n) \n"\
 "{ \n"\
 "    float3 p; \n"\
-"     \n"\
+" \n"\
 "    if (fabs(n.z) > 0.f) { \n"\
 "        float k = sqrt(n.y*n.y + n.z*n.z); \n"\
 "        p.x = 0; p.y = -n.z/k; p.z = n.y/k; \n"\
@@ -13494,7 +14622,7 @@ static const char g_integrator_ao_opencl[]= \
 "float4 quaternion_inverse(float4 q) \n"\
 "{ \n"\
 "    float sqnorm = q.x*q.x + q.y*q.y + q.z*q.z + q.w*q.w; \n"\
-"     \n"\
+" \n"\
 "    /// Check if it is singular \n"\
 "    if (sqnorm != 0.f) \n"\
 "    { \n"\
@@ -13516,7 +14644,7 @@ static const char g_integrator_ao_opencl[]= \
 "} \n"\
 " \n"\
 "/// Linearly interpolate between two values \n"\
-"float3 lerp(float3 a, float3 b, float w) \n"\
+"float4 lerp(float4 a, float4 b, float w) \n"\
 "{ \n"\
 "    return a + w*(b-a); \n"\
 "} \n"\
@@ -13535,7 +14663,7 @@ static const char g_integrator_ao_opencl[]= \
 "float3 GetOrthoVector(float3 n) \n"\
 "{ \n"\
 "    float3 p; \n"\
-"     \n"\
+" \n"\
 "    if (fabs(n.z) > 0.f) { \n"\
 "        float k = sqrt(n.y*n.y + n.z*n.z); \n"\
 "        p.x = 0; p.y = -n.z/k; p.z = n.y/k; \n"\
@@ -13604,88 +14732,88 @@ static const char g_integrator_ao_opencl[]= \
 "#define TEXTURE_ARGS_IDX(x) x, textures, texturedata \n"\
 " \n"\
 "/// Sample 2D texture \n"\
-"float3 Texture_Sample2D(float2 uv, TEXTURE_ARG_LIST_IDX(texidx)) \n"\
+"float4 Texture_Sample2D(float2 uv, TEXTURE_ARG_LIST_IDX(texidx)) \n"\
 "{ \n"\
 "    // Get width and height \n"\
 "    int width = textures[texidx].w; \n"\
 "    int height = textures[texidx].h; \n"\
-"     \n"\
+" \n"\
 "    // Find the origin of the data in the pool \n"\
 "    __global char const* mydata = texturedata + textures[texidx].dataoffset; \n"\
 " \n"\
 "    // Handle UV wrap \n"\
 "    // TODO: need UV mode support \n"\
 "    uv -= floor(uv); \n"\
-"     \n"\
+" \n"\
 "    // Reverse Y: \n"\
 "    // it is needed as textures are loaded with Y axis going top to down \n"\
 "    // and our axis goes from down to top \n"\
 "    uv.y = 1.f - uv.y; \n"\
-"     \n"\
+" \n"\
 "    // Calculate integer coordinates \n"\
 "    int x0 = clamp((int)floor(uv.x * width), 0, width - 1); \n"\
 "    int y0 = clamp((int)floor(uv.y * height), 0, height - 1); \n"\
-"     \n"\
+" \n"\
 "    // Calculate samples for linear filtering \n"\
 "    int x1 = clamp(x0 + 1, 0,  width - 1); \n"\
 "    int y1 = clamp(y0 + 1, 0, height - 1); \n"\
-"     \n"\
+" \n"\
 "    // Calculate weights for linear filtering \n"\
 "    float wx = uv.x * width - floor(uv.x * width); \n"\
 "    float wy = uv.y * height - floor(uv.y * height); \n"\
-"     \n"\
+" \n"\
 "    switch (textures[texidx].fmt) \n"\
 "    { \n"\
 "        case RGBA32: \n"\
 "        { \n"\
-"            __global float3 const* mydataf = (__global float3 const*)mydata; \n"\
-"             \n"\
+"            __global float4 const* mydataf = (__global float4 const*)mydata; \n"\
+" \n"\
 "            // Get 4 values for linear filtering \n"\
-"            float3 val00 = *(mydataf + width * y0 + x0); \n"\
-"            float3 val01 = *(mydataf + width * y0 + x1); \n"\
-"            float3 val10 = *(mydataf + width * y1 + x0); \n"\
-"            float3 val11 = *(mydataf + width * y1 + x1); \n"\
-"             \n"\
+"            float4 val00 = *(mydataf + width * y0 + x0); \n"\
+"            float4 val01 = *(mydataf + width * y0 + x1); \n"\
+"            float4 val10 = *(mydataf + width * y1 + x0); \n"\
+"            float4 val11 = *(mydataf + width * y1 + x1); \n"\
+" \n"\
 "            // Filter and return the result \n"\
 "            return lerp(lerp(val00, val01, wx), lerp(val10, val11, wx), wy); \n"\
 "        } \n"\
-"             \n"\
+" \n"\
 "        case RGBA16: \n"\
 "        { \n"\
 "            __global half const* mydatah = (__global half const*)mydata; \n"\
-"             \n"\
+" \n"\
 "            // Get 4 values \n"\
-"            float3 val00 = vload_half4(width * y0 + x0, mydatah).xyz; \n"\
-"            float3 val01 = vload_half4(width * y0 + x1, mydatah).xyz; \n"\
-"            float3 val10 = vload_half4(width * y1 + x0, mydatah).xyz; \n"\
-"            float3 val11 = vload_half4(width * y1 + x1, mydatah).xyz; \n"\
-"             \n"\
+"            float4 val00 = vload_half4(width * y0 + x0, mydatah); \n"\
+"            float4 val01 = vload_half4(width * y0 + x1, mydatah); \n"\
+"            float4 val10 = vload_half4(width * y1 + x0, mydatah); \n"\
+"            float4 val11 = vload_half4(width * y1 + x1, mydatah); \n"\
+" \n"\
 "            // Filter and return the result \n"\
 "            return lerp(lerp(val00, val01, wx), lerp(val10, val11, wx), wy); \n"\
 "        } \n"\
-"             \n"\
+" \n"\
 "        case RGBA8: \n"\
 "        { \n"\
 "            __global uchar4 const* mydatac = (__global uchar4 const*)mydata; \n"\
-"             \n"\
+" \n"\
 "            // Get 4 values and convert to float \n"\
 "            uchar4 valu00 = *(mydatac + width * y0 + x0); \n"\
 "            uchar4 valu01 = *(mydatac + width * y0 + x1); \n"\
 "            uchar4 valu10 = *(mydatac + width * y1 + x0); \n"\
 "            uchar4 valu11 = *(mydatac + width * y1 + x1); \n"\
-"             \n"\
-"            float3 val00 = make_float3((float)valu00.x / 255.f, (float)valu00.y / 255.f, (float)valu00.z / 255.f); \n"\
-"            float3 val01 = make_float3((float)valu01.x / 255.f, (float)valu01.y / 255.f, (float)valu01.z / 255.f); \n"\
-"            float3 val10 = make_float3((float)valu10.x / 255.f, (float)valu10.y / 255.f, (float)valu10.z / 255.f); \n"\
-"            float3 val11 = make_float3((float)valu11.x / 255.f, (float)valu11.y / 255.f, (float)valu11.z / 255.f); \n"\
-"             \n"\
+" \n"\
+"            float4 val00 = make_float4((float)valu00.x / 255.f, (float)valu00.y / 255.f, (float)valu00.z / 255.f, (float)valu00.w / 255.f); \n"\
+"            float4 val01 = make_float4((float)valu01.x / 255.f, (float)valu01.y / 255.f, (float)valu01.z / 255.f, (float)valu01.w / 255.f); \n"\
+"            float4 val10 = make_float4((float)valu10.x / 255.f, (float)valu10.y / 255.f, (float)valu10.z / 255.f, (float)valu10.w / 255.f); \n"\
+"            float4 val11 = make_float4((float)valu11.x / 255.f, (float)valu11.y / 255.f, (float)valu11.z / 255.f, (float)valu11.w / 255.f); \n"\
+" \n"\
 "            // Filter and return the result \n"\
 "            return lerp(lerp(val00, val01, wx), lerp(val10, val11, wx), wy); \n"\
 "        } \n"\
-"             \n"\
+" \n"\
 "        default: \n"\
 "        { \n"\
-"            return make_float3(0.f, 0.f, 0.f); \n"\
+"            return make_float4(0.f, 0.f, 0.f, 0.f); \n"\
 "        } \n"\
 "    } \n"\
 "} \n"\
@@ -13696,14 +14824,14 @@ static const char g_integrator_ao_opencl[]= \
 "    // Transform to spherical coords \n"\
 "    float r, phi, theta; \n"\
 "    CartesianToSpherical(d, &r, &phi, &theta); \n"\
-"     \n"\
+" \n"\
 "    // Map to [0,1]x[0,1] range and reverse Y axis \n"\
 "    float2 uv; \n"\
 "    uv.x = phi / (2*PI); \n"\
 "    uv.y = 1.f - theta / PI; \n"\
-"     \n"\
+" \n"\
 "    // Sample the texture \n"\
-"    return native_powr(Texture_Sample2D(uv, TEXTURE_ARGS_IDX(texidx)), 1.f / 1.f); \n"\
+"    return Texture_Sample2D(uv, TEXTURE_ARGS_IDX(texidx)).xyz; \n"\
 "} \n"\
 " \n"\
 "/// Get data from parameter value or texture \n"\
@@ -13720,9 +14848,30 @@ static const char g_integrator_ao_opencl[]= \
 "    if (texidx != -1) \n"\
 "    { \n"\
 "        // Sample texture \n"\
+"        return native_powr(Texture_Sample2D(uv, TEXTURE_ARGS_IDX(texidx)).xyz, 2.2f); \n"\
+"    } \n"\
+" \n"\
+"    // Return fixed color otherwise \n"\
+"    return v; \n"\
+"} \n"\
+" \n"\
+"/// Get data from parameter value or texture \n"\
+"float4 Texture_GetValue4f( \n"\
+"                // Value \n"\
+"                float4 v, \n"\
+"                // Texture coordinate \n"\
+"                float2 uv, \n"\
+"                // Texture args \n"\
+"                TEXTURE_ARG_LIST_IDX(texidx) \n"\
+"                ) \n"\
+"{ \n"\
+"    // If texture present sample from texture \n"\
+"    if (texidx != -1) \n"\
+"    { \n"\
+"        // Sample texture \n"\
 "        return native_powr(Texture_Sample2D(uv, TEXTURE_ARGS_IDX(texidx)), 2.2f); \n"\
 "    } \n"\
-"     \n"\
+" \n"\
 "    // Return fixed color otherwise \n"\
 "    return v; \n"\
 "} \n"\
@@ -13743,7 +14892,7 @@ static const char g_integrator_ao_opencl[]= \
 "        // Sample texture \n"\
 "        return Texture_Sample2D(uv, TEXTURE_ARGS_IDX(texidx)).x; \n"\
 "    } \n"\
-"     \n"\
+" \n"\
 "    // Return fixed color otherwise \n"\
 "    return v; \n"\
 "} \n"\
@@ -13778,11 +14927,11 @@ static const char g_integrator_ao_opencl[]= \
 "        __global float3 const* mydataf = (__global float3 const*)mydata; \n"\
 " \n"\
 "        // Sobel filter \n"\
-"        const float tex00 = (*(mydataf + width * (t0 - 1) + (s0-1))).x;  \n"\
+"        const float tex00 = (*(mydataf + width * (t0 - 1) + (s0-1))).x; \n"\
 "        const float tex10 = (*(mydataf + width * (t0 - 1) + (s0))).x; \n"\
-"        const float tex20 = (*(mydataf + width * (t0 - 1) + (s0 + 1))).x;  \n"\
+"        const float tex20 = (*(mydataf + width * (t0 - 1) + (s0 + 1))).x; \n"\
 " \n"\
-"        const float tex01 = (*(mydataf + width * (t0) + (s0 - 1))).x;  \n"\
+"        const float tex01 = (*(mydataf + width * (t0) + (s0 - 1))).x; \n"\
 "        const float tex21 = (*(mydataf + width * (t0) + (s0 + 1))).x; \n"\
 " \n"\
 "        const float tex02 = (*(mydataf + width * (t0 + 1) + (s0 - 1))).x; \n"\
@@ -13804,8 +14953,8 @@ static const char g_integrator_ao_opencl[]= \
 "        const float tex10 = vload_half4(width * (t0 - 1) + (s0), mydatah).x; \n"\
 "        const float tex20 = vload_half4(width * (t0 - 1) + (s0 + 1), mydatah).x; \n"\
 " \n"\
-"        const float tex01 = vload_half4(width * (t0)+(s0 - 1), mydatah).x;  \n"\
-"        const float tex21 = vload_half4(width * (t0)+(s0 + 1), mydatah).x;  \n"\
+"        const float tex01 = vload_half4(width * (t0)+(s0 - 1), mydatah).x; \n"\
+"        const float tex21 = vload_half4(width * (t0)+(s0 + 1), mydatah).x; \n"\
 " \n"\
 "        const float tex02 = vload_half4(width * (t0 + 1) + (s0 - 1), mydatah).x; \n"\
 "        const float tex12 = vload_half4(width * (t0 + 1) + (s0), mydatah).x; \n"\
@@ -13884,7 +15033,7 @@ static const char g_integrator_ao_opencl[]= \
 "********************************************************************/ \n"\
 "#ifndef PAYLOAD_CL \n"\
 "#define PAYLOAD_CL \n"\
-"#define SOBOL \n"\
+"//#define SOBOL \n"\
 "#define MULTISCATTER \n"\
 " \n"\
 "/// Ray descriptor \n"\
@@ -13896,7 +15045,7 @@ static const char g_integrator_ao_opencl[]= \
 "    float4 d; \n"\
 "    /// x - ray mask, y - activity flag \n"\
 "    int2 extra; \n"\
-"    int2 padding; \n"\
+"    float2 padding; \n"\
 "} ray; \n"\
 " \n"\
 "/// Intersection data returned by RadeonRays \n"\
@@ -13950,8 +15099,6 @@ static const char g_integrator_ao_opencl[]= \
 "} Emissive; \n"\
 " \n"\
 " \n"\
-" \n"\
-" \n"\
 "typedef enum _PathFlags \n"\
 "{ \n"\
 "    kNone = 0x0, \n"\
@@ -14001,6 +15148,53 @@ static const char g_integrator_ao_opencl[]= \
 " \n"\
 "} Material; \n"\
 " \n"\
+" \n"\
+"enum LightType \n"\
+"{ \n"\
+"    kPoint = 0x1, \n"\
+"    kDirectional, \n"\
+"    kSpot, \n"\
+"    kArea, \n"\
+"    kIbl \n"\
+"}; \n"\
+" \n"\
+"typedef struct _Light \n"\
+"{ \n"\
+"    int type; \n"\
+" \n"\
+"    union \n"\
+"    { \n"\
+"        // Area light \n"\
+"        struct \n"\
+"        { \n"\
+"            int shapeidx; \n"\
+"            int primidx; \n"\
+"            int matidx; \n"\
+"        }; \n"\
+" \n"\
+"        // IBL \n"\
+"        struct \n"\
+"        { \n"\
+"            int tex; \n"\
+"            int texdiffuse; \n"\
+"            float multiplier; \n"\
+"        }; \n"\
+"         \n"\
+"         \n"\
+"        // Spot \n"\
+"        struct \n"\
+"        { \n"\
+"            float ia; \n"\
+"            float oa; \n"\
+"            float f; \n"\
+"        }; \n"\
+"    }; \n"\
+" \n"\
+"    float3 p; \n"\
+"    float3 d; \n"\
+"    float3 intensity; \n"\
+"} Light; \n"\
+" \n"\
 "typedef struct _Scene \n"\
 "{ \n"\
 "    // Vertices \n"\
@@ -14018,13 +15212,13 @@ static const char g_integrator_ao_opencl[]= \
 "    // Materials \n"\
 "    __global Material const* materials; \n"\
 "    // Emissive objects \n"\
-"    __global Emissive const* emissives; \n"\
+"    __global Light const* lights; \n"\
 "    // Envmap idx \n"\
 "    int envmapidx; \n"\
 "    // Envmap multiplier \n"\
 "    float envmapmul; \n"\
 "    // Number of emissive objects \n"\
-"    int numemissives; \n"\
+"    int num_lights; \n"\
 "} Scene; \n"\
 " \n"\
 "// Hit data \n"\
@@ -14042,7 +15236,7 @@ static const char g_integrator_ao_opencl[]= \
 "    float3 dpdu; \n"\
 "    float3 dpdv; \n"\
 "    float  area; \n"\
-"    // Material  \n"\
+"    // Material \n"\
 "    Material mat; \n"\
 "} DifferentialGeometry; \n"\
 " \n"\
@@ -14098,6 +15292,16 @@ static const char g_integrator_ao_opencl[]= \
 "    r->extra.y = 0; \n"\
 "} \n"\
 " \n"\
+"void Ray_SetExtra(__global ray* r, float2 extra) \n"\
+"{ \n"\
+"    r->padding = extra; \n"\
+"} \n"\
+" \n"\
+"float2 Ray_GetExtra(__global ray const* r) \n"\
+"{ \n"\
+"    return r->padding; \n"\
+"} \n"\
+" \n"\
 "void Ray_Init(__global ray* r, float3 o, float3 d, float maxt, float time, int mask) \n"\
 "{ \n"\
 "    // TODO: Check if it generates MTBUF_XYZW write \n"\
@@ -14108,6 +15312,8 @@ static const char g_integrator_ao_opencl[]= \
 "    r->extra.x = mask; \n"\
 "    r->extra.y = 0xFFFFFFFF; \n"\
 "} \n"\
+" \n"\
+" \n"\
 " \n"\
 "#endif // PAYLOAD_CL \n"\
 " \n"\
@@ -15660,8 +16866,9 @@ static const char g_integrator_ao_opencl[]= \
 "#else \n"\
 "                float sample = UniformSampler_Sample2D(rng).x; \n"\
 "#endif \n"\
+"                float weight = Texture_GetValue1f(mat.ns, dg->uv, TEXTURE_ARGS_IDX(mat.nsmapidx)); \n"\
 " \n"\
-"                if (sample < mat.ns) \n"\
+"                if (sample < weight) \n"\
 "                { \n"\
 "                    // Sample top \n"\
 "                    int idx = mat.brdftopidx; \n"\
@@ -15733,7 +16940,7 @@ static const char g_integrator_ao_opencl[]= \
 "********************************************************************/ \n"\
 "#ifndef PAYLOAD_CL \n"\
 "#define PAYLOAD_CL \n"\
-"#define SOBOL \n"\
+"//#define SOBOL \n"\
 "#define MULTISCATTER \n"\
 " \n"\
 "/// Ray descriptor \n"\
@@ -15745,7 +16952,7 @@ static const char g_integrator_ao_opencl[]= \
 "    float4 d; \n"\
 "    /// x - ray mask, y - activity flag \n"\
 "    int2 extra; \n"\
-"    int2 padding; \n"\
+"    float2 padding; \n"\
 "} ray; \n"\
 " \n"\
 "/// Intersection data returned by RadeonRays \n"\
@@ -15799,8 +17006,6 @@ static const char g_integrator_ao_opencl[]= \
 "} Emissive; \n"\
 " \n"\
 " \n"\
-" \n"\
-" \n"\
 "typedef enum _PathFlags \n"\
 "{ \n"\
 "    kNone = 0x0, \n"\
@@ -15850,6 +17055,53 @@ static const char g_integrator_ao_opencl[]= \
 " \n"\
 "} Material; \n"\
 " \n"\
+" \n"\
+"enum LightType \n"\
+"{ \n"\
+"    kPoint = 0x1, \n"\
+"    kDirectional, \n"\
+"    kSpot, \n"\
+"    kArea, \n"\
+"    kIbl \n"\
+"}; \n"\
+" \n"\
+"typedef struct _Light \n"\
+"{ \n"\
+"    int type; \n"\
+" \n"\
+"    union \n"\
+"    { \n"\
+"        // Area light \n"\
+"        struct \n"\
+"        { \n"\
+"            int shapeidx; \n"\
+"            int primidx; \n"\
+"            int matidx; \n"\
+"        }; \n"\
+" \n"\
+"        // IBL \n"\
+"        struct \n"\
+"        { \n"\
+"            int tex; \n"\
+"            int texdiffuse; \n"\
+"            float multiplier; \n"\
+"        }; \n"\
+"         \n"\
+"         \n"\
+"        // Spot \n"\
+"        struct \n"\
+"        { \n"\
+"            float ia; \n"\
+"            float oa; \n"\
+"            float f; \n"\
+"        }; \n"\
+"    }; \n"\
+" \n"\
+"    float3 p; \n"\
+"    float3 d; \n"\
+"    float3 intensity; \n"\
+"} Light; \n"\
+" \n"\
 "typedef struct _Scene \n"\
 "{ \n"\
 "    // Vertices \n"\
@@ -15867,13 +17119,13 @@ static const char g_integrator_ao_opencl[]= \
 "    // Materials \n"\
 "    __global Material const* materials; \n"\
 "    // Emissive objects \n"\
-"    __global Emissive const* emissives; \n"\
+"    __global Light const* lights; \n"\
 "    // Envmap idx \n"\
 "    int envmapidx; \n"\
 "    // Envmap multiplier \n"\
 "    float envmapmul; \n"\
 "    // Number of emissive objects \n"\
-"    int numemissives; \n"\
+"    int num_lights; \n"\
 "} Scene; \n"\
 " \n"\
 "// Hit data \n"\
@@ -15891,7 +17143,7 @@ static const char g_integrator_ao_opencl[]= \
 "    float3 dpdu; \n"\
 "    float3 dpdv; \n"\
 "    float  area; \n"\
-"    // Material  \n"\
+"    // Material \n"\
 "    Material mat; \n"\
 "} DifferentialGeometry; \n"\
 " \n"\
@@ -15947,6 +17199,16 @@ static const char g_integrator_ao_opencl[]= \
 "    r->extra.y = 0; \n"\
 "} \n"\
 " \n"\
+"void Ray_SetExtra(__global ray* r, float2 extra) \n"\
+"{ \n"\
+"    r->padding = extra; \n"\
+"} \n"\
+" \n"\
+"float2 Ray_GetExtra(__global ray const* r) \n"\
+"{ \n"\
+"    return r->padding; \n"\
+"} \n"\
+" \n"\
 "void Ray_Init(__global ray* r, float3 o, float3 d, float maxt, float time, int mask) \n"\
 "{ \n"\
 "    // TODO: Check if it generates MTBUF_XYZW write \n"\
@@ -15957,6 +17219,8 @@ static const char g_integrator_ao_opencl[]= \
 "    r->extra.x = mask; \n"\
 "    r->extra.y = 0xFFFFFFFF; \n"\
 "} \n"\
+" \n"\
+" \n"\
 " \n"\
 "#endif // PAYLOAD_CL \n"\
 "/********************************************************************** \n"\
@@ -16006,7 +17270,7 @@ static const char g_integrator_ao_opencl[]= \
 "********************************************************************/ \n"\
 "#ifndef PAYLOAD_CL \n"\
 "#define PAYLOAD_CL \n"\
-"#define SOBOL \n"\
+"//#define SOBOL \n"\
 "#define MULTISCATTER \n"\
 " \n"\
 "/// Ray descriptor \n"\
@@ -16018,7 +17282,7 @@ static const char g_integrator_ao_opencl[]= \
 "    float4 d; \n"\
 "    /// x - ray mask, y - activity flag \n"\
 "    int2 extra; \n"\
-"    int2 padding; \n"\
+"    float2 padding; \n"\
 "} ray; \n"\
 " \n"\
 "/// Intersection data returned by RadeonRays \n"\
@@ -16072,8 +17336,6 @@ static const char g_integrator_ao_opencl[]= \
 "} Emissive; \n"\
 " \n"\
 " \n"\
-" \n"\
-" \n"\
 "typedef enum _PathFlags \n"\
 "{ \n"\
 "    kNone = 0x0, \n"\
@@ -16123,6 +17385,53 @@ static const char g_integrator_ao_opencl[]= \
 " \n"\
 "} Material; \n"\
 " \n"\
+" \n"\
+"enum LightType \n"\
+"{ \n"\
+"    kPoint = 0x1, \n"\
+"    kDirectional, \n"\
+"    kSpot, \n"\
+"    kArea, \n"\
+"    kIbl \n"\
+"}; \n"\
+" \n"\
+"typedef struct _Light \n"\
+"{ \n"\
+"    int type; \n"\
+" \n"\
+"    union \n"\
+"    { \n"\
+"        // Area light \n"\
+"        struct \n"\
+"        { \n"\
+"            int shapeidx; \n"\
+"            int primidx; \n"\
+"            int matidx; \n"\
+"        }; \n"\
+" \n"\
+"        // IBL \n"\
+"        struct \n"\
+"        { \n"\
+"            int tex; \n"\
+"            int texdiffuse; \n"\
+"            float multiplier; \n"\
+"        }; \n"\
+"         \n"\
+"         \n"\
+"        // Spot \n"\
+"        struct \n"\
+"        { \n"\
+"            float ia; \n"\
+"            float oa; \n"\
+"            float f; \n"\
+"        }; \n"\
+"    }; \n"\
+" \n"\
+"    float3 p; \n"\
+"    float3 d; \n"\
+"    float3 intensity; \n"\
+"} Light; \n"\
+" \n"\
 "typedef struct _Scene \n"\
 "{ \n"\
 "    // Vertices \n"\
@@ -16140,13 +17449,13 @@ static const char g_integrator_ao_opencl[]= \
 "    // Materials \n"\
 "    __global Material const* materials; \n"\
 "    // Emissive objects \n"\
-"    __global Emissive const* emissives; \n"\
+"    __global Light const* lights; \n"\
 "    // Envmap idx \n"\
 "    int envmapidx; \n"\
 "    // Envmap multiplier \n"\
 "    float envmapmul; \n"\
 "    // Number of emissive objects \n"\
-"    int numemissives; \n"\
+"    int num_lights; \n"\
 "} Scene; \n"\
 " \n"\
 "// Hit data \n"\
@@ -16164,7 +17473,7 @@ static const char g_integrator_ao_opencl[]= \
 "    float3 dpdu; \n"\
 "    float3 dpdv; \n"\
 "    float  area; \n"\
-"    // Material  \n"\
+"    // Material \n"\
 "    Material mat; \n"\
 "} DifferentialGeometry; \n"\
 " \n"\
@@ -16220,6 +17529,16 @@ static const char g_integrator_ao_opencl[]= \
 "    r->extra.y = 0; \n"\
 "} \n"\
 " \n"\
+"void Ray_SetExtra(__global ray* r, float2 extra) \n"\
+"{ \n"\
+"    r->padding = extra; \n"\
+"} \n"\
+" \n"\
+"float2 Ray_GetExtra(__global ray const* r) \n"\
+"{ \n"\
+"    return r->padding; \n"\
+"} \n"\
+" \n"\
 "void Ray_Init(__global ray* r, float3 o, float3 d, float maxt, float time, int mask) \n"\
 "{ \n"\
 "    // TODO: Check if it generates MTBUF_XYZW write \n"\
@@ -16230,6 +17549,8 @@ static const char g_integrator_ao_opencl[]= \
 "    r->extra.x = mask; \n"\
 "    r->extra.y = 0xFFFFFFFF; \n"\
 "} \n"\
+" \n"\
+" \n"\
 " \n"\
 "#endif // PAYLOAD_CL \n"\
 " \n"\
@@ -16575,7 +17896,7 @@ static const char g_integrator_ao_opencl[]= \
 "********************************************************************/ \n"\
 "#ifndef PAYLOAD_CL \n"\
 "#define PAYLOAD_CL \n"\
-"#define SOBOL \n"\
+"//#define SOBOL \n"\
 "#define MULTISCATTER \n"\
 " \n"\
 "/// Ray descriptor \n"\
@@ -16587,7 +17908,7 @@ static const char g_integrator_ao_opencl[]= \
 "    float4 d; \n"\
 "    /// x - ray mask, y - activity flag \n"\
 "    int2 extra; \n"\
-"    int2 padding; \n"\
+"    float2 padding; \n"\
 "} ray; \n"\
 " \n"\
 "/// Intersection data returned by RadeonRays \n"\
@@ -16641,8 +17962,6 @@ static const char g_integrator_ao_opencl[]= \
 "} Emissive; \n"\
 " \n"\
 " \n"\
-" \n"\
-" \n"\
 "typedef enum _PathFlags \n"\
 "{ \n"\
 "    kNone = 0x0, \n"\
@@ -16692,6 +18011,53 @@ static const char g_integrator_ao_opencl[]= \
 " \n"\
 "} Material; \n"\
 " \n"\
+" \n"\
+"enum LightType \n"\
+"{ \n"\
+"    kPoint = 0x1, \n"\
+"    kDirectional, \n"\
+"    kSpot, \n"\
+"    kArea, \n"\
+"    kIbl \n"\
+"}; \n"\
+" \n"\
+"typedef struct _Light \n"\
+"{ \n"\
+"    int type; \n"\
+" \n"\
+"    union \n"\
+"    { \n"\
+"        // Area light \n"\
+"        struct \n"\
+"        { \n"\
+"            int shapeidx; \n"\
+"            int primidx; \n"\
+"            int matidx; \n"\
+"        }; \n"\
+" \n"\
+"        // IBL \n"\
+"        struct \n"\
+"        { \n"\
+"            int tex; \n"\
+"            int texdiffuse; \n"\
+"            float multiplier; \n"\
+"        }; \n"\
+"         \n"\
+"         \n"\
+"        // Spot \n"\
+"        struct \n"\
+"        { \n"\
+"            float ia; \n"\
+"            float oa; \n"\
+"            float f; \n"\
+"        }; \n"\
+"    }; \n"\
+" \n"\
+"    float3 p; \n"\
+"    float3 d; \n"\
+"    float3 intensity; \n"\
+"} Light; \n"\
+" \n"\
 "typedef struct _Scene \n"\
 "{ \n"\
 "    // Vertices \n"\
@@ -16709,13 +18075,13 @@ static const char g_integrator_ao_opencl[]= \
 "    // Materials \n"\
 "    __global Material const* materials; \n"\
 "    // Emissive objects \n"\
-"    __global Emissive const* emissives; \n"\
+"    __global Light const* lights; \n"\
 "    // Envmap idx \n"\
 "    int envmapidx; \n"\
 "    // Envmap multiplier \n"\
 "    float envmapmul; \n"\
 "    // Number of emissive objects \n"\
-"    int numemissives; \n"\
+"    int num_lights; \n"\
 "} Scene; \n"\
 " \n"\
 "// Hit data \n"\
@@ -16733,7 +18099,7 @@ static const char g_integrator_ao_opencl[]= \
 "    float3 dpdu; \n"\
 "    float3 dpdv; \n"\
 "    float  area; \n"\
-"    // Material  \n"\
+"    // Material \n"\
 "    Material mat; \n"\
 "} DifferentialGeometry; \n"\
 " \n"\
@@ -16789,6 +18155,16 @@ static const char g_integrator_ao_opencl[]= \
 "    r->extra.y = 0; \n"\
 "} \n"\
 " \n"\
+"void Ray_SetExtra(__global ray* r, float2 extra) \n"\
+"{ \n"\
+"    r->padding = extra; \n"\
+"} \n"\
+" \n"\
+"float2 Ray_GetExtra(__global ray const* r) \n"\
+"{ \n"\
+"    return r->padding; \n"\
+"} \n"\
+" \n"\
 "void Ray_Init(__global ray* r, float3 o, float3 d, float maxt, float time, int mask) \n"\
 "{ \n"\
 "    // TODO: Check if it generates MTBUF_XYZW write \n"\
@@ -16799,6 +18175,8 @@ static const char g_integrator_ao_opencl[]= \
 "    r->extra.x = mask; \n"\
 "    r->extra.y = 0xFFFFFFFF; \n"\
 "} \n"\
+" \n"\
+" \n"\
 " \n"\
 "#endif // PAYLOAD_CL \n"\
 " \n"\
@@ -17246,7 +18624,7 @@ static const char g_integrator_pt_opencl[]= \
 "float4 quaternion_inverse(float4 q) \n"\
 "{ \n"\
 "    float sqnorm = q.x*q.x + q.y*q.y + q.z*q.z + q.w*q.w; \n"\
-"     \n"\
+" \n"\
 "    /// Check if it is singular \n"\
 "    if (sqnorm != 0.f) \n"\
 "    { \n"\
@@ -17268,7 +18646,7 @@ static const char g_integrator_pt_opencl[]= \
 "} \n"\
 " \n"\
 "/// Linearly interpolate between two values \n"\
-"float3 lerp(float3 a, float3 b, float w) \n"\
+"float4 lerp(float4 a, float4 b, float w) \n"\
 "{ \n"\
 "    return a + w*(b-a); \n"\
 "} \n"\
@@ -17287,7 +18665,7 @@ static const char g_integrator_pt_opencl[]= \
 "float3 GetOrthoVector(float3 n) \n"\
 "{ \n"\
 "    float3 p; \n"\
-"     \n"\
+" \n"\
 "    if (fabs(n.z) > 0.f) { \n"\
 "        float k = sqrt(n.y*n.y + n.z*n.z); \n"\
 "        p.x = 0; p.y = -n.z/k; p.z = n.y/k; \n"\
@@ -17412,7 +18790,7 @@ static const char g_integrator_pt_opencl[]= \
 "********************************************************************/ \n"\
 "#ifndef PAYLOAD_CL \n"\
 "#define PAYLOAD_CL \n"\
-"#define SOBOL \n"\
+"//#define SOBOL \n"\
 "#define MULTISCATTER \n"\
 " \n"\
 "/// Ray descriptor \n"\
@@ -17424,7 +18802,7 @@ static const char g_integrator_pt_opencl[]= \
 "    float4 d; \n"\
 "    /// x - ray mask, y - activity flag \n"\
 "    int2 extra; \n"\
-"    int2 padding; \n"\
+"    float2 padding; \n"\
 "} ray; \n"\
 " \n"\
 "/// Intersection data returned by RadeonRays \n"\
@@ -17478,8 +18856,6 @@ static const char g_integrator_pt_opencl[]= \
 "} Emissive; \n"\
 " \n"\
 " \n"\
-" \n"\
-" \n"\
 "typedef enum _PathFlags \n"\
 "{ \n"\
 "    kNone = 0x0, \n"\
@@ -17529,6 +18905,53 @@ static const char g_integrator_pt_opencl[]= \
 " \n"\
 "} Material; \n"\
 " \n"\
+" \n"\
+"enum LightType \n"\
+"{ \n"\
+"    kPoint = 0x1, \n"\
+"    kDirectional, \n"\
+"    kSpot, \n"\
+"    kArea, \n"\
+"    kIbl \n"\
+"}; \n"\
+" \n"\
+"typedef struct _Light \n"\
+"{ \n"\
+"    int type; \n"\
+" \n"\
+"    union \n"\
+"    { \n"\
+"        // Area light \n"\
+"        struct \n"\
+"        { \n"\
+"            int shapeidx; \n"\
+"            int primidx; \n"\
+"            int matidx; \n"\
+"        }; \n"\
+" \n"\
+"        // IBL \n"\
+"        struct \n"\
+"        { \n"\
+"            int tex; \n"\
+"            int texdiffuse; \n"\
+"            float multiplier; \n"\
+"        }; \n"\
+"         \n"\
+"         \n"\
+"        // Spot \n"\
+"        struct \n"\
+"        { \n"\
+"            float ia; \n"\
+"            float oa; \n"\
+"            float f; \n"\
+"        }; \n"\
+"    }; \n"\
+" \n"\
+"    float3 p; \n"\
+"    float3 d; \n"\
+"    float3 intensity; \n"\
+"} Light; \n"\
+" \n"\
 "typedef struct _Scene \n"\
 "{ \n"\
 "    // Vertices \n"\
@@ -17546,13 +18969,13 @@ static const char g_integrator_pt_opencl[]= \
 "    // Materials \n"\
 "    __global Material const* materials; \n"\
 "    // Emissive objects \n"\
-"    __global Emissive const* emissives; \n"\
+"    __global Light const* lights; \n"\
 "    // Envmap idx \n"\
 "    int envmapidx; \n"\
 "    // Envmap multiplier \n"\
 "    float envmapmul; \n"\
 "    // Number of emissive objects \n"\
-"    int numemissives; \n"\
+"    int num_lights; \n"\
 "} Scene; \n"\
 " \n"\
 "// Hit data \n"\
@@ -17570,7 +18993,7 @@ static const char g_integrator_pt_opencl[]= \
 "    float3 dpdu; \n"\
 "    float3 dpdv; \n"\
 "    float  area; \n"\
-"    // Material  \n"\
+"    // Material \n"\
 "    Material mat; \n"\
 "} DifferentialGeometry; \n"\
 " \n"\
@@ -17626,6 +19049,16 @@ static const char g_integrator_pt_opencl[]= \
 "    r->extra.y = 0; \n"\
 "} \n"\
 " \n"\
+"void Ray_SetExtra(__global ray* r, float2 extra) \n"\
+"{ \n"\
+"    r->padding = extra; \n"\
+"} \n"\
+" \n"\
+"float2 Ray_GetExtra(__global ray const* r) \n"\
+"{ \n"\
+"    return r->padding; \n"\
+"} \n"\
+" \n"\
 "void Ray_Init(__global ray* r, float3 o, float3 d, float maxt, float time, int mask) \n"\
 "{ \n"\
 "    // TODO: Check if it generates MTBUF_XYZW write \n"\
@@ -17636,6 +19069,8 @@ static const char g_integrator_pt_opencl[]= \
 "    r->extra.x = mask; \n"\
 "    r->extra.y = 0xFFFFFFFF; \n"\
 "} \n"\
+" \n"\
+" \n"\
 " \n"\
 "#endif // PAYLOAD_CL \n"\
 "/********************************************************************** \n"\
@@ -17779,7 +19214,7 @@ static const char g_integrator_pt_opencl[]= \
 "float4 quaternion_inverse(float4 q) \n"\
 "{ \n"\
 "    float sqnorm = q.x*q.x + q.y*q.y + q.z*q.z + q.w*q.w; \n"\
-"     \n"\
+" \n"\
 "    /// Check if it is singular \n"\
 "    if (sqnorm != 0.f) \n"\
 "    { \n"\
@@ -17801,7 +19236,7 @@ static const char g_integrator_pt_opencl[]= \
 "} \n"\
 " \n"\
 "/// Linearly interpolate between two values \n"\
-"float3 lerp(float3 a, float3 b, float w) \n"\
+"float4 lerp(float4 a, float4 b, float w) \n"\
 "{ \n"\
 "    return a + w*(b-a); \n"\
 "} \n"\
@@ -17820,7 +19255,7 @@ static const char g_integrator_pt_opencl[]= \
 "float3 GetOrthoVector(float3 n) \n"\
 "{ \n"\
 "    float3 p; \n"\
-"     \n"\
+" \n"\
 "    if (fabs(n.z) > 0.f) { \n"\
 "        float k = sqrt(n.y*n.y + n.z*n.z); \n"\
 "        p.x = 0; p.y = -n.z/k; p.z = n.y/k; \n"\
@@ -17889,88 +19324,88 @@ static const char g_integrator_pt_opencl[]= \
 "#define TEXTURE_ARGS_IDX(x) x, textures, texturedata \n"\
 " \n"\
 "/// Sample 2D texture \n"\
-"float3 Texture_Sample2D(float2 uv, TEXTURE_ARG_LIST_IDX(texidx)) \n"\
+"float4 Texture_Sample2D(float2 uv, TEXTURE_ARG_LIST_IDX(texidx)) \n"\
 "{ \n"\
 "    // Get width and height \n"\
 "    int width = textures[texidx].w; \n"\
 "    int height = textures[texidx].h; \n"\
-"     \n"\
+" \n"\
 "    // Find the origin of the data in the pool \n"\
 "    __global char const* mydata = texturedata + textures[texidx].dataoffset; \n"\
 " \n"\
 "    // Handle UV wrap \n"\
 "    // TODO: need UV mode support \n"\
 "    uv -= floor(uv); \n"\
-"     \n"\
+" \n"\
 "    // Reverse Y: \n"\
 "    // it is needed as textures are loaded with Y axis going top to down \n"\
 "    // and our axis goes from down to top \n"\
 "    uv.y = 1.f - uv.y; \n"\
-"     \n"\
+" \n"\
 "    // Calculate integer coordinates \n"\
 "    int x0 = clamp((int)floor(uv.x * width), 0, width - 1); \n"\
 "    int y0 = clamp((int)floor(uv.y * height), 0, height - 1); \n"\
-"     \n"\
+" \n"\
 "    // Calculate samples for linear filtering \n"\
 "    int x1 = clamp(x0 + 1, 0,  width - 1); \n"\
 "    int y1 = clamp(y0 + 1, 0, height - 1); \n"\
-"     \n"\
+" \n"\
 "    // Calculate weights for linear filtering \n"\
 "    float wx = uv.x * width - floor(uv.x * width); \n"\
 "    float wy = uv.y * height - floor(uv.y * height); \n"\
-"     \n"\
+" \n"\
 "    switch (textures[texidx].fmt) \n"\
 "    { \n"\
 "        case RGBA32: \n"\
 "        { \n"\
-"            __global float3 const* mydataf = (__global float3 const*)mydata; \n"\
-"             \n"\
+"            __global float4 const* mydataf = (__global float4 const*)mydata; \n"\
+" \n"\
 "            // Get 4 values for linear filtering \n"\
-"            float3 val00 = *(mydataf + width * y0 + x0); \n"\
-"            float3 val01 = *(mydataf + width * y0 + x1); \n"\
-"            float3 val10 = *(mydataf + width * y1 + x0); \n"\
-"            float3 val11 = *(mydataf + width * y1 + x1); \n"\
-"             \n"\
+"            float4 val00 = *(mydataf + width * y0 + x0); \n"\
+"            float4 val01 = *(mydataf + width * y0 + x1); \n"\
+"            float4 val10 = *(mydataf + width * y1 + x0); \n"\
+"            float4 val11 = *(mydataf + width * y1 + x1); \n"\
+" \n"\
 "            // Filter and return the result \n"\
 "            return lerp(lerp(val00, val01, wx), lerp(val10, val11, wx), wy); \n"\
 "        } \n"\
-"             \n"\
+" \n"\
 "        case RGBA16: \n"\
 "        { \n"\
 "            __global half const* mydatah = (__global half const*)mydata; \n"\
-"             \n"\
+" \n"\
 "            // Get 4 values \n"\
-"            float3 val00 = vload_half4(width * y0 + x0, mydatah).xyz; \n"\
-"            float3 val01 = vload_half4(width * y0 + x1, mydatah).xyz; \n"\
-"            float3 val10 = vload_half4(width * y1 + x0, mydatah).xyz; \n"\
-"            float3 val11 = vload_half4(width * y1 + x1, mydatah).xyz; \n"\
-"             \n"\
+"            float4 val00 = vload_half4(width * y0 + x0, mydatah); \n"\
+"            float4 val01 = vload_half4(width * y0 + x1, mydatah); \n"\
+"            float4 val10 = vload_half4(width * y1 + x0, mydatah); \n"\
+"            float4 val11 = vload_half4(width * y1 + x1, mydatah); \n"\
+" \n"\
 "            // Filter and return the result \n"\
 "            return lerp(lerp(val00, val01, wx), lerp(val10, val11, wx), wy); \n"\
 "        } \n"\
-"             \n"\
+" \n"\
 "        case RGBA8: \n"\
 "        { \n"\
 "            __global uchar4 const* mydatac = (__global uchar4 const*)mydata; \n"\
-"             \n"\
+" \n"\
 "            // Get 4 values and convert to float \n"\
 "            uchar4 valu00 = *(mydatac + width * y0 + x0); \n"\
 "            uchar4 valu01 = *(mydatac + width * y0 + x1); \n"\
 "            uchar4 valu10 = *(mydatac + width * y1 + x0); \n"\
 "            uchar4 valu11 = *(mydatac + width * y1 + x1); \n"\
-"             \n"\
-"            float3 val00 = make_float3((float)valu00.x / 255.f, (float)valu00.y / 255.f, (float)valu00.z / 255.f); \n"\
-"            float3 val01 = make_float3((float)valu01.x / 255.f, (float)valu01.y / 255.f, (float)valu01.z / 255.f); \n"\
-"            float3 val10 = make_float3((float)valu10.x / 255.f, (float)valu10.y / 255.f, (float)valu10.z / 255.f); \n"\
-"            float3 val11 = make_float3((float)valu11.x / 255.f, (float)valu11.y / 255.f, (float)valu11.z / 255.f); \n"\
-"             \n"\
+" \n"\
+"            float4 val00 = make_float4((float)valu00.x / 255.f, (float)valu00.y / 255.f, (float)valu00.z / 255.f, (float)valu00.w / 255.f); \n"\
+"            float4 val01 = make_float4((float)valu01.x / 255.f, (float)valu01.y / 255.f, (float)valu01.z / 255.f, (float)valu01.w / 255.f); \n"\
+"            float4 val10 = make_float4((float)valu10.x / 255.f, (float)valu10.y / 255.f, (float)valu10.z / 255.f, (float)valu10.w / 255.f); \n"\
+"            float4 val11 = make_float4((float)valu11.x / 255.f, (float)valu11.y / 255.f, (float)valu11.z / 255.f, (float)valu11.w / 255.f); \n"\
+" \n"\
 "            // Filter and return the result \n"\
 "            return lerp(lerp(val00, val01, wx), lerp(val10, val11, wx), wy); \n"\
 "        } \n"\
-"             \n"\
+" \n"\
 "        default: \n"\
 "        { \n"\
-"            return make_float3(0.f, 0.f, 0.f); \n"\
+"            return make_float4(0.f, 0.f, 0.f, 0.f); \n"\
 "        } \n"\
 "    } \n"\
 "} \n"\
@@ -17981,14 +19416,14 @@ static const char g_integrator_pt_opencl[]= \
 "    // Transform to spherical coords \n"\
 "    float r, phi, theta; \n"\
 "    CartesianToSpherical(d, &r, &phi, &theta); \n"\
-"     \n"\
+" \n"\
 "    // Map to [0,1]x[0,1] range and reverse Y axis \n"\
 "    float2 uv; \n"\
 "    uv.x = phi / (2*PI); \n"\
 "    uv.y = 1.f - theta / PI; \n"\
-"     \n"\
+" \n"\
 "    // Sample the texture \n"\
-"    return native_powr(Texture_Sample2D(uv, TEXTURE_ARGS_IDX(texidx)), 1.f / 1.f); \n"\
+"    return Texture_Sample2D(uv, TEXTURE_ARGS_IDX(texidx)).xyz; \n"\
 "} \n"\
 " \n"\
 "/// Get data from parameter value or texture \n"\
@@ -18005,9 +19440,30 @@ static const char g_integrator_pt_opencl[]= \
 "    if (texidx != -1) \n"\
 "    { \n"\
 "        // Sample texture \n"\
+"        return native_powr(Texture_Sample2D(uv, TEXTURE_ARGS_IDX(texidx)).xyz, 2.2f); \n"\
+"    } \n"\
+" \n"\
+"    // Return fixed color otherwise \n"\
+"    return v; \n"\
+"} \n"\
+" \n"\
+"/// Get data from parameter value or texture \n"\
+"float4 Texture_GetValue4f( \n"\
+"                // Value \n"\
+"                float4 v, \n"\
+"                // Texture coordinate \n"\
+"                float2 uv, \n"\
+"                // Texture args \n"\
+"                TEXTURE_ARG_LIST_IDX(texidx) \n"\
+"                ) \n"\
+"{ \n"\
+"    // If texture present sample from texture \n"\
+"    if (texidx != -1) \n"\
+"    { \n"\
+"        // Sample texture \n"\
 "        return native_powr(Texture_Sample2D(uv, TEXTURE_ARGS_IDX(texidx)), 2.2f); \n"\
 "    } \n"\
-"     \n"\
+" \n"\
 "    // Return fixed color otherwise \n"\
 "    return v; \n"\
 "} \n"\
@@ -18028,7 +19484,7 @@ static const char g_integrator_pt_opencl[]= \
 "        // Sample texture \n"\
 "        return Texture_Sample2D(uv, TEXTURE_ARGS_IDX(texidx)).x; \n"\
 "    } \n"\
-"     \n"\
+" \n"\
 "    // Return fixed color otherwise \n"\
 "    return v; \n"\
 "} \n"\
@@ -18063,11 +19519,11 @@ static const char g_integrator_pt_opencl[]= \
 "        __global float3 const* mydataf = (__global float3 const*)mydata; \n"\
 " \n"\
 "        // Sobel filter \n"\
-"        const float tex00 = (*(mydataf + width * (t0 - 1) + (s0-1))).x;  \n"\
+"        const float tex00 = (*(mydataf + width * (t0 - 1) + (s0-1))).x; \n"\
 "        const float tex10 = (*(mydataf + width * (t0 - 1) + (s0))).x; \n"\
-"        const float tex20 = (*(mydataf + width * (t0 - 1) + (s0 + 1))).x;  \n"\
+"        const float tex20 = (*(mydataf + width * (t0 - 1) + (s0 + 1))).x; \n"\
 " \n"\
-"        const float tex01 = (*(mydataf + width * (t0) + (s0 - 1))).x;  \n"\
+"        const float tex01 = (*(mydataf + width * (t0) + (s0 - 1))).x; \n"\
 "        const float tex21 = (*(mydataf + width * (t0) + (s0 + 1))).x; \n"\
 " \n"\
 "        const float tex02 = (*(mydataf + width * (t0 + 1) + (s0 - 1))).x; \n"\
@@ -18089,8 +19545,8 @@ static const char g_integrator_pt_opencl[]= \
 "        const float tex10 = vload_half4(width * (t0 - 1) + (s0), mydatah).x; \n"\
 "        const float tex20 = vload_half4(width * (t0 - 1) + (s0 + 1), mydatah).x; \n"\
 " \n"\
-"        const float tex01 = vload_half4(width * (t0)+(s0 - 1), mydatah).x;  \n"\
-"        const float tex21 = vload_half4(width * (t0)+(s0 + 1), mydatah).x;  \n"\
+"        const float tex01 = vload_half4(width * (t0)+(s0 - 1), mydatah).x; \n"\
+"        const float tex21 = vload_half4(width * (t0)+(s0 + 1), mydatah).x; \n"\
 " \n"\
 "        const float tex02 = vload_half4(width * (t0 + 1) + (s0 - 1), mydatah).x; \n"\
 "        const float tex12 = vload_half4(width * (t0 + 1) + (s0), mydatah).x; \n"\
@@ -18287,7 +19743,7 @@ static const char g_integrator_pt_opencl[]= \
 "float4 quaternion_inverse(float4 q) \n"\
 "{ \n"\
 "    float sqnorm = q.x*q.x + q.y*q.y + q.z*q.z + q.w*q.w; \n"\
-"     \n"\
+" \n"\
 "    /// Check if it is singular \n"\
 "    if (sqnorm != 0.f) \n"\
 "    { \n"\
@@ -18309,7 +19765,7 @@ static const char g_integrator_pt_opencl[]= \
 "} \n"\
 " \n"\
 "/// Linearly interpolate between two values \n"\
-"float3 lerp(float3 a, float3 b, float w) \n"\
+"float4 lerp(float4 a, float4 b, float w) \n"\
 "{ \n"\
 "    return a + w*(b-a); \n"\
 "} \n"\
@@ -18328,7 +19784,7 @@ static const char g_integrator_pt_opencl[]= \
 "float3 GetOrthoVector(float3 n) \n"\
 "{ \n"\
 "    float3 p; \n"\
-"     \n"\
+" \n"\
 "    if (fabs(n.z) > 0.f) { \n"\
 "        float k = sqrt(n.y*n.y + n.z*n.z); \n"\
 "        p.x = 0; p.y = -n.z/k; p.z = n.y/k; \n"\
@@ -18720,7 +20176,7 @@ static const char g_integrator_pt_opencl[]= \
 "float4 quaternion_inverse(float4 q) \n"\
 "{ \n"\
 "    float sqnorm = q.x*q.x + q.y*q.y + q.z*q.z + q.w*q.w; \n"\
-"     \n"\
+" \n"\
 "    /// Check if it is singular \n"\
 "    if (sqnorm != 0.f) \n"\
 "    { \n"\
@@ -18742,7 +20198,7 @@ static const char g_integrator_pt_opencl[]= \
 "} \n"\
 " \n"\
 "/// Linearly interpolate between two values \n"\
-"float3 lerp(float3 a, float3 b, float w) \n"\
+"float4 lerp(float4 a, float4 b, float w) \n"\
 "{ \n"\
 "    return a + w*(b-a); \n"\
 "} \n"\
@@ -18761,7 +20217,7 @@ static const char g_integrator_pt_opencl[]= \
 "float3 GetOrthoVector(float3 n) \n"\
 "{ \n"\
 "    float3 p; \n"\
-"     \n"\
+" \n"\
 "    if (fabs(n.z) > 0.f) { \n"\
 "        float k = sqrt(n.y*n.y + n.z*n.z); \n"\
 "        p.x = 0; p.y = -n.z/k; p.z = n.y/k; \n"\
@@ -18939,7 +20395,7 @@ static const char g_integrator_pt_opencl[]= \
 "float4 quaternion_inverse(float4 q) \n"\
 "{ \n"\
 "    float sqnorm = q.x*q.x + q.y*q.y + q.z*q.z + q.w*q.w; \n"\
-"     \n"\
+" \n"\
 "    /// Check if it is singular \n"\
 "    if (sqnorm != 0.f) \n"\
 "    { \n"\
@@ -18961,7 +20417,7 @@ static const char g_integrator_pt_opencl[]= \
 "} \n"\
 " \n"\
 "/// Linearly interpolate between two values \n"\
-"float3 lerp(float3 a, float3 b, float w) \n"\
+"float4 lerp(float4 a, float4 b, float w) \n"\
 "{ \n"\
 "    return a + w*(b-a); \n"\
 "} \n"\
@@ -18980,7 +20436,7 @@ static const char g_integrator_pt_opencl[]= \
 "float3 GetOrthoVector(float3 n) \n"\
 "{ \n"\
 "    float3 p; \n"\
-"     \n"\
+" \n"\
 "    if (fabs(n.z) > 0.f) { \n"\
 "        float k = sqrt(n.y*n.y + n.z*n.z); \n"\
 "        p.x = 0; p.y = -n.z/k; p.z = n.y/k; \n"\
@@ -19049,88 +20505,88 @@ static const char g_integrator_pt_opencl[]= \
 "#define TEXTURE_ARGS_IDX(x) x, textures, texturedata \n"\
 " \n"\
 "/// Sample 2D texture \n"\
-"float3 Texture_Sample2D(float2 uv, TEXTURE_ARG_LIST_IDX(texidx)) \n"\
+"float4 Texture_Sample2D(float2 uv, TEXTURE_ARG_LIST_IDX(texidx)) \n"\
 "{ \n"\
 "    // Get width and height \n"\
 "    int width = textures[texidx].w; \n"\
 "    int height = textures[texidx].h; \n"\
-"     \n"\
+" \n"\
 "    // Find the origin of the data in the pool \n"\
 "    __global char const* mydata = texturedata + textures[texidx].dataoffset; \n"\
 " \n"\
 "    // Handle UV wrap \n"\
 "    // TODO: need UV mode support \n"\
 "    uv -= floor(uv); \n"\
-"     \n"\
+" \n"\
 "    // Reverse Y: \n"\
 "    // it is needed as textures are loaded with Y axis going top to down \n"\
 "    // and our axis goes from down to top \n"\
 "    uv.y = 1.f - uv.y; \n"\
-"     \n"\
+" \n"\
 "    // Calculate integer coordinates \n"\
 "    int x0 = clamp((int)floor(uv.x * width), 0, width - 1); \n"\
 "    int y0 = clamp((int)floor(uv.y * height), 0, height - 1); \n"\
-"     \n"\
+" \n"\
 "    // Calculate samples for linear filtering \n"\
 "    int x1 = clamp(x0 + 1, 0,  width - 1); \n"\
 "    int y1 = clamp(y0 + 1, 0, height - 1); \n"\
-"     \n"\
+" \n"\
 "    // Calculate weights for linear filtering \n"\
 "    float wx = uv.x * width - floor(uv.x * width); \n"\
 "    float wy = uv.y * height - floor(uv.y * height); \n"\
-"     \n"\
+" \n"\
 "    switch (textures[texidx].fmt) \n"\
 "    { \n"\
 "        case RGBA32: \n"\
 "        { \n"\
-"            __global float3 const* mydataf = (__global float3 const*)mydata; \n"\
-"             \n"\
+"            __global float4 const* mydataf = (__global float4 const*)mydata; \n"\
+" \n"\
 "            // Get 4 values for linear filtering \n"\
-"            float3 val00 = *(mydataf + width * y0 + x0); \n"\
-"            float3 val01 = *(mydataf + width * y0 + x1); \n"\
-"            float3 val10 = *(mydataf + width * y1 + x0); \n"\
-"            float3 val11 = *(mydataf + width * y1 + x1); \n"\
-"             \n"\
+"            float4 val00 = *(mydataf + width * y0 + x0); \n"\
+"            float4 val01 = *(mydataf + width * y0 + x1); \n"\
+"            float4 val10 = *(mydataf + width * y1 + x0); \n"\
+"            float4 val11 = *(mydataf + width * y1 + x1); \n"\
+" \n"\
 "            // Filter and return the result \n"\
 "            return lerp(lerp(val00, val01, wx), lerp(val10, val11, wx), wy); \n"\
 "        } \n"\
-"             \n"\
+" \n"\
 "        case RGBA16: \n"\
 "        { \n"\
 "            __global half const* mydatah = (__global half const*)mydata; \n"\
-"             \n"\
+" \n"\
 "            // Get 4 values \n"\
-"            float3 val00 = vload_half4(width * y0 + x0, mydatah).xyz; \n"\
-"            float3 val01 = vload_half4(width * y0 + x1, mydatah).xyz; \n"\
-"            float3 val10 = vload_half4(width * y1 + x0, mydatah).xyz; \n"\
-"            float3 val11 = vload_half4(width * y1 + x1, mydatah).xyz; \n"\
-"             \n"\
+"            float4 val00 = vload_half4(width * y0 + x0, mydatah); \n"\
+"            float4 val01 = vload_half4(width * y0 + x1, mydatah); \n"\
+"            float4 val10 = vload_half4(width * y1 + x0, mydatah); \n"\
+"            float4 val11 = vload_half4(width * y1 + x1, mydatah); \n"\
+" \n"\
 "            // Filter and return the result \n"\
 "            return lerp(lerp(val00, val01, wx), lerp(val10, val11, wx), wy); \n"\
 "        } \n"\
-"             \n"\
+" \n"\
 "        case RGBA8: \n"\
 "        { \n"\
 "            __global uchar4 const* mydatac = (__global uchar4 const*)mydata; \n"\
-"             \n"\
+" \n"\
 "            // Get 4 values and convert to float \n"\
 "            uchar4 valu00 = *(mydatac + width * y0 + x0); \n"\
 "            uchar4 valu01 = *(mydatac + width * y0 + x1); \n"\
 "            uchar4 valu10 = *(mydatac + width * y1 + x0); \n"\
 "            uchar4 valu11 = *(mydatac + width * y1 + x1); \n"\
-"             \n"\
-"            float3 val00 = make_float3((float)valu00.x / 255.f, (float)valu00.y / 255.f, (float)valu00.z / 255.f); \n"\
-"            float3 val01 = make_float3((float)valu01.x / 255.f, (float)valu01.y / 255.f, (float)valu01.z / 255.f); \n"\
-"            float3 val10 = make_float3((float)valu10.x / 255.f, (float)valu10.y / 255.f, (float)valu10.z / 255.f); \n"\
-"            float3 val11 = make_float3((float)valu11.x / 255.f, (float)valu11.y / 255.f, (float)valu11.z / 255.f); \n"\
-"             \n"\
+" \n"\
+"            float4 val00 = make_float4((float)valu00.x / 255.f, (float)valu00.y / 255.f, (float)valu00.z / 255.f, (float)valu00.w / 255.f); \n"\
+"            float4 val01 = make_float4((float)valu01.x / 255.f, (float)valu01.y / 255.f, (float)valu01.z / 255.f, (float)valu01.w / 255.f); \n"\
+"            float4 val10 = make_float4((float)valu10.x / 255.f, (float)valu10.y / 255.f, (float)valu10.z / 255.f, (float)valu10.w / 255.f); \n"\
+"            float4 val11 = make_float4((float)valu11.x / 255.f, (float)valu11.y / 255.f, (float)valu11.z / 255.f, (float)valu11.w / 255.f); \n"\
+" \n"\
 "            // Filter and return the result \n"\
 "            return lerp(lerp(val00, val01, wx), lerp(val10, val11, wx), wy); \n"\
 "        } \n"\
-"             \n"\
+" \n"\
 "        default: \n"\
 "        { \n"\
-"            return make_float3(0.f, 0.f, 0.f); \n"\
+"            return make_float4(0.f, 0.f, 0.f, 0.f); \n"\
 "        } \n"\
 "    } \n"\
 "} \n"\
@@ -19141,14 +20597,14 @@ static const char g_integrator_pt_opencl[]= \
 "    // Transform to spherical coords \n"\
 "    float r, phi, theta; \n"\
 "    CartesianToSpherical(d, &r, &phi, &theta); \n"\
-"     \n"\
+" \n"\
 "    // Map to [0,1]x[0,1] range and reverse Y axis \n"\
 "    float2 uv; \n"\
 "    uv.x = phi / (2*PI); \n"\
 "    uv.y = 1.f - theta / PI; \n"\
-"     \n"\
+" \n"\
 "    // Sample the texture \n"\
-"    return native_powr(Texture_Sample2D(uv, TEXTURE_ARGS_IDX(texidx)), 1.f / 1.f); \n"\
+"    return Texture_Sample2D(uv, TEXTURE_ARGS_IDX(texidx)).xyz; \n"\
 "} \n"\
 " \n"\
 "/// Get data from parameter value or texture \n"\
@@ -19165,9 +20621,30 @@ static const char g_integrator_pt_opencl[]= \
 "    if (texidx != -1) \n"\
 "    { \n"\
 "        // Sample texture \n"\
+"        return native_powr(Texture_Sample2D(uv, TEXTURE_ARGS_IDX(texidx)).xyz, 2.2f); \n"\
+"    } \n"\
+" \n"\
+"    // Return fixed color otherwise \n"\
+"    return v; \n"\
+"} \n"\
+" \n"\
+"/// Get data from parameter value or texture \n"\
+"float4 Texture_GetValue4f( \n"\
+"                // Value \n"\
+"                float4 v, \n"\
+"                // Texture coordinate \n"\
+"                float2 uv, \n"\
+"                // Texture args \n"\
+"                TEXTURE_ARG_LIST_IDX(texidx) \n"\
+"                ) \n"\
+"{ \n"\
+"    // If texture present sample from texture \n"\
+"    if (texidx != -1) \n"\
+"    { \n"\
+"        // Sample texture \n"\
 "        return native_powr(Texture_Sample2D(uv, TEXTURE_ARGS_IDX(texidx)), 2.2f); \n"\
 "    } \n"\
-"     \n"\
+" \n"\
 "    // Return fixed color otherwise \n"\
 "    return v; \n"\
 "} \n"\
@@ -19188,7 +20665,7 @@ static const char g_integrator_pt_opencl[]= \
 "        // Sample texture \n"\
 "        return Texture_Sample2D(uv, TEXTURE_ARGS_IDX(texidx)).x; \n"\
 "    } \n"\
-"     \n"\
+" \n"\
 "    // Return fixed color otherwise \n"\
 "    return v; \n"\
 "} \n"\
@@ -19223,11 +20700,11 @@ static const char g_integrator_pt_opencl[]= \
 "        __global float3 const* mydataf = (__global float3 const*)mydata; \n"\
 " \n"\
 "        // Sobel filter \n"\
-"        const float tex00 = (*(mydataf + width * (t0 - 1) + (s0-1))).x;  \n"\
+"        const float tex00 = (*(mydataf + width * (t0 - 1) + (s0-1))).x; \n"\
 "        const float tex10 = (*(mydataf + width * (t0 - 1) + (s0))).x; \n"\
-"        const float tex20 = (*(mydataf + width * (t0 - 1) + (s0 + 1))).x;  \n"\
+"        const float tex20 = (*(mydataf + width * (t0 - 1) + (s0 + 1))).x; \n"\
 " \n"\
-"        const float tex01 = (*(mydataf + width * (t0) + (s0 - 1))).x;  \n"\
+"        const float tex01 = (*(mydataf + width * (t0) + (s0 - 1))).x; \n"\
 "        const float tex21 = (*(mydataf + width * (t0) + (s0 + 1))).x; \n"\
 " \n"\
 "        const float tex02 = (*(mydataf + width * (t0 + 1) + (s0 - 1))).x; \n"\
@@ -19249,8 +20726,8 @@ static const char g_integrator_pt_opencl[]= \
 "        const float tex10 = vload_half4(width * (t0 - 1) + (s0), mydatah).x; \n"\
 "        const float tex20 = vload_half4(width * (t0 - 1) + (s0 + 1), mydatah).x; \n"\
 " \n"\
-"        const float tex01 = vload_half4(width * (t0)+(s0 - 1), mydatah).x;  \n"\
-"        const float tex21 = vload_half4(width * (t0)+(s0 + 1), mydatah).x;  \n"\
+"        const float tex01 = vload_half4(width * (t0)+(s0 - 1), mydatah).x; \n"\
+"        const float tex21 = vload_half4(width * (t0)+(s0 + 1), mydatah).x; \n"\
 " \n"\
 "        const float tex02 = vload_half4(width * (t0 + 1) + (s0 - 1), mydatah).x; \n"\
 "        const float tex12 = vload_half4(width * (t0 + 1) + (s0), mydatah).x; \n"\
@@ -19329,7 +20806,7 @@ static const char g_integrator_pt_opencl[]= \
 "********************************************************************/ \n"\
 "#ifndef PAYLOAD_CL \n"\
 "#define PAYLOAD_CL \n"\
-"#define SOBOL \n"\
+"//#define SOBOL \n"\
 "#define MULTISCATTER \n"\
 " \n"\
 "/// Ray descriptor \n"\
@@ -19341,7 +20818,7 @@ static const char g_integrator_pt_opencl[]= \
 "    float4 d; \n"\
 "    /// x - ray mask, y - activity flag \n"\
 "    int2 extra; \n"\
-"    int2 padding; \n"\
+"    float2 padding; \n"\
 "} ray; \n"\
 " \n"\
 "/// Intersection data returned by RadeonRays \n"\
@@ -19395,8 +20872,6 @@ static const char g_integrator_pt_opencl[]= \
 "} Emissive; \n"\
 " \n"\
 " \n"\
-" \n"\
-" \n"\
 "typedef enum _PathFlags \n"\
 "{ \n"\
 "    kNone = 0x0, \n"\
@@ -19446,6 +20921,53 @@ static const char g_integrator_pt_opencl[]= \
 " \n"\
 "} Material; \n"\
 " \n"\
+" \n"\
+"enum LightType \n"\
+"{ \n"\
+"    kPoint = 0x1, \n"\
+"    kDirectional, \n"\
+"    kSpot, \n"\
+"    kArea, \n"\
+"    kIbl \n"\
+"}; \n"\
+" \n"\
+"typedef struct _Light \n"\
+"{ \n"\
+"    int type; \n"\
+" \n"\
+"    union \n"\
+"    { \n"\
+"        // Area light \n"\
+"        struct \n"\
+"        { \n"\
+"            int shapeidx; \n"\
+"            int primidx; \n"\
+"            int matidx; \n"\
+"        }; \n"\
+" \n"\
+"        // IBL \n"\
+"        struct \n"\
+"        { \n"\
+"            int tex; \n"\
+"            int texdiffuse; \n"\
+"            float multiplier; \n"\
+"        }; \n"\
+"         \n"\
+"         \n"\
+"        // Spot \n"\
+"        struct \n"\
+"        { \n"\
+"            float ia; \n"\
+"            float oa; \n"\
+"            float f; \n"\
+"        }; \n"\
+"    }; \n"\
+" \n"\
+"    float3 p; \n"\
+"    float3 d; \n"\
+"    float3 intensity; \n"\
+"} Light; \n"\
+" \n"\
 "typedef struct _Scene \n"\
 "{ \n"\
 "    // Vertices \n"\
@@ -19463,13 +20985,13 @@ static const char g_integrator_pt_opencl[]= \
 "    // Materials \n"\
 "    __global Material const* materials; \n"\
 "    // Emissive objects \n"\
-"    __global Emissive const* emissives; \n"\
+"    __global Light const* lights; \n"\
 "    // Envmap idx \n"\
 "    int envmapidx; \n"\
 "    // Envmap multiplier \n"\
 "    float envmapmul; \n"\
 "    // Number of emissive objects \n"\
-"    int numemissives; \n"\
+"    int num_lights; \n"\
 "} Scene; \n"\
 " \n"\
 "// Hit data \n"\
@@ -19487,7 +21009,7 @@ static const char g_integrator_pt_opencl[]= \
 "    float3 dpdu; \n"\
 "    float3 dpdv; \n"\
 "    float  area; \n"\
-"    // Material  \n"\
+"    // Material \n"\
 "    Material mat; \n"\
 "} DifferentialGeometry; \n"\
 " \n"\
@@ -19543,6 +21065,16 @@ static const char g_integrator_pt_opencl[]= \
 "    r->extra.y = 0; \n"\
 "} \n"\
 " \n"\
+"void Ray_SetExtra(__global ray* r, float2 extra) \n"\
+"{ \n"\
+"    r->padding = extra; \n"\
+"} \n"\
+" \n"\
+"float2 Ray_GetExtra(__global ray const* r) \n"\
+"{ \n"\
+"    return r->padding; \n"\
+"} \n"\
+" \n"\
 "void Ray_Init(__global ray* r, float3 o, float3 d, float maxt, float time, int mask) \n"\
 "{ \n"\
 "    // TODO: Check if it generates MTBUF_XYZW write \n"\
@@ -19554,6 +21086,8 @@ static const char g_integrator_pt_opencl[]= \
 "    r->extra.y = 0xFFFFFFFF; \n"\
 "} \n"\
 " \n"\
+" \n"\
+" \n"\
 "#endif // PAYLOAD_CL \n"\
 " \n"\
 "void ApplyNormalMap(DifferentialGeometry* dg, TEXTURE_ARG_LIST) \n"\
@@ -19562,8 +21096,8 @@ static const char g_integrator_pt_opencl[]= \
 "    if (nmapidx != -1) \n"\
 "    { \n"\
 "        // Now n, dpdu, dpdv is orthonormal basis \n"\
-"        float3 mappednormal = 2.f * Texture_Sample2D(dg->uv, TEXTURE_ARGS_IDX(nmapidx)) - make_float3(1.f, 1.f, 1.f); \n"\
-"     \n"\
+"        float3 mappednormal = 2.f * Texture_Sample2D(dg->uv, TEXTURE_ARGS_IDX(nmapidx)).xyz - make_float3(1.f, 1.f, 1.f); \n"\
+" \n"\
 "        // Return mapped version \n"\
 "        dg->n = normalize(mappednormal.z *  dg->n * 0.5f + mappednormal.x * dg->dpdu + mappednormal.y * dg->dpdv); \n"\
 "    } \n"\
@@ -19724,7 +21258,7 @@ static const char g_integrator_pt_opencl[]= \
 "float4 quaternion_inverse(float4 q) \n"\
 "{ \n"\
 "    float sqnorm = q.x*q.x + q.y*q.y + q.z*q.z + q.w*q.w; \n"\
-"     \n"\
+" \n"\
 "    /// Check if it is singular \n"\
 "    if (sqnorm != 0.f) \n"\
 "    { \n"\
@@ -19746,7 +21280,7 @@ static const char g_integrator_pt_opencl[]= \
 "} \n"\
 " \n"\
 "/// Linearly interpolate between two values \n"\
-"float3 lerp(float3 a, float3 b, float w) \n"\
+"float4 lerp(float4 a, float4 b, float w) \n"\
 "{ \n"\
 "    return a + w*(b-a); \n"\
 "} \n"\
@@ -19765,7 +21299,7 @@ static const char g_integrator_pt_opencl[]= \
 "float3 GetOrthoVector(float3 n) \n"\
 "{ \n"\
 "    float3 p; \n"\
-"     \n"\
+" \n"\
 "    if (fabs(n.z) > 0.f) { \n"\
 "        float k = sqrt(n.y*n.y + n.z*n.z); \n"\
 "        p.x = 0; p.y = -n.z/k; p.z = n.y/k; \n"\
@@ -20008,7 +21542,7 @@ static const char g_integrator_pt_opencl[]= \
 "float4 quaternion_inverse(float4 q) \n"\
 "{ \n"\
 "    float sqnorm = q.x*q.x + q.y*q.y + q.z*q.z + q.w*q.w; \n"\
-"     \n"\
+" \n"\
 "    /// Check if it is singular \n"\
 "    if (sqnorm != 0.f) \n"\
 "    { \n"\
@@ -20030,7 +21564,7 @@ static const char g_integrator_pt_opencl[]= \
 "} \n"\
 " \n"\
 "/// Linearly interpolate between two values \n"\
-"float3 lerp(float3 a, float3 b, float w) \n"\
+"float4 lerp(float4 a, float4 b, float w) \n"\
 "{ \n"\
 "    return a + w*(b-a); \n"\
 "} \n"\
@@ -20049,7 +21583,7 @@ static const char g_integrator_pt_opencl[]= \
 "float3 GetOrthoVector(float3 n) \n"\
 "{ \n"\
 "    float3 p; \n"\
-"     \n"\
+" \n"\
 "    if (fabs(n.z) > 0.f) { \n"\
 "        float k = sqrt(n.y*n.y + n.z*n.z); \n"\
 "        p.x = 0; p.y = -n.z/k; p.z = n.y/k; \n"\
@@ -20118,88 +21652,88 @@ static const char g_integrator_pt_opencl[]= \
 "#define TEXTURE_ARGS_IDX(x) x, textures, texturedata \n"\
 " \n"\
 "/// Sample 2D texture \n"\
-"float3 Texture_Sample2D(float2 uv, TEXTURE_ARG_LIST_IDX(texidx)) \n"\
+"float4 Texture_Sample2D(float2 uv, TEXTURE_ARG_LIST_IDX(texidx)) \n"\
 "{ \n"\
 "    // Get width and height \n"\
 "    int width = textures[texidx].w; \n"\
 "    int height = textures[texidx].h; \n"\
-"     \n"\
+" \n"\
 "    // Find the origin of the data in the pool \n"\
 "    __global char const* mydata = texturedata + textures[texidx].dataoffset; \n"\
 " \n"\
 "    // Handle UV wrap \n"\
 "    // TODO: need UV mode support \n"\
 "    uv -= floor(uv); \n"\
-"     \n"\
+" \n"\
 "    // Reverse Y: \n"\
 "    // it is needed as textures are loaded with Y axis going top to down \n"\
 "    // and our axis goes from down to top \n"\
 "    uv.y = 1.f - uv.y; \n"\
-"     \n"\
+" \n"\
 "    // Calculate integer coordinates \n"\
 "    int x0 = clamp((int)floor(uv.x * width), 0, width - 1); \n"\
 "    int y0 = clamp((int)floor(uv.y * height), 0, height - 1); \n"\
-"     \n"\
+" \n"\
 "    // Calculate samples for linear filtering \n"\
 "    int x1 = clamp(x0 + 1, 0,  width - 1); \n"\
 "    int y1 = clamp(y0 + 1, 0, height - 1); \n"\
-"     \n"\
+" \n"\
 "    // Calculate weights for linear filtering \n"\
 "    float wx = uv.x * width - floor(uv.x * width); \n"\
 "    float wy = uv.y * height - floor(uv.y * height); \n"\
-"     \n"\
+" \n"\
 "    switch (textures[texidx].fmt) \n"\
 "    { \n"\
 "        case RGBA32: \n"\
 "        { \n"\
-"            __global float3 const* mydataf = (__global float3 const*)mydata; \n"\
-"             \n"\
+"            __global float4 const* mydataf = (__global float4 const*)mydata; \n"\
+" \n"\
 "            // Get 4 values for linear filtering \n"\
-"            float3 val00 = *(mydataf + width * y0 + x0); \n"\
-"            float3 val01 = *(mydataf + width * y0 + x1); \n"\
-"            float3 val10 = *(mydataf + width * y1 + x0); \n"\
-"            float3 val11 = *(mydataf + width * y1 + x1); \n"\
-"             \n"\
+"            float4 val00 = *(mydataf + width * y0 + x0); \n"\
+"            float4 val01 = *(mydataf + width * y0 + x1); \n"\
+"            float4 val10 = *(mydataf + width * y1 + x0); \n"\
+"            float4 val11 = *(mydataf + width * y1 + x1); \n"\
+" \n"\
 "            // Filter and return the result \n"\
 "            return lerp(lerp(val00, val01, wx), lerp(val10, val11, wx), wy); \n"\
 "        } \n"\
-"             \n"\
+" \n"\
 "        case RGBA16: \n"\
 "        { \n"\
 "            __global half const* mydatah = (__global half const*)mydata; \n"\
-"             \n"\
+" \n"\
 "            // Get 4 values \n"\
-"            float3 val00 = vload_half4(width * y0 + x0, mydatah).xyz; \n"\
-"            float3 val01 = vload_half4(width * y0 + x1, mydatah).xyz; \n"\
-"            float3 val10 = vload_half4(width * y1 + x0, mydatah).xyz; \n"\
-"            float3 val11 = vload_half4(width * y1 + x1, mydatah).xyz; \n"\
-"             \n"\
+"            float4 val00 = vload_half4(width * y0 + x0, mydatah); \n"\
+"            float4 val01 = vload_half4(width * y0 + x1, mydatah); \n"\
+"            float4 val10 = vload_half4(width * y1 + x0, mydatah); \n"\
+"            float4 val11 = vload_half4(width * y1 + x1, mydatah); \n"\
+" \n"\
 "            // Filter and return the result \n"\
 "            return lerp(lerp(val00, val01, wx), lerp(val10, val11, wx), wy); \n"\
 "        } \n"\
-"             \n"\
+" \n"\
 "        case RGBA8: \n"\
 "        { \n"\
 "            __global uchar4 const* mydatac = (__global uchar4 const*)mydata; \n"\
-"             \n"\
+" \n"\
 "            // Get 4 values and convert to float \n"\
 "            uchar4 valu00 = *(mydatac + width * y0 + x0); \n"\
 "            uchar4 valu01 = *(mydatac + width * y0 + x1); \n"\
 "            uchar4 valu10 = *(mydatac + width * y1 + x0); \n"\
 "            uchar4 valu11 = *(mydatac + width * y1 + x1); \n"\
-"             \n"\
-"            float3 val00 = make_float3((float)valu00.x / 255.f, (float)valu00.y / 255.f, (float)valu00.z / 255.f); \n"\
-"            float3 val01 = make_float3((float)valu01.x / 255.f, (float)valu01.y / 255.f, (float)valu01.z / 255.f); \n"\
-"            float3 val10 = make_float3((float)valu10.x / 255.f, (float)valu10.y / 255.f, (float)valu10.z / 255.f); \n"\
-"            float3 val11 = make_float3((float)valu11.x / 255.f, (float)valu11.y / 255.f, (float)valu11.z / 255.f); \n"\
-"             \n"\
+" \n"\
+"            float4 val00 = make_float4((float)valu00.x / 255.f, (float)valu00.y / 255.f, (float)valu00.z / 255.f, (float)valu00.w / 255.f); \n"\
+"            float4 val01 = make_float4((float)valu01.x / 255.f, (float)valu01.y / 255.f, (float)valu01.z / 255.f, (float)valu01.w / 255.f); \n"\
+"            float4 val10 = make_float4((float)valu10.x / 255.f, (float)valu10.y / 255.f, (float)valu10.z / 255.f, (float)valu10.w / 255.f); \n"\
+"            float4 val11 = make_float4((float)valu11.x / 255.f, (float)valu11.y / 255.f, (float)valu11.z / 255.f, (float)valu11.w / 255.f); \n"\
+" \n"\
 "            // Filter and return the result \n"\
 "            return lerp(lerp(val00, val01, wx), lerp(val10, val11, wx), wy); \n"\
 "        } \n"\
-"             \n"\
+" \n"\
 "        default: \n"\
 "        { \n"\
-"            return make_float3(0.f, 0.f, 0.f); \n"\
+"            return make_float4(0.f, 0.f, 0.f, 0.f); \n"\
 "        } \n"\
 "    } \n"\
 "} \n"\
@@ -20210,14 +21744,14 @@ static const char g_integrator_pt_opencl[]= \
 "    // Transform to spherical coords \n"\
 "    float r, phi, theta; \n"\
 "    CartesianToSpherical(d, &r, &phi, &theta); \n"\
-"     \n"\
+" \n"\
 "    // Map to [0,1]x[0,1] range and reverse Y axis \n"\
 "    float2 uv; \n"\
 "    uv.x = phi / (2*PI); \n"\
 "    uv.y = 1.f - theta / PI; \n"\
-"     \n"\
+" \n"\
 "    // Sample the texture \n"\
-"    return native_powr(Texture_Sample2D(uv, TEXTURE_ARGS_IDX(texidx)), 1.f / 1.f); \n"\
+"    return Texture_Sample2D(uv, TEXTURE_ARGS_IDX(texidx)).xyz; \n"\
 "} \n"\
 " \n"\
 "/// Get data from parameter value or texture \n"\
@@ -20234,9 +21768,30 @@ static const char g_integrator_pt_opencl[]= \
 "    if (texidx != -1) \n"\
 "    { \n"\
 "        // Sample texture \n"\
+"        return native_powr(Texture_Sample2D(uv, TEXTURE_ARGS_IDX(texidx)).xyz, 2.2f); \n"\
+"    } \n"\
+" \n"\
+"    // Return fixed color otherwise \n"\
+"    return v; \n"\
+"} \n"\
+" \n"\
+"/// Get data from parameter value or texture \n"\
+"float4 Texture_GetValue4f( \n"\
+"                // Value \n"\
+"                float4 v, \n"\
+"                // Texture coordinate \n"\
+"                float2 uv, \n"\
+"                // Texture args \n"\
+"                TEXTURE_ARG_LIST_IDX(texidx) \n"\
+"                ) \n"\
+"{ \n"\
+"    // If texture present sample from texture \n"\
+"    if (texidx != -1) \n"\
+"    { \n"\
+"        // Sample texture \n"\
 "        return native_powr(Texture_Sample2D(uv, TEXTURE_ARGS_IDX(texidx)), 2.2f); \n"\
 "    } \n"\
-"     \n"\
+" \n"\
 "    // Return fixed color otherwise \n"\
 "    return v; \n"\
 "} \n"\
@@ -20257,7 +21812,7 @@ static const char g_integrator_pt_opencl[]= \
 "        // Sample texture \n"\
 "        return Texture_Sample2D(uv, TEXTURE_ARGS_IDX(texidx)).x; \n"\
 "    } \n"\
-"     \n"\
+" \n"\
 "    // Return fixed color otherwise \n"\
 "    return v; \n"\
 "} \n"\
@@ -20292,11 +21847,11 @@ static const char g_integrator_pt_opencl[]= \
 "        __global float3 const* mydataf = (__global float3 const*)mydata; \n"\
 " \n"\
 "        // Sobel filter \n"\
-"        const float tex00 = (*(mydataf + width * (t0 - 1) + (s0-1))).x;  \n"\
+"        const float tex00 = (*(mydataf + width * (t0 - 1) + (s0-1))).x; \n"\
 "        const float tex10 = (*(mydataf + width * (t0 - 1) + (s0))).x; \n"\
-"        const float tex20 = (*(mydataf + width * (t0 - 1) + (s0 + 1))).x;  \n"\
+"        const float tex20 = (*(mydataf + width * (t0 - 1) + (s0 + 1))).x; \n"\
 " \n"\
-"        const float tex01 = (*(mydataf + width * (t0) + (s0 - 1))).x;  \n"\
+"        const float tex01 = (*(mydataf + width * (t0) + (s0 - 1))).x; \n"\
 "        const float tex21 = (*(mydataf + width * (t0) + (s0 + 1))).x; \n"\
 " \n"\
 "        const float tex02 = (*(mydataf + width * (t0 + 1) + (s0 - 1))).x; \n"\
@@ -20318,8 +21873,8 @@ static const char g_integrator_pt_opencl[]= \
 "        const float tex10 = vload_half4(width * (t0 - 1) + (s0), mydatah).x; \n"\
 "        const float tex20 = vload_half4(width * (t0 - 1) + (s0 + 1), mydatah).x; \n"\
 " \n"\
-"        const float tex01 = vload_half4(width * (t0)+(s0 - 1), mydatah).x;  \n"\
-"        const float tex21 = vload_half4(width * (t0)+(s0 + 1), mydatah).x;  \n"\
+"        const float tex01 = vload_half4(width * (t0)+(s0 - 1), mydatah).x; \n"\
+"        const float tex21 = vload_half4(width * (t0)+(s0 + 1), mydatah).x; \n"\
 " \n"\
 "        const float tex02 = vload_half4(width * (t0 + 1) + (s0 - 1), mydatah).x; \n"\
 "        const float tex12 = vload_half4(width * (t0 + 1) + (s0), mydatah).x; \n"\
@@ -20398,7 +21953,7 @@ static const char g_integrator_pt_opencl[]= \
 "********************************************************************/ \n"\
 "#ifndef PAYLOAD_CL \n"\
 "#define PAYLOAD_CL \n"\
-"#define SOBOL \n"\
+"//#define SOBOL \n"\
 "#define MULTISCATTER \n"\
 " \n"\
 "/// Ray descriptor \n"\
@@ -20410,7 +21965,7 @@ static const char g_integrator_pt_opencl[]= \
 "    float4 d; \n"\
 "    /// x - ray mask, y - activity flag \n"\
 "    int2 extra; \n"\
-"    int2 padding; \n"\
+"    float2 padding; \n"\
 "} ray; \n"\
 " \n"\
 "/// Intersection data returned by RadeonRays \n"\
@@ -20464,8 +22019,6 @@ static const char g_integrator_pt_opencl[]= \
 "} Emissive; \n"\
 " \n"\
 " \n"\
-" \n"\
-" \n"\
 "typedef enum _PathFlags \n"\
 "{ \n"\
 "    kNone = 0x0, \n"\
@@ -20515,6 +22068,53 @@ static const char g_integrator_pt_opencl[]= \
 " \n"\
 "} Material; \n"\
 " \n"\
+" \n"\
+"enum LightType \n"\
+"{ \n"\
+"    kPoint = 0x1, \n"\
+"    kDirectional, \n"\
+"    kSpot, \n"\
+"    kArea, \n"\
+"    kIbl \n"\
+"}; \n"\
+" \n"\
+"typedef struct _Light \n"\
+"{ \n"\
+"    int type; \n"\
+" \n"\
+"    union \n"\
+"    { \n"\
+"        // Area light \n"\
+"        struct \n"\
+"        { \n"\
+"            int shapeidx; \n"\
+"            int primidx; \n"\
+"            int matidx; \n"\
+"        }; \n"\
+" \n"\
+"        // IBL \n"\
+"        struct \n"\
+"        { \n"\
+"            int tex; \n"\
+"            int texdiffuse; \n"\
+"            float multiplier; \n"\
+"        }; \n"\
+"         \n"\
+"         \n"\
+"        // Spot \n"\
+"        struct \n"\
+"        { \n"\
+"            float ia; \n"\
+"            float oa; \n"\
+"            float f; \n"\
+"        }; \n"\
+"    }; \n"\
+" \n"\
+"    float3 p; \n"\
+"    float3 d; \n"\
+"    float3 intensity; \n"\
+"} Light; \n"\
+" \n"\
 "typedef struct _Scene \n"\
 "{ \n"\
 "    // Vertices \n"\
@@ -20532,13 +22132,13 @@ static const char g_integrator_pt_opencl[]= \
 "    // Materials \n"\
 "    __global Material const* materials; \n"\
 "    // Emissive objects \n"\
-"    __global Emissive const* emissives; \n"\
+"    __global Light const* lights; \n"\
 "    // Envmap idx \n"\
 "    int envmapidx; \n"\
 "    // Envmap multiplier \n"\
 "    float envmapmul; \n"\
 "    // Number of emissive objects \n"\
-"    int numemissives; \n"\
+"    int num_lights; \n"\
 "} Scene; \n"\
 " \n"\
 "// Hit data \n"\
@@ -20556,7 +22156,7 @@ static const char g_integrator_pt_opencl[]= \
 "    float3 dpdu; \n"\
 "    float3 dpdv; \n"\
 "    float  area; \n"\
-"    // Material  \n"\
+"    // Material \n"\
 "    Material mat; \n"\
 "} DifferentialGeometry; \n"\
 " \n"\
@@ -20612,6 +22212,16 @@ static const char g_integrator_pt_opencl[]= \
 "    r->extra.y = 0; \n"\
 "} \n"\
 " \n"\
+"void Ray_SetExtra(__global ray* r, float2 extra) \n"\
+"{ \n"\
+"    r->padding = extra; \n"\
+"} \n"\
+" \n"\
+"float2 Ray_GetExtra(__global ray const* r) \n"\
+"{ \n"\
+"    return r->padding; \n"\
+"} \n"\
+" \n"\
 "void Ray_Init(__global ray* r, float3 o, float3 d, float maxt, float time, int mask) \n"\
 "{ \n"\
 "    // TODO: Check if it generates MTBUF_XYZW write \n"\
@@ -20622,6 +22232,8 @@ static const char g_integrator_pt_opencl[]= \
 "    r->extra.x = mask; \n"\
 "    r->extra.y = 0xFFFFFFFF; \n"\
 "} \n"\
+" \n"\
+" \n"\
 " \n"\
 "#endif // PAYLOAD_CL \n"\
 " \n"\
@@ -22179,7 +23791,7 @@ static const char g_integrator_pt_opencl[]= \
 "float4 quaternion_inverse(float4 q) \n"\
 "{ \n"\
 "    float sqnorm = q.x*q.x + q.y*q.y + q.z*q.z + q.w*q.w; \n"\
-"     \n"\
+" \n"\
 "    /// Check if it is singular \n"\
 "    if (sqnorm != 0.f) \n"\
 "    { \n"\
@@ -22201,7 +23813,7 @@ static const char g_integrator_pt_opencl[]= \
 "} \n"\
 " \n"\
 "/// Linearly interpolate between two values \n"\
-"float3 lerp(float3 a, float3 b, float w) \n"\
+"float4 lerp(float4 a, float4 b, float w) \n"\
 "{ \n"\
 "    return a + w*(b-a); \n"\
 "} \n"\
@@ -22220,7 +23832,7 @@ static const char g_integrator_pt_opencl[]= \
 "float3 GetOrthoVector(float3 n) \n"\
 "{ \n"\
 "    float3 p; \n"\
-"     \n"\
+" \n"\
 "    if (fabs(n.z) > 0.f) { \n"\
 "        float k = sqrt(n.y*n.y + n.z*n.z); \n"\
 "        p.x = 0; p.y = -n.z/k; p.z = n.y/k; \n"\
@@ -22280,7 +23892,7 @@ static const char g_integrator_pt_opencl[]= \
 "********************************************************************/ \n"\
 "#ifndef PAYLOAD_CL \n"\
 "#define PAYLOAD_CL \n"\
-"#define SOBOL \n"\
+"//#define SOBOL \n"\
 "#define MULTISCATTER \n"\
 " \n"\
 "/// Ray descriptor \n"\
@@ -22292,7 +23904,7 @@ static const char g_integrator_pt_opencl[]= \
 "    float4 d; \n"\
 "    /// x - ray mask, y - activity flag \n"\
 "    int2 extra; \n"\
-"    int2 padding; \n"\
+"    float2 padding; \n"\
 "} ray; \n"\
 " \n"\
 "/// Intersection data returned by RadeonRays \n"\
@@ -22346,8 +23958,6 @@ static const char g_integrator_pt_opencl[]= \
 "} Emissive; \n"\
 " \n"\
 " \n"\
-" \n"\
-" \n"\
 "typedef enum _PathFlags \n"\
 "{ \n"\
 "    kNone = 0x0, \n"\
@@ -22397,6 +24007,53 @@ static const char g_integrator_pt_opencl[]= \
 " \n"\
 "} Material; \n"\
 " \n"\
+" \n"\
+"enum LightType \n"\
+"{ \n"\
+"    kPoint = 0x1, \n"\
+"    kDirectional, \n"\
+"    kSpot, \n"\
+"    kArea, \n"\
+"    kIbl \n"\
+"}; \n"\
+" \n"\
+"typedef struct _Light \n"\
+"{ \n"\
+"    int type; \n"\
+" \n"\
+"    union \n"\
+"    { \n"\
+"        // Area light \n"\
+"        struct \n"\
+"        { \n"\
+"            int shapeidx; \n"\
+"            int primidx; \n"\
+"            int matidx; \n"\
+"        }; \n"\
+" \n"\
+"        // IBL \n"\
+"        struct \n"\
+"        { \n"\
+"            int tex; \n"\
+"            int texdiffuse; \n"\
+"            float multiplier; \n"\
+"        }; \n"\
+"         \n"\
+"         \n"\
+"        // Spot \n"\
+"        struct \n"\
+"        { \n"\
+"            float ia; \n"\
+"            float oa; \n"\
+"            float f; \n"\
+"        }; \n"\
+"    }; \n"\
+" \n"\
+"    float3 p; \n"\
+"    float3 d; \n"\
+"    float3 intensity; \n"\
+"} Light; \n"\
+" \n"\
 "typedef struct _Scene \n"\
 "{ \n"\
 "    // Vertices \n"\
@@ -22414,13 +24071,13 @@ static const char g_integrator_pt_opencl[]= \
 "    // Materials \n"\
 "    __global Material const* materials; \n"\
 "    // Emissive objects \n"\
-"    __global Emissive const* emissives; \n"\
+"    __global Light const* lights; \n"\
 "    // Envmap idx \n"\
 "    int envmapidx; \n"\
 "    // Envmap multiplier \n"\
 "    float envmapmul; \n"\
 "    // Number of emissive objects \n"\
-"    int numemissives; \n"\
+"    int num_lights; \n"\
 "} Scene; \n"\
 " \n"\
 "// Hit data \n"\
@@ -22438,7 +24095,7 @@ static const char g_integrator_pt_opencl[]= \
 "    float3 dpdu; \n"\
 "    float3 dpdv; \n"\
 "    float  area; \n"\
-"    // Material  \n"\
+"    // Material \n"\
 "    Material mat; \n"\
 "} DifferentialGeometry; \n"\
 " \n"\
@@ -22494,6 +24151,16 @@ static const char g_integrator_pt_opencl[]= \
 "    r->extra.y = 0; \n"\
 "} \n"\
 " \n"\
+"void Ray_SetExtra(__global ray* r, float2 extra) \n"\
+"{ \n"\
+"    r->padding = extra; \n"\
+"} \n"\
+" \n"\
+"float2 Ray_GetExtra(__global ray const* r) \n"\
+"{ \n"\
+"    return r->padding; \n"\
+"} \n"\
+" \n"\
 "void Ray_Init(__global ray* r, float3 o, float3 d, float maxt, float time, int mask) \n"\
 "{ \n"\
 "    // TODO: Check if it generates MTBUF_XYZW write \n"\
@@ -22504,6 +24171,8 @@ static const char g_integrator_pt_opencl[]= \
 "    r->extra.x = mask; \n"\
 "    r->extra.y = 0xFFFFFFFF; \n"\
 "} \n"\
+" \n"\
+" \n"\
 " \n"\
 "#endif // PAYLOAD_CL \n"\
 "/********************************************************************** \n"\
@@ -22712,7 +24381,7 @@ static const char g_integrator_pt_opencl[]= \
 "float4 quaternion_inverse(float4 q) \n"\
 "{ \n"\
 "    float sqnorm = q.x*q.x + q.y*q.y + q.z*q.z + q.w*q.w; \n"\
-"     \n"\
+" \n"\
 "    /// Check if it is singular \n"\
 "    if (sqnorm != 0.f) \n"\
 "    { \n"\
@@ -22734,7 +24403,7 @@ static const char g_integrator_pt_opencl[]= \
 "} \n"\
 " \n"\
 "/// Linearly interpolate between two values \n"\
-"float3 lerp(float3 a, float3 b, float w) \n"\
+"float4 lerp(float4 a, float4 b, float w) \n"\
 "{ \n"\
 "    return a + w*(b-a); \n"\
 "} \n"\
@@ -22753,7 +24422,7 @@ static const char g_integrator_pt_opencl[]= \
 "float3 GetOrthoVector(float3 n) \n"\
 "{ \n"\
 "    float3 p; \n"\
-"     \n"\
+" \n"\
 "    if (fabs(n.z) > 0.f) { \n"\
 "        float k = sqrt(n.y*n.y + n.z*n.z); \n"\
 "        p.x = 0; p.y = -n.z/k; p.z = n.y/k; \n"\
@@ -22822,88 +24491,88 @@ static const char g_integrator_pt_opencl[]= \
 "#define TEXTURE_ARGS_IDX(x) x, textures, texturedata \n"\
 " \n"\
 "/// Sample 2D texture \n"\
-"float3 Texture_Sample2D(float2 uv, TEXTURE_ARG_LIST_IDX(texidx)) \n"\
+"float4 Texture_Sample2D(float2 uv, TEXTURE_ARG_LIST_IDX(texidx)) \n"\
 "{ \n"\
 "    // Get width and height \n"\
 "    int width = textures[texidx].w; \n"\
 "    int height = textures[texidx].h; \n"\
-"     \n"\
+" \n"\
 "    // Find the origin of the data in the pool \n"\
 "    __global char const* mydata = texturedata + textures[texidx].dataoffset; \n"\
 " \n"\
 "    // Handle UV wrap \n"\
 "    // TODO: need UV mode support \n"\
 "    uv -= floor(uv); \n"\
-"     \n"\
+" \n"\
 "    // Reverse Y: \n"\
 "    // it is needed as textures are loaded with Y axis going top to down \n"\
 "    // and our axis goes from down to top \n"\
 "    uv.y = 1.f - uv.y; \n"\
-"     \n"\
+" \n"\
 "    // Calculate integer coordinates \n"\
 "    int x0 = clamp((int)floor(uv.x * width), 0, width - 1); \n"\
 "    int y0 = clamp((int)floor(uv.y * height), 0, height - 1); \n"\
-"     \n"\
+" \n"\
 "    // Calculate samples for linear filtering \n"\
 "    int x1 = clamp(x0 + 1, 0,  width - 1); \n"\
 "    int y1 = clamp(y0 + 1, 0, height - 1); \n"\
-"     \n"\
+" \n"\
 "    // Calculate weights for linear filtering \n"\
 "    float wx = uv.x * width - floor(uv.x * width); \n"\
 "    float wy = uv.y * height - floor(uv.y * height); \n"\
-"     \n"\
+" \n"\
 "    switch (textures[texidx].fmt) \n"\
 "    { \n"\
 "        case RGBA32: \n"\
 "        { \n"\
-"            __global float3 const* mydataf = (__global float3 const*)mydata; \n"\
-"             \n"\
+"            __global float4 const* mydataf = (__global float4 const*)mydata; \n"\
+" \n"\
 "            // Get 4 values for linear filtering \n"\
-"            float3 val00 = *(mydataf + width * y0 + x0); \n"\
-"            float3 val01 = *(mydataf + width * y0 + x1); \n"\
-"            float3 val10 = *(mydataf + width * y1 + x0); \n"\
-"            float3 val11 = *(mydataf + width * y1 + x1); \n"\
-"             \n"\
+"            float4 val00 = *(mydataf + width * y0 + x0); \n"\
+"            float4 val01 = *(mydataf + width * y0 + x1); \n"\
+"            float4 val10 = *(mydataf + width * y1 + x0); \n"\
+"            float4 val11 = *(mydataf + width * y1 + x1); \n"\
+" \n"\
 "            // Filter and return the result \n"\
 "            return lerp(lerp(val00, val01, wx), lerp(val10, val11, wx), wy); \n"\
 "        } \n"\
-"             \n"\
+" \n"\
 "        case RGBA16: \n"\
 "        { \n"\
 "            __global half const* mydatah = (__global half const*)mydata; \n"\
-"             \n"\
+" \n"\
 "            // Get 4 values \n"\
-"            float3 val00 = vload_half4(width * y0 + x0, mydatah).xyz; \n"\
-"            float3 val01 = vload_half4(width * y0 + x1, mydatah).xyz; \n"\
-"            float3 val10 = vload_half4(width * y1 + x0, mydatah).xyz; \n"\
-"            float3 val11 = vload_half4(width * y1 + x1, mydatah).xyz; \n"\
-"             \n"\
+"            float4 val00 = vload_half4(width * y0 + x0, mydatah); \n"\
+"            float4 val01 = vload_half4(width * y0 + x1, mydatah); \n"\
+"            float4 val10 = vload_half4(width * y1 + x0, mydatah); \n"\
+"            float4 val11 = vload_half4(width * y1 + x1, mydatah); \n"\
+" \n"\
 "            // Filter and return the result \n"\
 "            return lerp(lerp(val00, val01, wx), lerp(val10, val11, wx), wy); \n"\
 "        } \n"\
-"             \n"\
+" \n"\
 "        case RGBA8: \n"\
 "        { \n"\
 "            __global uchar4 const* mydatac = (__global uchar4 const*)mydata; \n"\
-"             \n"\
+" \n"\
 "            // Get 4 values and convert to float \n"\
 "            uchar4 valu00 = *(mydatac + width * y0 + x0); \n"\
 "            uchar4 valu01 = *(mydatac + width * y0 + x1); \n"\
 "            uchar4 valu10 = *(mydatac + width * y1 + x0); \n"\
 "            uchar4 valu11 = *(mydatac + width * y1 + x1); \n"\
-"             \n"\
-"            float3 val00 = make_float3((float)valu00.x / 255.f, (float)valu00.y / 255.f, (float)valu00.z / 255.f); \n"\
-"            float3 val01 = make_float3((float)valu01.x / 255.f, (float)valu01.y / 255.f, (float)valu01.z / 255.f); \n"\
-"            float3 val10 = make_float3((float)valu10.x / 255.f, (float)valu10.y / 255.f, (float)valu10.z / 255.f); \n"\
-"            float3 val11 = make_float3((float)valu11.x / 255.f, (float)valu11.y / 255.f, (float)valu11.z / 255.f); \n"\
-"             \n"\
+" \n"\
+"            float4 val00 = make_float4((float)valu00.x / 255.f, (float)valu00.y / 255.f, (float)valu00.z / 255.f, (float)valu00.w / 255.f); \n"\
+"            float4 val01 = make_float4((float)valu01.x / 255.f, (float)valu01.y / 255.f, (float)valu01.z / 255.f, (float)valu01.w / 255.f); \n"\
+"            float4 val10 = make_float4((float)valu10.x / 255.f, (float)valu10.y / 255.f, (float)valu10.z / 255.f, (float)valu10.w / 255.f); \n"\
+"            float4 val11 = make_float4((float)valu11.x / 255.f, (float)valu11.y / 255.f, (float)valu11.z / 255.f, (float)valu11.w / 255.f); \n"\
+" \n"\
 "            // Filter and return the result \n"\
 "            return lerp(lerp(val00, val01, wx), lerp(val10, val11, wx), wy); \n"\
 "        } \n"\
-"             \n"\
+" \n"\
 "        default: \n"\
 "        { \n"\
-"            return make_float3(0.f, 0.f, 0.f); \n"\
+"            return make_float4(0.f, 0.f, 0.f, 0.f); \n"\
 "        } \n"\
 "    } \n"\
 "} \n"\
@@ -22914,14 +24583,14 @@ static const char g_integrator_pt_opencl[]= \
 "    // Transform to spherical coords \n"\
 "    float r, phi, theta; \n"\
 "    CartesianToSpherical(d, &r, &phi, &theta); \n"\
-"     \n"\
+" \n"\
 "    // Map to [0,1]x[0,1] range and reverse Y axis \n"\
 "    float2 uv; \n"\
 "    uv.x = phi / (2*PI); \n"\
 "    uv.y = 1.f - theta / PI; \n"\
-"     \n"\
+" \n"\
 "    // Sample the texture \n"\
-"    return native_powr(Texture_Sample2D(uv, TEXTURE_ARGS_IDX(texidx)), 1.f / 1.f); \n"\
+"    return Texture_Sample2D(uv, TEXTURE_ARGS_IDX(texidx)).xyz; \n"\
 "} \n"\
 " \n"\
 "/// Get data from parameter value or texture \n"\
@@ -22938,9 +24607,30 @@ static const char g_integrator_pt_opencl[]= \
 "    if (texidx != -1) \n"\
 "    { \n"\
 "        // Sample texture \n"\
+"        return native_powr(Texture_Sample2D(uv, TEXTURE_ARGS_IDX(texidx)).xyz, 2.2f); \n"\
+"    } \n"\
+" \n"\
+"    // Return fixed color otherwise \n"\
+"    return v; \n"\
+"} \n"\
+" \n"\
+"/// Get data from parameter value or texture \n"\
+"float4 Texture_GetValue4f( \n"\
+"                // Value \n"\
+"                float4 v, \n"\
+"                // Texture coordinate \n"\
+"                float2 uv, \n"\
+"                // Texture args \n"\
+"                TEXTURE_ARG_LIST_IDX(texidx) \n"\
+"                ) \n"\
+"{ \n"\
+"    // If texture present sample from texture \n"\
+"    if (texidx != -1) \n"\
+"    { \n"\
+"        // Sample texture \n"\
 "        return native_powr(Texture_Sample2D(uv, TEXTURE_ARGS_IDX(texidx)), 2.2f); \n"\
 "    } \n"\
-"     \n"\
+" \n"\
 "    // Return fixed color otherwise \n"\
 "    return v; \n"\
 "} \n"\
@@ -22961,7 +24651,7 @@ static const char g_integrator_pt_opencl[]= \
 "        // Sample texture \n"\
 "        return Texture_Sample2D(uv, TEXTURE_ARGS_IDX(texidx)).x; \n"\
 "    } \n"\
-"     \n"\
+" \n"\
 "    // Return fixed color otherwise \n"\
 "    return v; \n"\
 "} \n"\
@@ -22996,11 +24686,11 @@ static const char g_integrator_pt_opencl[]= \
 "        __global float3 const* mydataf = (__global float3 const*)mydata; \n"\
 " \n"\
 "        // Sobel filter \n"\
-"        const float tex00 = (*(mydataf + width * (t0 - 1) + (s0-1))).x;  \n"\
+"        const float tex00 = (*(mydataf + width * (t0 - 1) + (s0-1))).x; \n"\
 "        const float tex10 = (*(mydataf + width * (t0 - 1) + (s0))).x; \n"\
-"        const float tex20 = (*(mydataf + width * (t0 - 1) + (s0 + 1))).x;  \n"\
+"        const float tex20 = (*(mydataf + width * (t0 - 1) + (s0 + 1))).x; \n"\
 " \n"\
-"        const float tex01 = (*(mydataf + width * (t0) + (s0 - 1))).x;  \n"\
+"        const float tex01 = (*(mydataf + width * (t0) + (s0 - 1))).x; \n"\
 "        const float tex21 = (*(mydataf + width * (t0) + (s0 + 1))).x; \n"\
 " \n"\
 "        const float tex02 = (*(mydataf + width * (t0 + 1) + (s0 - 1))).x; \n"\
@@ -23022,8 +24712,8 @@ static const char g_integrator_pt_opencl[]= \
 "        const float tex10 = vload_half4(width * (t0 - 1) + (s0), mydatah).x; \n"\
 "        const float tex20 = vload_half4(width * (t0 - 1) + (s0 + 1), mydatah).x; \n"\
 " \n"\
-"        const float tex01 = vload_half4(width * (t0)+(s0 - 1), mydatah).x;  \n"\
-"        const float tex21 = vload_half4(width * (t0)+(s0 + 1), mydatah).x;  \n"\
+"        const float tex01 = vload_half4(width * (t0)+(s0 - 1), mydatah).x; \n"\
+"        const float tex21 = vload_half4(width * (t0)+(s0 + 1), mydatah).x; \n"\
 " \n"\
 "        const float tex02 = vload_half4(width * (t0 + 1) + (s0 - 1), mydatah).x; \n"\
 "        const float tex12 = vload_half4(width * (t0 + 1) + (s0), mydatah).x; \n"\
@@ -23080,7 +24770,8 @@ static const char g_integrator_pt_opencl[]= \
 " \n"\
 "#endif // TEXTURE_CL \n"\
 " \n"\
-"int IntersectTriangle(ray const* r, float3 v1, float3 v2, float3 v3, float* a, float* b) \n"\
+" \n"\
+"bool IntersectTriangle(ray const* r, float3 v1, float3 v2, float3 v3, float* a, float* b) \n"\
 "{ \n"\
 "    const float3 e1 = v2 - v1; \n"\
 "    const float3 e2 = v3 - v1; \n"\
@@ -23092,15 +24783,15 @@ static const char g_integrator_pt_opencl[]= \
 "    const float  b2 = dot(r->d.xyz, s2) * invd; \n"\
 "    const float temp = dot(e2, s2) * invd; \n"\
 " \n"\
-"    if (b1 < 0.f || b1 > 1.f || b2 < 0.f || b1 + b2 > 1.f || temp < 0.f || temp > r->o.w) \n"\
+"    if (b1 < 0.f || b1 > 1.f || b2 < 0.f || b1 + b2 > 1.f) \n"\
 "    { \n"\
-"        return 0; \n"\
+"        return false; \n"\
 "    } \n"\
 "    else \n"\
 "    { \n"\
 "        *a = b1; \n"\
 "        *b = b2; \n"\
-"        return 1; \n"\
+"        return true; \n"\
 "    } \n"\
 "} \n"\
 " \n"\
@@ -23108,7 +24799,8 @@ static const char g_integrator_pt_opencl[]= \
 " Environment light \n"\
 " */ \n"\
 "/// Get intensity for a given direction \n"\
-"float3 EnvironmentLight_GetLe( \n"\
+"float3 EnvironmentLight_GetLe(// Light \n"\
+"                              Light const* light, \n"\
 "                              // Scene \n"\
 "                              Scene const* scene, \n"\
 "                              // Geometry \n"\
@@ -23121,12 +24813,14 @@ static const char g_integrator_pt_opencl[]= \
 "{ \n"\
 "    // Sample envmap \n"\
 "    *wo *= 100000.f; \n"\
-"    //  \n"\
+"    // \n"\
 "    return scene->envmapmul * Texture_SampleEnvMap(normalize(*wo), TEXTURE_ARGS_IDX(scene->envmapidx)); \n"\
 "} \n"\
 " \n"\
 "/// Sample direction to the light \n"\
-"float3 EnvironmentLight_Sample(// Scene \n"\
+"float3 EnvironmentLight_Sample(// Light \n"\
+"                               Light const* light, \n"\
+"                               // Scene \n"\
 "                               Scene const* scene, \n"\
 "                               // Geometry \n"\
 "                               DifferentialGeometry const* dg, \n"\
@@ -23144,16 +24838,19 @@ static const char g_integrator_pt_opencl[]= \
 " \n"\
 "    // Generate direction \n"\
 "    *wo = 100000.f * d; \n"\
-"     \n"\
+" \n"\
 "    // Envmap PDF \n"\
 "    *pdf = fabs(dot(dg->n, normalize(d))) / PI; \n"\
-"     \n"\
+" \n"\
 "    // Sample envmap \n"\
 "    return scene->envmapmul * Texture_SampleEnvMap(d, TEXTURE_ARGS_IDX(scene->envmapidx)); \n"\
 "} \n"\
 " \n"\
 "/// Get PDF for a given direction \n"\
-"float EnvironmentLight_GetPdf(// Scene \n"\
+"float EnvironmentLight_GetPdf( \n"\
+"                              // Light \n"\
+"                              Light const* light, \n"\
+"                              // Scene \n"\
 "                              Scene const* scene, \n"\
 "                              // Geometry \n"\
 "                              DifferentialGeometry const* dg, \n"\
@@ -23172,7 +24869,7 @@ static const char g_integrator_pt_opencl[]= \
 " */ \n"\
 "// Get intensity for a given direction \n"\
 "float3 AreaLight_GetLe(// Emissive object \n"\
-"                       Emissive const* light, \n"\
+"                       Light const* light, \n"\
 "                       // Scene \n"\
 "                       Scene const* scene, \n"\
 "                       // Geometry \n"\
@@ -23184,8 +24881,8 @@ static const char g_integrator_pt_opencl[]= \
 "                       ) \n"\
 "{ \n"\
 "    ray r; \n"\
-"    r.o.xyz = dg->p + normalize(*wo) * 0.01f; \n"\
-"    r.d.xyz = *wo; \n"\
+"    r.o.xyz = dg->p; \n"\
+"    r.d.xyz = normalize(*wo); \n"\
 " \n"\
 "    int shapeidx = light->shapeidx; \n"\
 "    int primidx = light->primidx; \n"\
@@ -23213,8 +24910,9 @@ static const char g_integrator_pt_opencl[]= \
 "    float2 uv1 = scene->uvs[shape.startvtx + i1]; \n"\
 "    float2 uv2 = scene->uvs[shape.startvtx + i2]; \n"\
 " \n"\
-"     \n"\
+" \n"\
 "    // Intersect ray against this area light \n"\
+" \n"\
 "    float a, b; \n"\
 "    if (IntersectTriangle(&r, v0, v1, v2, &a, &b)) \n"\
 "    { \n"\
@@ -23224,23 +24922,14 @@ static const char g_integrator_pt_opencl[]= \
 " \n"\
 "        float3 d = p - dg->p; \n"\
 "        float  ld = length(d); \n"\
+"        *wo = p - dg->p; \n"\
 " \n"\
 "        int matidx = scene->materialids[shape.startidx / 3 + primidx]; \n"\
 "        Material mat = scene->materials[matidx]; \n"\
 " \n"\
 "        const float3 ke = Texture_GetValue3f(mat.kx.xyz, tx, TEXTURE_ARGS_IDX(mat.kxmapidx)); \n"\
 "        float ndotv = dot(n, -(normalize(d))); \n"\
-" \n"\
-"        if (ndotv > 0.f) \n"\
-"        { \n"\
-"            *wo = d; \n"\
-"            float denom = ld * ld; \n"\
-"            return  denom > 0.f ? ke * ndotv / denom : 0.f; \n"\
-"        } \n"\
-"        else \n"\
-"        { \n"\
-"            return 0.f; \n"\
-"        } \n"\
+"        return  ke; \n"\
 "    } \n"\
 "    else \n"\
 "    { \n"\
@@ -23250,7 +24939,7 @@ static const char g_integrator_pt_opencl[]= \
 " \n"\
 "/// Sample direction to the light \n"\
 "float3 AreaLight_Sample(// Emissive object \n"\
-"                        Emissive const* light, \n"\
+"                        Light const* light, \n"\
 "                        // Scene \n"\
 "                        Scene const* scene, \n"\
 "                        // Geometry \n"\
@@ -23266,7 +24955,7 @@ static const char g_integrator_pt_opencl[]= \
 "{ \n"\
 "    int shapeidx = light->shapeidx; \n"\
 "    int primidx = light->primidx; \n"\
-"    \n"\
+" \n"\
 "    // Extract shape data \n"\
 "    Shape shape = scene->shapes[shapeidx]; \n"\
 " \n"\
@@ -23311,9 +25000,9 @@ static const char g_integrator_pt_opencl[]= \
 "    Material mat = scene->materials[matidx]; \n"\
 " \n"\
 "    const float3 ke = Texture_GetValue3f(mat.kx.xyz, tx, TEXTURE_ARGS_IDX(mat.kxmapidx)); \n"\
-"  \n"\
+" \n"\
 "    float3 v = -normalize(*wo); \n"\
-"     \n"\
+" \n"\
 "    float ndotv = dot(n, v); \n"\
 " \n"\
 "    if (ndotv > 0.f) \n"\
@@ -23330,7 +25019,7 @@ static const char g_integrator_pt_opencl[]= \
 " \n"\
 "/// Get PDF for a given direction \n"\
 "float AreaLight_GetPdf(// Emissive object \n"\
-"                       Emissive const* light, \n"\
+"                       Light const* light, \n"\
 "                       // Scene \n"\
 "                       Scene const* scene, \n"\
 "                       // Geometry \n"\
@@ -23342,7 +25031,7 @@ static const char g_integrator_pt_opencl[]= \
 "                       ) \n"\
 "{ \n"\
 "    ray r; \n"\
-"    r.o.xyz = dg->p + normalize(wo) * 0.001f; \n"\
+"    r.o.xyz = dg->p; \n"\
 "    r.d.xyz = wo; \n"\
 " \n"\
 "    int shapeidx = light->shapeidx; \n"\
@@ -23390,6 +25079,185 @@ static const char g_integrator_pt_opencl[]= \
 "    } \n"\
 "} \n"\
 " \n"\
+"/* \n"\
+"Directional light \n"\
+"*/ \n"\
+"// Get intensity for a given direction \n"\
+"float3 DirectionalLight_GetLe(// Emissive object \n"\
+"    Light const* light, \n"\
+"    // Scene \n"\
+"    Scene const* scene, \n"\
+"    // Geometry \n"\
+"    DifferentialGeometry const* dg, \n"\
+"    // Direction to light source \n"\
+"    float3* wo, \n"\
+"    // Textures \n"\
+"    TEXTURE_ARG_LIST \n"\
+") \n"\
+"{ \n"\
+"    return 0.f; \n"\
+"} \n"\
+" \n"\
+"/// Sample direction to the light \n"\
+"float3 DirectionalLight_Sample(// Emissive object \n"\
+"    Light const* light, \n"\
+"    // Scene \n"\
+"    Scene const* scene, \n"\
+"    // Geometry \n"\
+"    DifferentialGeometry const* dg, \n"\
+"    // Textures \n"\
+"    TEXTURE_ARG_LIST, \n"\
+"    // Sample \n"\
+"    float2 sample, \n"\
+"    // Direction to light source \n"\
+"    float3* wo, \n"\
+"    // PDF \n"\
+"    float* pdf) \n"\
+"{ \n"\
+"    *wo = 100000.f * -light->d; \n"\
+"    *pdf = 1.f; \n"\
+"    return light->intensity; \n"\
+"} \n"\
+" \n"\
+"/// Get PDF for a given direction \n"\
+"float DirectionalLight_GetPdf(// Emissive object \n"\
+"    Light const* light, \n"\
+"    // Scene \n"\
+"    Scene const* scene, \n"\
+"    // Geometry \n"\
+"    DifferentialGeometry const* dg, \n"\
+"    // Direction to light source \n"\
+"    float3 wo, \n"\
+"    // Textures \n"\
+"    TEXTURE_ARG_LIST \n"\
+") \n"\
+"{ \n"\
+"    return 0.f; \n"\
+"} \n"\
+" \n"\
+"/* \n"\
+" Point light \n"\
+" */ \n"\
+"// Get intensity for a given direction \n"\
+"float3 PointLight_GetLe(// Emissive object \n"\
+"                              Light const* light, \n"\
+"                              // Scene \n"\
+"                              Scene const* scene, \n"\
+"                              // Geometry \n"\
+"                              DifferentialGeometry const* dg, \n"\
+"                              // Direction to light source \n"\
+"                              float3* wo, \n"\
+"                              // Textures \n"\
+"                              TEXTURE_ARG_LIST \n"\
+"                              ) \n"\
+"{ \n"\
+"    return 0.f; \n"\
+"} \n"\
+" \n"\
+"/// Sample direction to the light \n"\
+"float3 PointLight_Sample(// Emissive object \n"\
+"                               Light const* light, \n"\
+"                               // Scene \n"\
+"                               Scene const* scene, \n"\
+"                               // Geometry \n"\
+"                               DifferentialGeometry const* dg, \n"\
+"                               // Textures \n"\
+"                               TEXTURE_ARG_LIST, \n"\
+"                               // Sample \n"\
+"                               float2 sample, \n"\
+"                               // Direction to light source \n"\
+"                               float3* wo, \n"\
+"                               // PDF \n"\
+"                               float* pdf) \n"\
+"{ \n"\
+"    *wo = light->p - dg->p; \n"\
+"    *pdf = 1.f; \n"\
+"    return light->intensity; \n"\
+"} \n"\
+" \n"\
+"/// Get PDF for a given direction \n"\
+"float PointLight_GetPdf(// Emissive object \n"\
+"                              Light const* light, \n"\
+"                              // Scene \n"\
+"                              Scene const* scene, \n"\
+"                              // Geometry \n"\
+"                              DifferentialGeometry const* dg, \n"\
+"                              // Direction to light source \n"\
+"                              float3 wo, \n"\
+"                              // Textures \n"\
+"                              TEXTURE_ARG_LIST \n"\
+"                              ) \n"\
+"{ \n"\
+"    return 0.f; \n"\
+"} \n"\
+" \n"\
+"/* \n"\
+" Spot light \n"\
+" */ \n"\
+"// Get intensity for a given direction \n"\
+"float3 SpotLight_GetLe(// Emissive object \n"\
+"                        Light const* light, \n"\
+"                        // Scene \n"\
+"                        Scene const* scene, \n"\
+"                        // Geometry \n"\
+"                        DifferentialGeometry const* dg, \n"\
+"                        // Direction to light source \n"\
+"                        float3* wo, \n"\
+"                        // Textures \n"\
+"                        TEXTURE_ARG_LIST \n"\
+"                        ) \n"\
+"{ \n"\
+"    return 0.f; \n"\
+"} \n"\
+" \n"\
+"/// Sample direction to the light \n"\
+"float3 SpotLight_Sample(// Emissive object \n"\
+"                         Light const* light, \n"\
+"                         // Scene \n"\
+"                         Scene const* scene, \n"\
+"                         // Geometry \n"\
+"                         DifferentialGeometry const* dg, \n"\
+"                         // Textures \n"\
+"                         TEXTURE_ARG_LIST, \n"\
+"                         // Sample \n"\
+"                         float2 sample, \n"\
+"                         // Direction to light source \n"\
+"                         float3* wo, \n"\
+"                         // PDF \n"\
+"                         float* pdf) \n"\
+"{ \n"\
+"    *wo = light->p - dg->p; \n"\
+"    float ddotwo = dot(-normalize(*wo), light->d); \n"\
+"     \n"\
+"    if (ddotwo > light->oa) \n"\
+"    { \n"\
+"        *pdf = 1.f; \n"\
+"        return ddotwo > light->ia ? light->intensity : light->intensity * (1.f - (light->ia - ddotwo) / (light->ia - light->oa)); \n"\
+"    } \n"\
+"    else \n"\
+"    { \n"\
+"        *pdf = 0.f; \n"\
+"        return 0.f; \n"\
+"    } \n"\
+"} \n"\
+" \n"\
+"/// Get PDF for a given direction \n"\
+"float SpotLight_GetPdf(// Emissive object \n"\
+"                        Light const* light, \n"\
+"                        // Scene \n"\
+"                        Scene const* scene, \n"\
+"                        // Geometry \n"\
+"                        DifferentialGeometry const* dg, \n"\
+"                        // Direction to light source \n"\
+"                        float3 wo, \n"\
+"                        // Textures \n"\
+"                        TEXTURE_ARG_LIST \n"\
+"                        ) \n"\
+"{ \n"\
+"    return 0.f; \n"\
+"} \n"\
+" \n"\
+" \n"\
 " \n"\
 " \n"\
 "/* \n"\
@@ -23409,16 +25277,23 @@ static const char g_integrator_pt_opencl[]= \
 "                   TEXTURE_ARG_LIST \n"\
 "                   ) \n"\
 "{ \n"\
-"    int numemissives = scene->numemissives; \n"\
-"    if (idx == numemissives) \n"\
+"    Light light = scene->lights[idx]; \n"\
+" \n"\
+"    switch(light.type) \n"\
 "    { \n"\
-"        return EnvironmentLight_GetLe(scene, dg, wo, TEXTURE_ARGS); \n"\
+"        case kIbl: \n"\
+"            return EnvironmentLight_GetLe(&light, scene, dg, wo, TEXTURE_ARGS); \n"\
+"        case kArea: \n"\
+"            return AreaLight_GetLe(&light, scene, dg, wo, TEXTURE_ARGS); \n"\
+"        case kDirectional: \n"\
+"            return DirectionalLight_GetLe(&light, scene, dg, wo, TEXTURE_ARGS); \n"\
+"        case kPoint: \n"\
+"            return PointLight_GetLe(&light, scene, dg, wo, TEXTURE_ARGS); \n"\
+"        case kSpot: \n"\
+"            return SpotLight_GetLe(&light, scene, dg, wo, TEXTURE_ARGS); \n"\
 "    } \n"\
-"    else \n"\
-"    { \n"\
-"        Emissive emissive = scene->emissives[idx]; \n"\
-"        return AreaLight_GetLe(&emissive, scene, dg, wo, TEXTURE_ARGS); \n"\
-"    } \n"\
+" \n"\
+"    return make_float3(0.f, 0.f, 0.f); \n"\
 "} \n"\
 " \n"\
 "/// Sample direction to the light \n"\
@@ -23437,16 +25312,24 @@ static const char g_integrator_pt_opencl[]= \
 "                    // PDF \n"\
 "                    float* pdf) \n"\
 "{ \n"\
-"    int numemissives = scene->numemissives; \n"\
-"    if (idx == numemissives) \n"\
+"    Light light = scene->lights[idx]; \n"\
+" \n"\
+"    switch(light.type) \n"\
 "    { \n"\
-"        return EnvironmentLight_Sample(scene, dg, TEXTURE_ARGS, sample, wo, pdf); \n"\
+"        case kIbl: \n"\
+"            return EnvironmentLight_Sample(&light, scene, dg, TEXTURE_ARGS, sample, wo, pdf); \n"\
+"        case kArea: \n"\
+"            return AreaLight_Sample(&light, scene, dg, TEXTURE_ARGS, sample, wo, pdf); \n"\
+"        case kDirectional: \n"\
+"            return DirectionalLight_Sample(&light, scene, dg, TEXTURE_ARGS, sample, wo, pdf); \n"\
+"        case kPoint: \n"\
+"            return PointLight_Sample(&light, scene, dg, TEXTURE_ARGS, sample, wo, pdf); \n"\
+"        case kSpot: \n"\
+"            return SpotLight_Sample(&light, scene, dg, TEXTURE_ARGS, sample, wo, pdf); \n"\
 "    } \n"\
-"    else \n"\
-"    { \n"\
-"        Emissive emissive = scene->emissives[idx]; \n"\
-"        return AreaLight_Sample(&emissive, scene, dg, TEXTURE_ARGS, sample, wo, pdf); \n"\
-"    } \n"\
+" \n"\
+"    *pdf = 0.f; \n"\
+"    return make_float3(0.f, 0.f, 0.f); \n"\
 "} \n"\
 " \n"\
 "/// Get PDF for a given direction \n"\
@@ -23462,16 +25345,31 @@ static const char g_integrator_pt_opencl[]= \
 "                   TEXTURE_ARG_LIST \n"\
 "                   ) \n"\
 "{ \n"\
-"    int numemissives = scene->numemissives; \n"\
-"    if (idx == numemissives) \n"\
+"    Light light = scene->lights[idx]; \n"\
+" \n"\
+"    switch(light.type) \n"\
 "    { \n"\
-"        return EnvironmentLight_GetPdf(scene, dg, wo, TEXTURE_ARGS); \n"\
+"        case kIbl: \n"\
+"            return EnvironmentLight_GetPdf(&light, scene, dg, wo, TEXTURE_ARGS); \n"\
+"        case kArea: \n"\
+"            return AreaLight_GetPdf(&light, scene, dg, wo, TEXTURE_ARGS); \n"\
+"        case kDirectional: \n"\
+"            return DirectionalLight_GetPdf(&light, scene, dg, wo, TEXTURE_ARGS); \n"\
+"        case kPoint: \n"\
+"            return PointLight_GetPdf(&light, scene, dg, wo, TEXTURE_ARGS); \n"\
+"        case kSpot: \n"\
+"            return SpotLight_GetPdf(&light, scene, dg, wo, TEXTURE_ARGS); \n"\
 "    } \n"\
-"    else \n"\
-"    { \n"\
-"        Emissive emissive = scene->emissives[idx]; \n"\
-"        return AreaLight_GetPdf(&emissive, scene, dg, wo, TEXTURE_ARGS); \n"\
-"    } \n"\
+" \n"\
+"    return 0.f; \n"\
+"} \n"\
+" \n"\
+"/// Check if the light is singular \n"\
+"bool Light_IsSingular(__global Light const* light) \n"\
+"{ \n"\
+"    return light->type == kPoint || \n"\
+"        light->type == kSpot || \n"\
+"        light->type == kDirectional; \n"\
 "} \n"\
 " \n"\
 "#endif // LIGHT_CLnv \n"\
@@ -23522,7 +25420,7 @@ static const char g_integrator_pt_opencl[]= \
 "********************************************************************/ \n"\
 "#ifndef PAYLOAD_CL \n"\
 "#define PAYLOAD_CL \n"\
-"#define SOBOL \n"\
+"//#define SOBOL \n"\
 "#define MULTISCATTER \n"\
 " \n"\
 "/// Ray descriptor \n"\
@@ -23534,7 +25432,7 @@ static const char g_integrator_pt_opencl[]= \
 "    float4 d; \n"\
 "    /// x - ray mask, y - activity flag \n"\
 "    int2 extra; \n"\
-"    int2 padding; \n"\
+"    float2 padding; \n"\
 "} ray; \n"\
 " \n"\
 "/// Intersection data returned by RadeonRays \n"\
@@ -23588,8 +25486,6 @@ static const char g_integrator_pt_opencl[]= \
 "} Emissive; \n"\
 " \n"\
 " \n"\
-" \n"\
-" \n"\
 "typedef enum _PathFlags \n"\
 "{ \n"\
 "    kNone = 0x0, \n"\
@@ -23639,6 +25535,53 @@ static const char g_integrator_pt_opencl[]= \
 " \n"\
 "} Material; \n"\
 " \n"\
+" \n"\
+"enum LightType \n"\
+"{ \n"\
+"    kPoint = 0x1, \n"\
+"    kDirectional, \n"\
+"    kSpot, \n"\
+"    kArea, \n"\
+"    kIbl \n"\
+"}; \n"\
+" \n"\
+"typedef struct _Light \n"\
+"{ \n"\
+"    int type; \n"\
+" \n"\
+"    union \n"\
+"    { \n"\
+"        // Area light \n"\
+"        struct \n"\
+"        { \n"\
+"            int shapeidx; \n"\
+"            int primidx; \n"\
+"            int matidx; \n"\
+"        }; \n"\
+" \n"\
+"        // IBL \n"\
+"        struct \n"\
+"        { \n"\
+"            int tex; \n"\
+"            int texdiffuse; \n"\
+"            float multiplier; \n"\
+"        }; \n"\
+"         \n"\
+"         \n"\
+"        // Spot \n"\
+"        struct \n"\
+"        { \n"\
+"            float ia; \n"\
+"            float oa; \n"\
+"            float f; \n"\
+"        }; \n"\
+"    }; \n"\
+" \n"\
+"    float3 p; \n"\
+"    float3 d; \n"\
+"    float3 intensity; \n"\
+"} Light; \n"\
+" \n"\
 "typedef struct _Scene \n"\
 "{ \n"\
 "    // Vertices \n"\
@@ -23656,13 +25599,13 @@ static const char g_integrator_pt_opencl[]= \
 "    // Materials \n"\
 "    __global Material const* materials; \n"\
 "    // Emissive objects \n"\
-"    __global Emissive const* emissives; \n"\
+"    __global Light const* lights; \n"\
 "    // Envmap idx \n"\
 "    int envmapidx; \n"\
 "    // Envmap multiplier \n"\
 "    float envmapmul; \n"\
 "    // Number of emissive objects \n"\
-"    int numemissives; \n"\
+"    int num_lights; \n"\
 "} Scene; \n"\
 " \n"\
 "// Hit data \n"\
@@ -23680,7 +25623,7 @@ static const char g_integrator_pt_opencl[]= \
 "    float3 dpdu; \n"\
 "    float3 dpdv; \n"\
 "    float  area; \n"\
-"    // Material  \n"\
+"    // Material \n"\
 "    Material mat; \n"\
 "} DifferentialGeometry; \n"\
 " \n"\
@@ -23736,6 +25679,16 @@ static const char g_integrator_pt_opencl[]= \
 "    r->extra.y = 0; \n"\
 "} \n"\
 " \n"\
+"void Ray_SetExtra(__global ray* r, float2 extra) \n"\
+"{ \n"\
+"    r->padding = extra; \n"\
+"} \n"\
+" \n"\
+"float2 Ray_GetExtra(__global ray const* r) \n"\
+"{ \n"\
+"    return r->padding; \n"\
+"} \n"\
+" \n"\
 "void Ray_Init(__global ray* r, float3 o, float3 d, float maxt, float time, int mask) \n"\
 "{ \n"\
 "    // TODO: Check if it generates MTBUF_XYZW write \n"\
@@ -23746,6 +25699,8 @@ static const char g_integrator_pt_opencl[]= \
 "    r->extra.x = mask; \n"\
 "    r->extra.y = 0xFFFFFFFF; \n"\
 "} \n"\
+" \n"\
+" \n"\
 " \n"\
 "#endif // PAYLOAD_CL \n"\
 "/********************************************************************** \n"\
@@ -23954,7 +25909,7 @@ static const char g_integrator_pt_opencl[]= \
 "float4 quaternion_inverse(float4 q) \n"\
 "{ \n"\
 "    float sqnorm = q.x*q.x + q.y*q.y + q.z*q.z + q.w*q.w; \n"\
-"     \n"\
+" \n"\
 "    /// Check if it is singular \n"\
 "    if (sqnorm != 0.f) \n"\
 "    { \n"\
@@ -23976,7 +25931,7 @@ static const char g_integrator_pt_opencl[]= \
 "} \n"\
 " \n"\
 "/// Linearly interpolate between two values \n"\
-"float3 lerp(float3 a, float3 b, float w) \n"\
+"float4 lerp(float4 a, float4 b, float w) \n"\
 "{ \n"\
 "    return a + w*(b-a); \n"\
 "} \n"\
@@ -23995,7 +25950,7 @@ static const char g_integrator_pt_opencl[]= \
 "float3 GetOrthoVector(float3 n) \n"\
 "{ \n"\
 "    float3 p; \n"\
-"     \n"\
+" \n"\
 "    if (fabs(n.z) > 0.f) { \n"\
 "        float k = sqrt(n.y*n.y + n.z*n.z); \n"\
 "        p.x = 0; p.y = -n.z/k; p.z = n.y/k; \n"\
@@ -24363,7 +26318,7 @@ static const char g_integrator_pt_opencl[]= \
 "float4 quaternion_inverse(float4 q) \n"\
 "{ \n"\
 "    float sqnorm = q.x*q.x + q.y*q.y + q.z*q.z + q.w*q.w; \n"\
-"     \n"\
+" \n"\
 "    /// Check if it is singular \n"\
 "    if (sqnorm != 0.f) \n"\
 "    { \n"\
@@ -24385,7 +26340,7 @@ static const char g_integrator_pt_opencl[]= \
 "} \n"\
 " \n"\
 "/// Linearly interpolate between two values \n"\
-"float3 lerp(float3 a, float3 b, float w) \n"\
+"float4 lerp(float4 a, float4 b, float w) \n"\
 "{ \n"\
 "    return a + w*(b-a); \n"\
 "} \n"\
@@ -24404,7 +26359,7 @@ static const char g_integrator_pt_opencl[]= \
 "float3 GetOrthoVector(float3 n) \n"\
 "{ \n"\
 "    float3 p; \n"\
-"     \n"\
+" \n"\
 "    if (fabs(n.z) > 0.f) { \n"\
 "        float k = sqrt(n.y*n.y + n.z*n.z); \n"\
 "        p.x = 0; p.y = -n.z/k; p.z = n.y/k; \n"\
@@ -24488,7 +26443,7 @@ static const char g_integrator_pt_opencl[]= \
 "********************************************************************/ \n"\
 "#ifndef PAYLOAD_CL \n"\
 "#define PAYLOAD_CL \n"\
-"#define SOBOL \n"\
+"//#define SOBOL \n"\
 "#define MULTISCATTER \n"\
 " \n"\
 "/// Ray descriptor \n"\
@@ -24500,7 +26455,7 @@ static const char g_integrator_pt_opencl[]= \
 "    float4 d; \n"\
 "    /// x - ray mask, y - activity flag \n"\
 "    int2 extra; \n"\
-"    int2 padding; \n"\
+"    float2 padding; \n"\
 "} ray; \n"\
 " \n"\
 "/// Intersection data returned by RadeonRays \n"\
@@ -24554,8 +26509,6 @@ static const char g_integrator_pt_opencl[]= \
 "} Emissive; \n"\
 " \n"\
 " \n"\
-" \n"\
-" \n"\
 "typedef enum _PathFlags \n"\
 "{ \n"\
 "    kNone = 0x0, \n"\
@@ -24605,6 +26558,53 @@ static const char g_integrator_pt_opencl[]= \
 " \n"\
 "} Material; \n"\
 " \n"\
+" \n"\
+"enum LightType \n"\
+"{ \n"\
+"    kPoint = 0x1, \n"\
+"    kDirectional, \n"\
+"    kSpot, \n"\
+"    kArea, \n"\
+"    kIbl \n"\
+"}; \n"\
+" \n"\
+"typedef struct _Light \n"\
+"{ \n"\
+"    int type; \n"\
+" \n"\
+"    union \n"\
+"    { \n"\
+"        // Area light \n"\
+"        struct \n"\
+"        { \n"\
+"            int shapeidx; \n"\
+"            int primidx; \n"\
+"            int matidx; \n"\
+"        }; \n"\
+" \n"\
+"        // IBL \n"\
+"        struct \n"\
+"        { \n"\
+"            int tex; \n"\
+"            int texdiffuse; \n"\
+"            float multiplier; \n"\
+"        }; \n"\
+"         \n"\
+"         \n"\
+"        // Spot \n"\
+"        struct \n"\
+"        { \n"\
+"            float ia; \n"\
+"            float oa; \n"\
+"            float f; \n"\
+"        }; \n"\
+"    }; \n"\
+" \n"\
+"    float3 p; \n"\
+"    float3 d; \n"\
+"    float3 intensity; \n"\
+"} Light; \n"\
+" \n"\
 "typedef struct _Scene \n"\
 "{ \n"\
 "    // Vertices \n"\
@@ -24622,13 +26622,13 @@ static const char g_integrator_pt_opencl[]= \
 "    // Materials \n"\
 "    __global Material const* materials; \n"\
 "    // Emissive objects \n"\
-"    __global Emissive const* emissives; \n"\
+"    __global Light const* lights; \n"\
 "    // Envmap idx \n"\
 "    int envmapidx; \n"\
 "    // Envmap multiplier \n"\
 "    float envmapmul; \n"\
 "    // Number of emissive objects \n"\
-"    int numemissives; \n"\
+"    int num_lights; \n"\
 "} Scene; \n"\
 " \n"\
 "// Hit data \n"\
@@ -24646,7 +26646,7 @@ static const char g_integrator_pt_opencl[]= \
 "    float3 dpdu; \n"\
 "    float3 dpdv; \n"\
 "    float  area; \n"\
-"    // Material  \n"\
+"    // Material \n"\
 "    Material mat; \n"\
 "} DifferentialGeometry; \n"\
 " \n"\
@@ -24702,6 +26702,16 @@ static const char g_integrator_pt_opencl[]= \
 "    r->extra.y = 0; \n"\
 "} \n"\
 " \n"\
+"void Ray_SetExtra(__global ray* r, float2 extra) \n"\
+"{ \n"\
+"    r->padding = extra; \n"\
+"} \n"\
+" \n"\
+"float2 Ray_GetExtra(__global ray const* r) \n"\
+"{ \n"\
+"    return r->padding; \n"\
+"} \n"\
+" \n"\
 "void Ray_Init(__global ray* r, float3 o, float3 d, float maxt, float time, int mask) \n"\
 "{ \n"\
 "    // TODO: Check if it generates MTBUF_XYZW write \n"\
@@ -24712,6 +26722,8 @@ static const char g_integrator_pt_opencl[]= \
 "    r->extra.x = mask; \n"\
 "    r->extra.y = 0xFFFFFFFF; \n"\
 "} \n"\
+" \n"\
+" \n"\
 " \n"\
 "#endif // PAYLOAD_CL \n"\
 " \n"\
@@ -24806,10 +26818,10 @@ static const char g_integrator_pt_opencl[]= \
 "        float3 right; \n"\
 "        float3 up; \n"\
 "        float3 p; \n"\
-"         \n"\
+" \n"\
 "        // Image plane width & height in current units \n"\
 "        float2 dim; \n"\
-"         \n"\
+" \n"\
 "        // Near and far Z \n"\
 "        float2 zcap; \n"\
 "        // Focal lenght \n"\
@@ -24846,7 +26858,7 @@ static const char g_integrator_pt_opencl[]= \
 "    int2 globalid; \n"\
 "    globalid.x  = get_global_id(0); \n"\
 "    globalid.y  = get_global_id(1); \n"\
-"     \n"\
+" \n"\
 "    // Check borders \n"\
 "    if (globalid.x < imgwidth && globalid.y < imgheight) \n"\
 "    { \n"\
@@ -24856,7 +26868,7 @@ static const char g_integrator_pt_opencl[]= \
 "#ifndef NO_PATH_DATA \n"\
 "        __global Path* mypath = paths + globalid.y * imgwidth + globalid.x; \n"\
 "#endif \n"\
-"         \n"\
+" \n"\
 "        // Prepare RNG \n"\
 "        Rng rng; \n"\
 "        InitRng(randseed +  globalid.x * 157 + 10433 * globalid.y, &rng); \n"\
@@ -24880,17 +26892,17 @@ static const char g_integrator_pt_opencl[]= \
 "#else \n"\
 "        float2 sample0 = UniformSampler_Sample2D(&rng); \n"\
 "#endif \n"\
-"         \n"\
+" \n"\
 "        // Calculate [0..1] image plane sample \n"\
 "        float2 imgsample; \n"\
 "        imgsample.x = (float)globalid.x / imgwidth + sample0.x / imgwidth; \n"\
 "        imgsample.y = (float)globalid.y / imgheight + sample0.y / imgheight; \n"\
-"         \n"\
+" \n"\
 "        // Transform into [-0.5, 0.5] \n"\
 "        float2 hsample = imgsample - make_float2(0.5f, 0.5f); \n"\
 "        // Transform into [-dim/2, dim/2] \n"\
 "        float2 csample = hsample * camera->dim; \n"\
-"         \n"\
+" \n"\
 "        // Calculate direction to image plane \n"\
 "        myray->d.xyz = normalize(camera->focal_length * camera->forward + csample.x * camera->right + csample.y * camera->up); \n"\
 "        // Origin == camera position + nearz * d \n"\
@@ -24902,6 +26914,7 @@ static const char g_integrator_pt_opencl[]= \
 "        // Set ray max \n"\
 "        myray->extra.x = 0xFFFFFFFF; \n"\
 "        myray->extra.y = 0xFFFFFFFF; \n"\
+"        Ray_SetExtra(myray, 1.f); \n"\
 " \n"\
 "#ifndef NO_PATH_DATA \n"\
 "        mypath->throughput = make_float3(1.f, 1.f, 1.f); \n"\
@@ -25018,6 +27031,118 @@ static const char g_integrator_pt_opencl[]= \
 "    } \n"\
 "} \n"\
 " \n"\
+"#define M_PI 3.14159265358979323846 \n"\
+" \n"\
+"/// Ray generation kernel for spherical camera. \n"\
+"/// \n"\
+"__kernel void SphericalCamera_GeneratePaths( \n"\
+"	// Camera descriptor \n"\
+"	__global Camera const* camera, \n"\
+"	// Image resolution \n"\
+"	int imgwidth, \n"\
+"	int imgheight, \n"\
+"	// RNG seed value \n"\
+"	int randseed, \n"\
+"	// Output rays \n"\
+"	__global ray* rays, \n"\
+"	__global SobolSampler* samplers, \n"\
+"	__global uint const* sobolmat, \n"\
+"	int reset \n"\
+"#ifndef NO_PATH_DATA \n"\
+"	, __global Path* paths \n"\
+"#endif \n"\
+") \n"\
+"{ \n"\
+"	int2 globalid; \n"\
+"	globalid.x = get_global_id(0); \n"\
+"	globalid.y = get_global_id(1); \n"\
+" \n"\
+"	// Check borders \n"\
+"	if (globalid.x < imgwidth && globalid.y < imgheight) \n"\
+"	{ \n"\
+"		// Get pointer to ray to handle \n"\
+"		__global ray* myray = rays + globalid.y * imgwidth + globalid.x; \n"\
+" \n"\
+"#ifndef NO_PATH_DATA \n"\
+"		__global Path* mypath = paths + globalid.y * imgwidth + globalid.x; \n"\
+"#endif \n"\
+" \n"\
+"		// Prepare RNG \n"\
+"		Rng rng; \n"\
+"		InitRng(randseed + globalid.x * 157 + 10433 * globalid.y, &rng); \n"\
+" \n"\
+"#ifdef SOBOL \n"\
+"		__global SobolSampler* sampler = samplers + globalid.y * imgwidth + globalid.x; \n"\
+" \n"\
+"		if (reset) \n"\
+"		{ \n"\
+"			sampler->seq = 0; \n"\
+"			sampler->s0 = RandUint(&rng); \n"\
+"		} else \n"\
+"		{ \n"\
+"			sampler->seq++; \n"\
+"		} \n"\
+" \n"\
+"		float2 sample0; \n"\
+"		sample0.x = SobolSampler_Sample1D(sampler->seq, kPixelX, sampler->s0, sobolmat); \n"\
+"		sample0.y = SobolSampler_Sample1D(sampler->seq, kPixelY, sampler->s0, sobolmat); \n"\
+"#else \n"\
+"		float2 sample0 = UniformSampler_Sample2D(&rng); \n"\
+"#endif \n"\
+" \n"\
+"		// Calculate [0..1] image plane sample \n"\
+"		float2 imgsample; \n"\
+"		imgsample.x = (float)globalid.x / imgwidth + sample0.x / imgwidth; \n"\
+"		imgsample.y = (float)globalid.y / imgheight + sample0.y / imgheight; \n"\
+" \n"\
+"		// Transform into [-0.5, 0.5] \n"\
+"		float2 hsample = imgsample - make_float2(0.5f, 0.5f); \n"\
+"		// Transform into [-dim/2, dim/2] \n"\
+"		float2 csample = hsample * camera->dim; \n"\
+" \n"\
+" \n"\
+"		float phi = (2.0 * M_PI) * (imgsample.x); \n"\
+"		float theta = (M_PI) * (imgsample.y); \n"\
+" \n"\
+"		float4 m1, m2, m3, m4; \n"\
+"		float4 n1, n2, n3, n4; \n"\
+" \n"\
+"		m1 = (float4) { cos(phi), 0.0, -sin(phi), 0.0 }; \n"\
+"		m2 = (float4) { 0.0, 1.0, 0.0, 0.0 }; \n"\
+"		m3 = (float4) { sin(phi), 0.0, cos(phi), 0.0 }; \n"\
+"		m4 = (float4) { 0.0, 0.0, 0.0, 1.0 }; \n"\
+" \n"\
+" \n"\
+"		n1 = (float4) { cos(theta), sin(theta), 0.0, 0.0 }; \n"\
+"		n2 = (float4) { -sin(theta), cos(theta), 0.0, 0.0 }; \n"\
+"		n3 = (float4) { 0.0, 0.0, 1.0, 0.0 }; \n"\
+"		n4 = (float4) { 0.0, 0.0, 0.0, 1.0 }; \n"\
+" \n"\
+"		//myray->d.xyz = normalize(camera->focal_length * transform_vector(transform_vector(-camera->up.xyz, n1, n2, n3, n4), m1, m2, m3, m4)); \n"\
+"		myray->d.xyz = normalize(camera->focal_length * transform_vector(transform_vector(-(float3) { 0, 1, 0 }, n1, n2, n3, n4), m1, m2, m3, m4)); \n"\
+" \n"\
+"		// Calculate direction to image plane \n"\
+"		//myray->d.xyz = normalize(camera->focal_length * camera->forward + csample.x * camera->right + csample.y * camera->up); \n"\
+"		// Origin == camera position + nearz * d \n"\
+"		myray->o.xyz = camera->p + camera->zcap.x * myray->d.xyz; \n"\
+"		// Max T value = zfar - znear since we moved origin to znear \n"\
+"		myray->o.w = camera->zcap.y - camera->zcap.x; \n"\
+"		// Generate random time from 0 to 1 \n"\
+"		myray->d.w = sample0.x; \n"\
+"		// Set ray max \n"\
+"		myray->extra.x = 0xFFFFFFFF; \n"\
+"		myray->extra.y = 0xFFFFFFFF; \n"\
+" \n"\
+"#ifndef NO_PATH_DATA \n"\
+"		mypath->throughput = make_float3(1.f, 1.f, 1.f); \n"\
+"		mypath->volume = -1; \n"\
+"		mypath->flags = 0; \n"\
+"		mypath->active = 0xFF; \n"\
+"#endif \n"\
+"	} \n"\
+"} \n"\
+" \n"\
+" \n"\
 "#endif // CAMERA_CL \n"\
 "/********************************************************************** \n"\
 "Copyright (c) 2016 Advanced Micro Devices, Inc. All rights reserved. \n"\
@@ -25043,8 +27168,6 @@ static const char g_integrator_pt_opencl[]= \
 "#ifndef SCENE_CL \n"\
 "#define SCENE_CL \n"\
 " \n"\
-"//#include \"../App/CL/utils.cl\" \n"\
-"//#include \"../App/CL/payload.cl\" \n"\
 " \n"\
 "/// Fill DifferentialGeometry structure based on intersection info from RadeonRays \n"\
 "void FillDifferentialGeometry(// Scene \n"\
@@ -25143,10 +27266,10 @@ static const char g_integrator_pt_opencl[]= \
 " \n"\
 "int Scene_SampleLight(Scene const* scene, float sample, float* pdf) \n"\
 "{ \n"\
-"    int numlights = scene->numemissives; \n"\
-"    int lightidx = clamp((int)(sample * numlights), 0, numlights - 1); \n"\
-"    *pdf = 1.f / numlights; \n"\
-"    return lightidx; \n"\
+"    int num_lights = scene->num_lights; \n"\
+"    int light_idx = clamp((int)(sample * num_lights), 0, num_lights - 1); \n"\
+"    *pdf = 1.f / num_lights; \n"\
+"    return light_idx; \n"\
 "} \n"\
 " \n"\
 " \n"\
@@ -25292,7 +27415,7 @@ static const char g_integrator_pt_opencl[]= \
 "float4 quaternion_inverse(float4 q) \n"\
 "{ \n"\
 "    float sqnorm = q.x*q.x + q.y*q.y + q.z*q.z + q.w*q.w; \n"\
-"     \n"\
+" \n"\
 "    /// Check if it is singular \n"\
 "    if (sqnorm != 0.f) \n"\
 "    { \n"\
@@ -25314,7 +27437,7 @@ static const char g_integrator_pt_opencl[]= \
 "} \n"\
 " \n"\
 "/// Linearly interpolate between two values \n"\
-"float3 lerp(float3 a, float3 b, float w) \n"\
+"float4 lerp(float4 a, float4 b, float w) \n"\
 "{ \n"\
 "    return a + w*(b-a); \n"\
 "} \n"\
@@ -25333,7 +27456,7 @@ static const char g_integrator_pt_opencl[]= \
 "float3 GetOrthoVector(float3 n) \n"\
 "{ \n"\
 "    float3 p; \n"\
-"     \n"\
+" \n"\
 "    if (fabs(n.z) > 0.f) { \n"\
 "        float k = sqrt(n.y*n.y + n.z*n.z); \n"\
 "        p.x = 0; p.y = -n.z/k; p.z = n.y/k; \n"\
@@ -25576,7 +27699,7 @@ static const char g_integrator_pt_opencl[]= \
 "float4 quaternion_inverse(float4 q) \n"\
 "{ \n"\
 "    float sqnorm = q.x*q.x + q.y*q.y + q.z*q.z + q.w*q.w; \n"\
-"     \n"\
+" \n"\
 "    /// Check if it is singular \n"\
 "    if (sqnorm != 0.f) \n"\
 "    { \n"\
@@ -25598,7 +27721,7 @@ static const char g_integrator_pt_opencl[]= \
 "} \n"\
 " \n"\
 "/// Linearly interpolate between two values \n"\
-"float3 lerp(float3 a, float3 b, float w) \n"\
+"float4 lerp(float4 a, float4 b, float w) \n"\
 "{ \n"\
 "    return a + w*(b-a); \n"\
 "} \n"\
@@ -25617,7 +27740,7 @@ static const char g_integrator_pt_opencl[]= \
 "float3 GetOrthoVector(float3 n) \n"\
 "{ \n"\
 "    float3 p; \n"\
-"     \n"\
+" \n"\
 "    if (fabs(n.z) > 0.f) { \n"\
 "        float k = sqrt(n.y*n.y + n.z*n.z); \n"\
 "        p.x = 0; p.y = -n.z/k; p.z = n.y/k; \n"\
@@ -25686,88 +27809,88 @@ static const char g_integrator_pt_opencl[]= \
 "#define TEXTURE_ARGS_IDX(x) x, textures, texturedata \n"\
 " \n"\
 "/// Sample 2D texture \n"\
-"float3 Texture_Sample2D(float2 uv, TEXTURE_ARG_LIST_IDX(texidx)) \n"\
+"float4 Texture_Sample2D(float2 uv, TEXTURE_ARG_LIST_IDX(texidx)) \n"\
 "{ \n"\
 "    // Get width and height \n"\
 "    int width = textures[texidx].w; \n"\
 "    int height = textures[texidx].h; \n"\
-"     \n"\
+" \n"\
 "    // Find the origin of the data in the pool \n"\
 "    __global char const* mydata = texturedata + textures[texidx].dataoffset; \n"\
 " \n"\
 "    // Handle UV wrap \n"\
 "    // TODO: need UV mode support \n"\
 "    uv -= floor(uv); \n"\
-"     \n"\
+" \n"\
 "    // Reverse Y: \n"\
 "    // it is needed as textures are loaded with Y axis going top to down \n"\
 "    // and our axis goes from down to top \n"\
 "    uv.y = 1.f - uv.y; \n"\
-"     \n"\
+" \n"\
 "    // Calculate integer coordinates \n"\
 "    int x0 = clamp((int)floor(uv.x * width), 0, width - 1); \n"\
 "    int y0 = clamp((int)floor(uv.y * height), 0, height - 1); \n"\
-"     \n"\
+" \n"\
 "    // Calculate samples for linear filtering \n"\
 "    int x1 = clamp(x0 + 1, 0,  width - 1); \n"\
 "    int y1 = clamp(y0 + 1, 0, height - 1); \n"\
-"     \n"\
+" \n"\
 "    // Calculate weights for linear filtering \n"\
 "    float wx = uv.x * width - floor(uv.x * width); \n"\
 "    float wy = uv.y * height - floor(uv.y * height); \n"\
-"     \n"\
+" \n"\
 "    switch (textures[texidx].fmt) \n"\
 "    { \n"\
 "        case RGBA32: \n"\
 "        { \n"\
-"            __global float3 const* mydataf = (__global float3 const*)mydata; \n"\
-"             \n"\
+"            __global float4 const* mydataf = (__global float4 const*)mydata; \n"\
+" \n"\
 "            // Get 4 values for linear filtering \n"\
-"            float3 val00 = *(mydataf + width * y0 + x0); \n"\
-"            float3 val01 = *(mydataf + width * y0 + x1); \n"\
-"            float3 val10 = *(mydataf + width * y1 + x0); \n"\
-"            float3 val11 = *(mydataf + width * y1 + x1); \n"\
-"             \n"\
+"            float4 val00 = *(mydataf + width * y0 + x0); \n"\
+"            float4 val01 = *(mydataf + width * y0 + x1); \n"\
+"            float4 val10 = *(mydataf + width * y1 + x0); \n"\
+"            float4 val11 = *(mydataf + width * y1 + x1); \n"\
+" \n"\
 "            // Filter and return the result \n"\
 "            return lerp(lerp(val00, val01, wx), lerp(val10, val11, wx), wy); \n"\
 "        } \n"\
-"             \n"\
+" \n"\
 "        case RGBA16: \n"\
 "        { \n"\
 "            __global half const* mydatah = (__global half const*)mydata; \n"\
-"             \n"\
+" \n"\
 "            // Get 4 values \n"\
-"            float3 val00 = vload_half4(width * y0 + x0, mydatah).xyz; \n"\
-"            float3 val01 = vload_half4(width * y0 + x1, mydatah).xyz; \n"\
-"            float3 val10 = vload_half4(width * y1 + x0, mydatah).xyz; \n"\
-"            float3 val11 = vload_half4(width * y1 + x1, mydatah).xyz; \n"\
-"             \n"\
+"            float4 val00 = vload_half4(width * y0 + x0, mydatah); \n"\
+"            float4 val01 = vload_half4(width * y0 + x1, mydatah); \n"\
+"            float4 val10 = vload_half4(width * y1 + x0, mydatah); \n"\
+"            float4 val11 = vload_half4(width * y1 + x1, mydatah); \n"\
+" \n"\
 "            // Filter and return the result \n"\
 "            return lerp(lerp(val00, val01, wx), lerp(val10, val11, wx), wy); \n"\
 "        } \n"\
-"             \n"\
+" \n"\
 "        case RGBA8: \n"\
 "        { \n"\
 "            __global uchar4 const* mydatac = (__global uchar4 const*)mydata; \n"\
-"             \n"\
+" \n"\
 "            // Get 4 values and convert to float \n"\
 "            uchar4 valu00 = *(mydatac + width * y0 + x0); \n"\
 "            uchar4 valu01 = *(mydatac + width * y0 + x1); \n"\
 "            uchar4 valu10 = *(mydatac + width * y1 + x0); \n"\
 "            uchar4 valu11 = *(mydatac + width * y1 + x1); \n"\
-"             \n"\
-"            float3 val00 = make_float3((float)valu00.x / 255.f, (float)valu00.y / 255.f, (float)valu00.z / 255.f); \n"\
-"            float3 val01 = make_float3((float)valu01.x / 255.f, (float)valu01.y / 255.f, (float)valu01.z / 255.f); \n"\
-"            float3 val10 = make_float3((float)valu10.x / 255.f, (float)valu10.y / 255.f, (float)valu10.z / 255.f); \n"\
-"            float3 val11 = make_float3((float)valu11.x / 255.f, (float)valu11.y / 255.f, (float)valu11.z / 255.f); \n"\
-"             \n"\
+" \n"\
+"            float4 val00 = make_float4((float)valu00.x / 255.f, (float)valu00.y / 255.f, (float)valu00.z / 255.f, (float)valu00.w / 255.f); \n"\
+"            float4 val01 = make_float4((float)valu01.x / 255.f, (float)valu01.y / 255.f, (float)valu01.z / 255.f, (float)valu01.w / 255.f); \n"\
+"            float4 val10 = make_float4((float)valu10.x / 255.f, (float)valu10.y / 255.f, (float)valu10.z / 255.f, (float)valu10.w / 255.f); \n"\
+"            float4 val11 = make_float4((float)valu11.x / 255.f, (float)valu11.y / 255.f, (float)valu11.z / 255.f, (float)valu11.w / 255.f); \n"\
+" \n"\
 "            // Filter and return the result \n"\
 "            return lerp(lerp(val00, val01, wx), lerp(val10, val11, wx), wy); \n"\
 "        } \n"\
-"             \n"\
+" \n"\
 "        default: \n"\
 "        { \n"\
-"            return make_float3(0.f, 0.f, 0.f); \n"\
+"            return make_float4(0.f, 0.f, 0.f, 0.f); \n"\
 "        } \n"\
 "    } \n"\
 "} \n"\
@@ -25778,14 +27901,14 @@ static const char g_integrator_pt_opencl[]= \
 "    // Transform to spherical coords \n"\
 "    float r, phi, theta; \n"\
 "    CartesianToSpherical(d, &r, &phi, &theta); \n"\
-"     \n"\
+" \n"\
 "    // Map to [0,1]x[0,1] range and reverse Y axis \n"\
 "    float2 uv; \n"\
 "    uv.x = phi / (2*PI); \n"\
 "    uv.y = 1.f - theta / PI; \n"\
-"     \n"\
+" \n"\
 "    // Sample the texture \n"\
-"    return native_powr(Texture_Sample2D(uv, TEXTURE_ARGS_IDX(texidx)), 1.f / 1.f); \n"\
+"    return Texture_Sample2D(uv, TEXTURE_ARGS_IDX(texidx)).xyz; \n"\
 "} \n"\
 " \n"\
 "/// Get data from parameter value or texture \n"\
@@ -25802,9 +27925,30 @@ static const char g_integrator_pt_opencl[]= \
 "    if (texidx != -1) \n"\
 "    { \n"\
 "        // Sample texture \n"\
+"        return native_powr(Texture_Sample2D(uv, TEXTURE_ARGS_IDX(texidx)).xyz, 2.2f); \n"\
+"    } \n"\
+" \n"\
+"    // Return fixed color otherwise \n"\
+"    return v; \n"\
+"} \n"\
+" \n"\
+"/// Get data from parameter value or texture \n"\
+"float4 Texture_GetValue4f( \n"\
+"                // Value \n"\
+"                float4 v, \n"\
+"                // Texture coordinate \n"\
+"                float2 uv, \n"\
+"                // Texture args \n"\
+"                TEXTURE_ARG_LIST_IDX(texidx) \n"\
+"                ) \n"\
+"{ \n"\
+"    // If texture present sample from texture \n"\
+"    if (texidx != -1) \n"\
+"    { \n"\
+"        // Sample texture \n"\
 "        return native_powr(Texture_Sample2D(uv, TEXTURE_ARGS_IDX(texidx)), 2.2f); \n"\
 "    } \n"\
-"     \n"\
+" \n"\
 "    // Return fixed color otherwise \n"\
 "    return v; \n"\
 "} \n"\
@@ -25825,7 +27969,7 @@ static const char g_integrator_pt_opencl[]= \
 "        // Sample texture \n"\
 "        return Texture_Sample2D(uv, TEXTURE_ARGS_IDX(texidx)).x; \n"\
 "    } \n"\
-"     \n"\
+" \n"\
 "    // Return fixed color otherwise \n"\
 "    return v; \n"\
 "} \n"\
@@ -25860,11 +28004,11 @@ static const char g_integrator_pt_opencl[]= \
 "        __global float3 const* mydataf = (__global float3 const*)mydata; \n"\
 " \n"\
 "        // Sobel filter \n"\
-"        const float tex00 = (*(mydataf + width * (t0 - 1) + (s0-1))).x;  \n"\
+"        const float tex00 = (*(mydataf + width * (t0 - 1) + (s0-1))).x; \n"\
 "        const float tex10 = (*(mydataf + width * (t0 - 1) + (s0))).x; \n"\
-"        const float tex20 = (*(mydataf + width * (t0 - 1) + (s0 + 1))).x;  \n"\
+"        const float tex20 = (*(mydataf + width * (t0 - 1) + (s0 + 1))).x; \n"\
 " \n"\
-"        const float tex01 = (*(mydataf + width * (t0) + (s0 - 1))).x;  \n"\
+"        const float tex01 = (*(mydataf + width * (t0) + (s0 - 1))).x; \n"\
 "        const float tex21 = (*(mydataf + width * (t0) + (s0 + 1))).x; \n"\
 " \n"\
 "        const float tex02 = (*(mydataf + width * (t0 + 1) + (s0 - 1))).x; \n"\
@@ -25886,8 +28030,8 @@ static const char g_integrator_pt_opencl[]= \
 "        const float tex10 = vload_half4(width * (t0 - 1) + (s0), mydatah).x; \n"\
 "        const float tex20 = vload_half4(width * (t0 - 1) + (s0 + 1), mydatah).x; \n"\
 " \n"\
-"        const float tex01 = vload_half4(width * (t0)+(s0 - 1), mydatah).x;  \n"\
-"        const float tex21 = vload_half4(width * (t0)+(s0 + 1), mydatah).x;  \n"\
+"        const float tex01 = vload_half4(width * (t0)+(s0 - 1), mydatah).x; \n"\
+"        const float tex21 = vload_half4(width * (t0)+(s0 + 1), mydatah).x; \n"\
 " \n"\
 "        const float tex02 = vload_half4(width * (t0 + 1) + (s0 - 1), mydatah).x; \n"\
 "        const float tex12 = vload_half4(width * (t0 + 1) + (s0), mydatah).x; \n"\
@@ -25966,7 +28110,7 @@ static const char g_integrator_pt_opencl[]= \
 "********************************************************************/ \n"\
 "#ifndef PAYLOAD_CL \n"\
 "#define PAYLOAD_CL \n"\
-"#define SOBOL \n"\
+"//#define SOBOL \n"\
 "#define MULTISCATTER \n"\
 " \n"\
 "/// Ray descriptor \n"\
@@ -25978,7 +28122,7 @@ static const char g_integrator_pt_opencl[]= \
 "    float4 d; \n"\
 "    /// x - ray mask, y - activity flag \n"\
 "    int2 extra; \n"\
-"    int2 padding; \n"\
+"    float2 padding; \n"\
 "} ray; \n"\
 " \n"\
 "/// Intersection data returned by RadeonRays \n"\
@@ -26032,8 +28176,6 @@ static const char g_integrator_pt_opencl[]= \
 "} Emissive; \n"\
 " \n"\
 " \n"\
-" \n"\
-" \n"\
 "typedef enum _PathFlags \n"\
 "{ \n"\
 "    kNone = 0x0, \n"\
@@ -26083,6 +28225,53 @@ static const char g_integrator_pt_opencl[]= \
 " \n"\
 "} Material; \n"\
 " \n"\
+" \n"\
+"enum LightType \n"\
+"{ \n"\
+"    kPoint = 0x1, \n"\
+"    kDirectional, \n"\
+"    kSpot, \n"\
+"    kArea, \n"\
+"    kIbl \n"\
+"}; \n"\
+" \n"\
+"typedef struct _Light \n"\
+"{ \n"\
+"    int type; \n"\
+" \n"\
+"    union \n"\
+"    { \n"\
+"        // Area light \n"\
+"        struct \n"\
+"        { \n"\
+"            int shapeidx; \n"\
+"            int primidx; \n"\
+"            int matidx; \n"\
+"        }; \n"\
+" \n"\
+"        // IBL \n"\
+"        struct \n"\
+"        { \n"\
+"            int tex; \n"\
+"            int texdiffuse; \n"\
+"            float multiplier; \n"\
+"        }; \n"\
+"         \n"\
+"         \n"\
+"        // Spot \n"\
+"        struct \n"\
+"        { \n"\
+"            float ia; \n"\
+"            float oa; \n"\
+"            float f; \n"\
+"        }; \n"\
+"    }; \n"\
+" \n"\
+"    float3 p; \n"\
+"    float3 d; \n"\
+"    float3 intensity; \n"\
+"} Light; \n"\
+" \n"\
 "typedef struct _Scene \n"\
 "{ \n"\
 "    // Vertices \n"\
@@ -26100,13 +28289,13 @@ static const char g_integrator_pt_opencl[]= \
 "    // Materials \n"\
 "    __global Material const* materials; \n"\
 "    // Emissive objects \n"\
-"    __global Emissive const* emissives; \n"\
+"    __global Light const* lights; \n"\
 "    // Envmap idx \n"\
 "    int envmapidx; \n"\
 "    // Envmap multiplier \n"\
 "    float envmapmul; \n"\
 "    // Number of emissive objects \n"\
-"    int numemissives; \n"\
+"    int num_lights; \n"\
 "} Scene; \n"\
 " \n"\
 "// Hit data \n"\
@@ -26124,7 +28313,7 @@ static const char g_integrator_pt_opencl[]= \
 "    float3 dpdu; \n"\
 "    float3 dpdv; \n"\
 "    float  area; \n"\
-"    // Material  \n"\
+"    // Material \n"\
 "    Material mat; \n"\
 "} DifferentialGeometry; \n"\
 " \n"\
@@ -26180,6 +28369,16 @@ static const char g_integrator_pt_opencl[]= \
 "    r->extra.y = 0; \n"\
 "} \n"\
 " \n"\
+"void Ray_SetExtra(__global ray* r, float2 extra) \n"\
+"{ \n"\
+"    r->padding = extra; \n"\
+"} \n"\
+" \n"\
+"float2 Ray_GetExtra(__global ray const* r) \n"\
+"{ \n"\
+"    return r->padding; \n"\
+"} \n"\
+" \n"\
 "void Ray_Init(__global ray* r, float3 o, float3 d, float maxt, float time, int mask) \n"\
 "{ \n"\
 "    // TODO: Check if it generates MTBUF_XYZW write \n"\
@@ -26190,6 +28389,8 @@ static const char g_integrator_pt_opencl[]= \
 "    r->extra.x = mask; \n"\
 "    r->extra.y = 0xFFFFFFFF; \n"\
 "} \n"\
+" \n"\
+" \n"\
 " \n"\
 "#endif // PAYLOAD_CL \n"\
 "/********************************************************************** \n"\
@@ -26333,7 +28534,7 @@ static const char g_integrator_pt_opencl[]= \
 "float4 quaternion_inverse(float4 q) \n"\
 "{ \n"\
 "    float sqnorm = q.x*q.x + q.y*q.y + q.z*q.z + q.w*q.w; \n"\
-"     \n"\
+" \n"\
 "    /// Check if it is singular \n"\
 "    if (sqnorm != 0.f) \n"\
 "    { \n"\
@@ -26355,7 +28556,7 @@ static const char g_integrator_pt_opencl[]= \
 "} \n"\
 " \n"\
 "/// Linearly interpolate between two values \n"\
-"float3 lerp(float3 a, float3 b, float w) \n"\
+"float4 lerp(float4 a, float4 b, float w) \n"\
 "{ \n"\
 "    return a + w*(b-a); \n"\
 "} \n"\
@@ -26374,7 +28575,7 @@ static const char g_integrator_pt_opencl[]= \
 "float3 GetOrthoVector(float3 n) \n"\
 "{ \n"\
 "    float3 p; \n"\
-"     \n"\
+" \n"\
 "    if (fabs(n.z) > 0.f) { \n"\
 "        float k = sqrt(n.y*n.y + n.z*n.z); \n"\
 "        p.x = 0; p.y = -n.z/k; p.z = n.y/k; \n"\
@@ -26617,7 +28818,7 @@ static const char g_integrator_pt_opencl[]= \
 "float4 quaternion_inverse(float4 q) \n"\
 "{ \n"\
 "    float sqnorm = q.x*q.x + q.y*q.y + q.z*q.z + q.w*q.w; \n"\
-"     \n"\
+" \n"\
 "    /// Check if it is singular \n"\
 "    if (sqnorm != 0.f) \n"\
 "    { \n"\
@@ -26639,7 +28840,7 @@ static const char g_integrator_pt_opencl[]= \
 "} \n"\
 " \n"\
 "/// Linearly interpolate between two values \n"\
-"float3 lerp(float3 a, float3 b, float w) \n"\
+"float4 lerp(float4 a, float4 b, float w) \n"\
 "{ \n"\
 "    return a + w*(b-a); \n"\
 "} \n"\
@@ -26658,7 +28859,7 @@ static const char g_integrator_pt_opencl[]= \
 "float3 GetOrthoVector(float3 n) \n"\
 "{ \n"\
 "    float3 p; \n"\
-"     \n"\
+" \n"\
 "    if (fabs(n.z) > 0.f) { \n"\
 "        float k = sqrt(n.y*n.y + n.z*n.z); \n"\
 "        p.x = 0; p.y = -n.z/k; p.z = n.y/k; \n"\
@@ -26727,88 +28928,88 @@ static const char g_integrator_pt_opencl[]= \
 "#define TEXTURE_ARGS_IDX(x) x, textures, texturedata \n"\
 " \n"\
 "/// Sample 2D texture \n"\
-"float3 Texture_Sample2D(float2 uv, TEXTURE_ARG_LIST_IDX(texidx)) \n"\
+"float4 Texture_Sample2D(float2 uv, TEXTURE_ARG_LIST_IDX(texidx)) \n"\
 "{ \n"\
 "    // Get width and height \n"\
 "    int width = textures[texidx].w; \n"\
 "    int height = textures[texidx].h; \n"\
-"     \n"\
+" \n"\
 "    // Find the origin of the data in the pool \n"\
 "    __global char const* mydata = texturedata + textures[texidx].dataoffset; \n"\
 " \n"\
 "    // Handle UV wrap \n"\
 "    // TODO: need UV mode support \n"\
 "    uv -= floor(uv); \n"\
-"     \n"\
+" \n"\
 "    // Reverse Y: \n"\
 "    // it is needed as textures are loaded with Y axis going top to down \n"\
 "    // and our axis goes from down to top \n"\
 "    uv.y = 1.f - uv.y; \n"\
-"     \n"\
+" \n"\
 "    // Calculate integer coordinates \n"\
 "    int x0 = clamp((int)floor(uv.x * width), 0, width - 1); \n"\
 "    int y0 = clamp((int)floor(uv.y * height), 0, height - 1); \n"\
-"     \n"\
+" \n"\
 "    // Calculate samples for linear filtering \n"\
 "    int x1 = clamp(x0 + 1, 0,  width - 1); \n"\
 "    int y1 = clamp(y0 + 1, 0, height - 1); \n"\
-"     \n"\
+" \n"\
 "    // Calculate weights for linear filtering \n"\
 "    float wx = uv.x * width - floor(uv.x * width); \n"\
 "    float wy = uv.y * height - floor(uv.y * height); \n"\
-"     \n"\
+" \n"\
 "    switch (textures[texidx].fmt) \n"\
 "    { \n"\
 "        case RGBA32: \n"\
 "        { \n"\
-"            __global float3 const* mydataf = (__global float3 const*)mydata; \n"\
-"             \n"\
+"            __global float4 const* mydataf = (__global float4 const*)mydata; \n"\
+" \n"\
 "            // Get 4 values for linear filtering \n"\
-"            float3 val00 = *(mydataf + width * y0 + x0); \n"\
-"            float3 val01 = *(mydataf + width * y0 + x1); \n"\
-"            float3 val10 = *(mydataf + width * y1 + x0); \n"\
-"            float3 val11 = *(mydataf + width * y1 + x1); \n"\
-"             \n"\
+"            float4 val00 = *(mydataf + width * y0 + x0); \n"\
+"            float4 val01 = *(mydataf + width * y0 + x1); \n"\
+"            float4 val10 = *(mydataf + width * y1 + x0); \n"\
+"            float4 val11 = *(mydataf + width * y1 + x1); \n"\
+" \n"\
 "            // Filter and return the result \n"\
 "            return lerp(lerp(val00, val01, wx), lerp(val10, val11, wx), wy); \n"\
 "        } \n"\
-"             \n"\
+" \n"\
 "        case RGBA16: \n"\
 "        { \n"\
 "            __global half const* mydatah = (__global half const*)mydata; \n"\
-"             \n"\
+" \n"\
 "            // Get 4 values \n"\
-"            float3 val00 = vload_half4(width * y0 + x0, mydatah).xyz; \n"\
-"            float3 val01 = vload_half4(width * y0 + x1, mydatah).xyz; \n"\
-"            float3 val10 = vload_half4(width * y1 + x0, mydatah).xyz; \n"\
-"            float3 val11 = vload_half4(width * y1 + x1, mydatah).xyz; \n"\
-"             \n"\
+"            float4 val00 = vload_half4(width * y0 + x0, mydatah); \n"\
+"            float4 val01 = vload_half4(width * y0 + x1, mydatah); \n"\
+"            float4 val10 = vload_half4(width * y1 + x0, mydatah); \n"\
+"            float4 val11 = vload_half4(width * y1 + x1, mydatah); \n"\
+" \n"\
 "            // Filter and return the result \n"\
 "            return lerp(lerp(val00, val01, wx), lerp(val10, val11, wx), wy); \n"\
 "        } \n"\
-"             \n"\
+" \n"\
 "        case RGBA8: \n"\
 "        { \n"\
 "            __global uchar4 const* mydatac = (__global uchar4 const*)mydata; \n"\
-"             \n"\
+" \n"\
 "            // Get 4 values and convert to float \n"\
 "            uchar4 valu00 = *(mydatac + width * y0 + x0); \n"\
 "            uchar4 valu01 = *(mydatac + width * y0 + x1); \n"\
 "            uchar4 valu10 = *(mydatac + width * y1 + x0); \n"\
 "            uchar4 valu11 = *(mydatac + width * y1 + x1); \n"\
-"             \n"\
-"            float3 val00 = make_float3((float)valu00.x / 255.f, (float)valu00.y / 255.f, (float)valu00.z / 255.f); \n"\
-"            float3 val01 = make_float3((float)valu01.x / 255.f, (float)valu01.y / 255.f, (float)valu01.z / 255.f); \n"\
-"            float3 val10 = make_float3((float)valu10.x / 255.f, (float)valu10.y / 255.f, (float)valu10.z / 255.f); \n"\
-"            float3 val11 = make_float3((float)valu11.x / 255.f, (float)valu11.y / 255.f, (float)valu11.z / 255.f); \n"\
-"             \n"\
+" \n"\
+"            float4 val00 = make_float4((float)valu00.x / 255.f, (float)valu00.y / 255.f, (float)valu00.z / 255.f, (float)valu00.w / 255.f); \n"\
+"            float4 val01 = make_float4((float)valu01.x / 255.f, (float)valu01.y / 255.f, (float)valu01.z / 255.f, (float)valu01.w / 255.f); \n"\
+"            float4 val10 = make_float4((float)valu10.x / 255.f, (float)valu10.y / 255.f, (float)valu10.z / 255.f, (float)valu10.w / 255.f); \n"\
+"            float4 val11 = make_float4((float)valu11.x / 255.f, (float)valu11.y / 255.f, (float)valu11.z / 255.f, (float)valu11.w / 255.f); \n"\
+" \n"\
 "            // Filter and return the result \n"\
 "            return lerp(lerp(val00, val01, wx), lerp(val10, val11, wx), wy); \n"\
 "        } \n"\
-"             \n"\
+" \n"\
 "        default: \n"\
 "        { \n"\
-"            return make_float3(0.f, 0.f, 0.f); \n"\
+"            return make_float4(0.f, 0.f, 0.f, 0.f); \n"\
 "        } \n"\
 "    } \n"\
 "} \n"\
@@ -26819,14 +29020,14 @@ static const char g_integrator_pt_opencl[]= \
 "    // Transform to spherical coords \n"\
 "    float r, phi, theta; \n"\
 "    CartesianToSpherical(d, &r, &phi, &theta); \n"\
-"     \n"\
+" \n"\
 "    // Map to [0,1]x[0,1] range and reverse Y axis \n"\
 "    float2 uv; \n"\
 "    uv.x = phi / (2*PI); \n"\
 "    uv.y = 1.f - theta / PI; \n"\
-"     \n"\
+" \n"\
 "    // Sample the texture \n"\
-"    return native_powr(Texture_Sample2D(uv, TEXTURE_ARGS_IDX(texidx)), 1.f / 1.f); \n"\
+"    return Texture_Sample2D(uv, TEXTURE_ARGS_IDX(texidx)).xyz; \n"\
 "} \n"\
 " \n"\
 "/// Get data from parameter value or texture \n"\
@@ -26843,9 +29044,30 @@ static const char g_integrator_pt_opencl[]= \
 "    if (texidx != -1) \n"\
 "    { \n"\
 "        // Sample texture \n"\
+"        return native_powr(Texture_Sample2D(uv, TEXTURE_ARGS_IDX(texidx)).xyz, 2.2f); \n"\
+"    } \n"\
+" \n"\
+"    // Return fixed color otherwise \n"\
+"    return v; \n"\
+"} \n"\
+" \n"\
+"/// Get data from parameter value or texture \n"\
+"float4 Texture_GetValue4f( \n"\
+"                // Value \n"\
+"                float4 v, \n"\
+"                // Texture coordinate \n"\
+"                float2 uv, \n"\
+"                // Texture args \n"\
+"                TEXTURE_ARG_LIST_IDX(texidx) \n"\
+"                ) \n"\
+"{ \n"\
+"    // If texture present sample from texture \n"\
+"    if (texidx != -1) \n"\
+"    { \n"\
+"        // Sample texture \n"\
 "        return native_powr(Texture_Sample2D(uv, TEXTURE_ARGS_IDX(texidx)), 2.2f); \n"\
 "    } \n"\
-"     \n"\
+" \n"\
 "    // Return fixed color otherwise \n"\
 "    return v; \n"\
 "} \n"\
@@ -26866,7 +29088,7 @@ static const char g_integrator_pt_opencl[]= \
 "        // Sample texture \n"\
 "        return Texture_Sample2D(uv, TEXTURE_ARGS_IDX(texidx)).x; \n"\
 "    } \n"\
-"     \n"\
+" \n"\
 "    // Return fixed color otherwise \n"\
 "    return v; \n"\
 "} \n"\
@@ -26901,11 +29123,11 @@ static const char g_integrator_pt_opencl[]= \
 "        __global float3 const* mydataf = (__global float3 const*)mydata; \n"\
 " \n"\
 "        // Sobel filter \n"\
-"        const float tex00 = (*(mydataf + width * (t0 - 1) + (s0-1))).x;  \n"\
+"        const float tex00 = (*(mydataf + width * (t0 - 1) + (s0-1))).x; \n"\
 "        const float tex10 = (*(mydataf + width * (t0 - 1) + (s0))).x; \n"\
-"        const float tex20 = (*(mydataf + width * (t0 - 1) + (s0 + 1))).x;  \n"\
+"        const float tex20 = (*(mydataf + width * (t0 - 1) + (s0 + 1))).x; \n"\
 " \n"\
-"        const float tex01 = (*(mydataf + width * (t0) + (s0 - 1))).x;  \n"\
+"        const float tex01 = (*(mydataf + width * (t0) + (s0 - 1))).x; \n"\
 "        const float tex21 = (*(mydataf + width * (t0) + (s0 + 1))).x; \n"\
 " \n"\
 "        const float tex02 = (*(mydataf + width * (t0 + 1) + (s0 - 1))).x; \n"\
@@ -26927,8 +29149,8 @@ static const char g_integrator_pt_opencl[]= \
 "        const float tex10 = vload_half4(width * (t0 - 1) + (s0), mydatah).x; \n"\
 "        const float tex20 = vload_half4(width * (t0 - 1) + (s0 + 1), mydatah).x; \n"\
 " \n"\
-"        const float tex01 = vload_half4(width * (t0)+(s0 - 1), mydatah).x;  \n"\
-"        const float tex21 = vload_half4(width * (t0)+(s0 + 1), mydatah).x;  \n"\
+"        const float tex01 = vload_half4(width * (t0)+(s0 - 1), mydatah).x; \n"\
+"        const float tex21 = vload_half4(width * (t0)+(s0 + 1), mydatah).x; \n"\
 " \n"\
 "        const float tex02 = vload_half4(width * (t0 + 1) + (s0 - 1), mydatah).x; \n"\
 "        const float tex12 = vload_half4(width * (t0 + 1) + (s0), mydatah).x; \n"\
@@ -27007,7 +29229,7 @@ static const char g_integrator_pt_opencl[]= \
 "********************************************************************/ \n"\
 "#ifndef PAYLOAD_CL \n"\
 "#define PAYLOAD_CL \n"\
-"#define SOBOL \n"\
+"//#define SOBOL \n"\
 "#define MULTISCATTER \n"\
 " \n"\
 "/// Ray descriptor \n"\
@@ -27019,7 +29241,7 @@ static const char g_integrator_pt_opencl[]= \
 "    float4 d; \n"\
 "    /// x - ray mask, y - activity flag \n"\
 "    int2 extra; \n"\
-"    int2 padding; \n"\
+"    float2 padding; \n"\
 "} ray; \n"\
 " \n"\
 "/// Intersection data returned by RadeonRays \n"\
@@ -27073,8 +29295,6 @@ static const char g_integrator_pt_opencl[]= \
 "} Emissive; \n"\
 " \n"\
 " \n"\
-" \n"\
-" \n"\
 "typedef enum _PathFlags \n"\
 "{ \n"\
 "    kNone = 0x0, \n"\
@@ -27124,6 +29344,53 @@ static const char g_integrator_pt_opencl[]= \
 " \n"\
 "} Material; \n"\
 " \n"\
+" \n"\
+"enum LightType \n"\
+"{ \n"\
+"    kPoint = 0x1, \n"\
+"    kDirectional, \n"\
+"    kSpot, \n"\
+"    kArea, \n"\
+"    kIbl \n"\
+"}; \n"\
+" \n"\
+"typedef struct _Light \n"\
+"{ \n"\
+"    int type; \n"\
+" \n"\
+"    union \n"\
+"    { \n"\
+"        // Area light \n"\
+"        struct \n"\
+"        { \n"\
+"            int shapeidx; \n"\
+"            int primidx; \n"\
+"            int matidx; \n"\
+"        }; \n"\
+" \n"\
+"        // IBL \n"\
+"        struct \n"\
+"        { \n"\
+"            int tex; \n"\
+"            int texdiffuse; \n"\
+"            float multiplier; \n"\
+"        }; \n"\
+"         \n"\
+"         \n"\
+"        // Spot \n"\
+"        struct \n"\
+"        { \n"\
+"            float ia; \n"\
+"            float oa; \n"\
+"            float f; \n"\
+"        }; \n"\
+"    }; \n"\
+" \n"\
+"    float3 p; \n"\
+"    float3 d; \n"\
+"    float3 intensity; \n"\
+"} Light; \n"\
+" \n"\
 "typedef struct _Scene \n"\
 "{ \n"\
 "    // Vertices \n"\
@@ -27141,13 +29408,13 @@ static const char g_integrator_pt_opencl[]= \
 "    // Materials \n"\
 "    __global Material const* materials; \n"\
 "    // Emissive objects \n"\
-"    __global Emissive const* emissives; \n"\
+"    __global Light const* lights; \n"\
 "    // Envmap idx \n"\
 "    int envmapidx; \n"\
 "    // Envmap multiplier \n"\
 "    float envmapmul; \n"\
 "    // Number of emissive objects \n"\
-"    int numemissives; \n"\
+"    int num_lights; \n"\
 "} Scene; \n"\
 " \n"\
 "// Hit data \n"\
@@ -27165,7 +29432,7 @@ static const char g_integrator_pt_opencl[]= \
 "    float3 dpdu; \n"\
 "    float3 dpdv; \n"\
 "    float  area; \n"\
-"    // Material  \n"\
+"    // Material \n"\
 "    Material mat; \n"\
 "} DifferentialGeometry; \n"\
 " \n"\
@@ -27221,6 +29488,16 @@ static const char g_integrator_pt_opencl[]= \
 "    r->extra.y = 0; \n"\
 "} \n"\
 " \n"\
+"void Ray_SetExtra(__global ray* r, float2 extra) \n"\
+"{ \n"\
+"    r->padding = extra; \n"\
+"} \n"\
+" \n"\
+"float2 Ray_GetExtra(__global ray const* r) \n"\
+"{ \n"\
+"    return r->padding; \n"\
+"} \n"\
+" \n"\
 "void Ray_Init(__global ray* r, float3 o, float3 d, float maxt, float time, int mask) \n"\
 "{ \n"\
 "    // TODO: Check if it generates MTBUF_XYZW write \n"\
@@ -27231,6 +29508,8 @@ static const char g_integrator_pt_opencl[]= \
 "    r->extra.x = mask; \n"\
 "    r->extra.y = 0xFFFFFFFF; \n"\
 "} \n"\
+" \n"\
+" \n"\
 " \n"\
 "#endif // PAYLOAD_CL \n"\
 " \n"\
@@ -28783,8 +31062,9 @@ static const char g_integrator_pt_opencl[]= \
 "#else \n"\
 "                float sample = UniformSampler_Sample2D(rng).x; \n"\
 "#endif \n"\
+"                float weight = Texture_GetValue1f(mat.ns, dg->uv, TEXTURE_ARGS_IDX(mat.nsmapidx)); \n"\
 " \n"\
-"                if (sample < mat.ns) \n"\
+"                if (sample < weight) \n"\
 "                { \n"\
 "                    // Sample top \n"\
 "                    int idx = mat.brdftopidx; \n"\
@@ -28856,7 +31136,7 @@ static const char g_integrator_pt_opencl[]= \
 "********************************************************************/ \n"\
 "#ifndef PAYLOAD_CL \n"\
 "#define PAYLOAD_CL \n"\
-"#define SOBOL \n"\
+"//#define SOBOL \n"\
 "#define MULTISCATTER \n"\
 " \n"\
 "/// Ray descriptor \n"\
@@ -28868,7 +31148,7 @@ static const char g_integrator_pt_opencl[]= \
 "    float4 d; \n"\
 "    /// x - ray mask, y - activity flag \n"\
 "    int2 extra; \n"\
-"    int2 padding; \n"\
+"    float2 padding; \n"\
 "} ray; \n"\
 " \n"\
 "/// Intersection data returned by RadeonRays \n"\
@@ -28922,8 +31202,6 @@ static const char g_integrator_pt_opencl[]= \
 "} Emissive; \n"\
 " \n"\
 " \n"\
-" \n"\
-" \n"\
 "typedef enum _PathFlags \n"\
 "{ \n"\
 "    kNone = 0x0, \n"\
@@ -28973,6 +31251,53 @@ static const char g_integrator_pt_opencl[]= \
 " \n"\
 "} Material; \n"\
 " \n"\
+" \n"\
+"enum LightType \n"\
+"{ \n"\
+"    kPoint = 0x1, \n"\
+"    kDirectional, \n"\
+"    kSpot, \n"\
+"    kArea, \n"\
+"    kIbl \n"\
+"}; \n"\
+" \n"\
+"typedef struct _Light \n"\
+"{ \n"\
+"    int type; \n"\
+" \n"\
+"    union \n"\
+"    { \n"\
+"        // Area light \n"\
+"        struct \n"\
+"        { \n"\
+"            int shapeidx; \n"\
+"            int primidx; \n"\
+"            int matidx; \n"\
+"        }; \n"\
+" \n"\
+"        // IBL \n"\
+"        struct \n"\
+"        { \n"\
+"            int tex; \n"\
+"            int texdiffuse; \n"\
+"            float multiplier; \n"\
+"        }; \n"\
+"         \n"\
+"         \n"\
+"        // Spot \n"\
+"        struct \n"\
+"        { \n"\
+"            float ia; \n"\
+"            float oa; \n"\
+"            float f; \n"\
+"        }; \n"\
+"    }; \n"\
+" \n"\
+"    float3 p; \n"\
+"    float3 d; \n"\
+"    float3 intensity; \n"\
+"} Light; \n"\
+" \n"\
 "typedef struct _Scene \n"\
 "{ \n"\
 "    // Vertices \n"\
@@ -28990,13 +31315,13 @@ static const char g_integrator_pt_opencl[]= \
 "    // Materials \n"\
 "    __global Material const* materials; \n"\
 "    // Emissive objects \n"\
-"    __global Emissive const* emissives; \n"\
+"    __global Light const* lights; \n"\
 "    // Envmap idx \n"\
 "    int envmapidx; \n"\
 "    // Envmap multiplier \n"\
 "    float envmapmul; \n"\
 "    // Number of emissive objects \n"\
-"    int numemissives; \n"\
+"    int num_lights; \n"\
 "} Scene; \n"\
 " \n"\
 "// Hit data \n"\
@@ -29014,7 +31339,7 @@ static const char g_integrator_pt_opencl[]= \
 "    float3 dpdu; \n"\
 "    float3 dpdv; \n"\
 "    float  area; \n"\
-"    // Material  \n"\
+"    // Material \n"\
 "    Material mat; \n"\
 "} DifferentialGeometry; \n"\
 " \n"\
@@ -29070,6 +31395,16 @@ static const char g_integrator_pt_opencl[]= \
 "    r->extra.y = 0; \n"\
 "} \n"\
 " \n"\
+"void Ray_SetExtra(__global ray* r, float2 extra) \n"\
+"{ \n"\
+"    r->padding = extra; \n"\
+"} \n"\
+" \n"\
+"float2 Ray_GetExtra(__global ray const* r) \n"\
+"{ \n"\
+"    return r->padding; \n"\
+"} \n"\
+" \n"\
 "void Ray_Init(__global ray* r, float3 o, float3 d, float maxt, float time, int mask) \n"\
 "{ \n"\
 "    // TODO: Check if it generates MTBUF_XYZW write \n"\
@@ -29080,6 +31415,8 @@ static const char g_integrator_pt_opencl[]= \
 "    r->extra.x = mask; \n"\
 "    r->extra.y = 0xFFFFFFFF; \n"\
 "} \n"\
+" \n"\
+" \n"\
 " \n"\
 "#endif // PAYLOAD_CL \n"\
 "/********************************************************************** \n"\
@@ -29129,7 +31466,7 @@ static const char g_integrator_pt_opencl[]= \
 "********************************************************************/ \n"\
 "#ifndef PAYLOAD_CL \n"\
 "#define PAYLOAD_CL \n"\
-"#define SOBOL \n"\
+"//#define SOBOL \n"\
 "#define MULTISCATTER \n"\
 " \n"\
 "/// Ray descriptor \n"\
@@ -29141,7 +31478,7 @@ static const char g_integrator_pt_opencl[]= \
 "    float4 d; \n"\
 "    /// x - ray mask, y - activity flag \n"\
 "    int2 extra; \n"\
-"    int2 padding; \n"\
+"    float2 padding; \n"\
 "} ray; \n"\
 " \n"\
 "/// Intersection data returned by RadeonRays \n"\
@@ -29195,8 +31532,6 @@ static const char g_integrator_pt_opencl[]= \
 "} Emissive; \n"\
 " \n"\
 " \n"\
-" \n"\
-" \n"\
 "typedef enum _PathFlags \n"\
 "{ \n"\
 "    kNone = 0x0, \n"\
@@ -29246,6 +31581,53 @@ static const char g_integrator_pt_opencl[]= \
 " \n"\
 "} Material; \n"\
 " \n"\
+" \n"\
+"enum LightType \n"\
+"{ \n"\
+"    kPoint = 0x1, \n"\
+"    kDirectional, \n"\
+"    kSpot, \n"\
+"    kArea, \n"\
+"    kIbl \n"\
+"}; \n"\
+" \n"\
+"typedef struct _Light \n"\
+"{ \n"\
+"    int type; \n"\
+" \n"\
+"    union \n"\
+"    { \n"\
+"        // Area light \n"\
+"        struct \n"\
+"        { \n"\
+"            int shapeidx; \n"\
+"            int primidx; \n"\
+"            int matidx; \n"\
+"        }; \n"\
+" \n"\
+"        // IBL \n"\
+"        struct \n"\
+"        { \n"\
+"            int tex; \n"\
+"            int texdiffuse; \n"\
+"            float multiplier; \n"\
+"        }; \n"\
+"         \n"\
+"         \n"\
+"        // Spot \n"\
+"        struct \n"\
+"        { \n"\
+"            float ia; \n"\
+"            float oa; \n"\
+"            float f; \n"\
+"        }; \n"\
+"    }; \n"\
+" \n"\
+"    float3 p; \n"\
+"    float3 d; \n"\
+"    float3 intensity; \n"\
+"} Light; \n"\
+" \n"\
 "typedef struct _Scene \n"\
 "{ \n"\
 "    // Vertices \n"\
@@ -29263,13 +31645,13 @@ static const char g_integrator_pt_opencl[]= \
 "    // Materials \n"\
 "    __global Material const* materials; \n"\
 "    // Emissive objects \n"\
-"    __global Emissive const* emissives; \n"\
+"    __global Light const* lights; \n"\
 "    // Envmap idx \n"\
 "    int envmapidx; \n"\
 "    // Envmap multiplier \n"\
 "    float envmapmul; \n"\
 "    // Number of emissive objects \n"\
-"    int numemissives; \n"\
+"    int num_lights; \n"\
 "} Scene; \n"\
 " \n"\
 "// Hit data \n"\
@@ -29287,7 +31669,7 @@ static const char g_integrator_pt_opencl[]= \
 "    float3 dpdu; \n"\
 "    float3 dpdv; \n"\
 "    float  area; \n"\
-"    // Material  \n"\
+"    // Material \n"\
 "    Material mat; \n"\
 "} DifferentialGeometry; \n"\
 " \n"\
@@ -29343,6 +31725,16 @@ static const char g_integrator_pt_opencl[]= \
 "    r->extra.y = 0; \n"\
 "} \n"\
 " \n"\
+"void Ray_SetExtra(__global ray* r, float2 extra) \n"\
+"{ \n"\
+"    r->padding = extra; \n"\
+"} \n"\
+" \n"\
+"float2 Ray_GetExtra(__global ray const* r) \n"\
+"{ \n"\
+"    return r->padding; \n"\
+"} \n"\
+" \n"\
 "void Ray_Init(__global ray* r, float3 o, float3 d, float maxt, float time, int mask) \n"\
 "{ \n"\
 "    // TODO: Check if it generates MTBUF_XYZW write \n"\
@@ -29353,6 +31745,8 @@ static const char g_integrator_pt_opencl[]= \
 "    r->extra.x = mask; \n"\
 "    r->extra.y = 0xFFFFFFFF; \n"\
 "} \n"\
+" \n"\
+" \n"\
 " \n"\
 "#endif // PAYLOAD_CL \n"\
 " \n"\
@@ -29698,7 +32092,7 @@ static const char g_integrator_pt_opencl[]= \
 "********************************************************************/ \n"\
 "#ifndef PAYLOAD_CL \n"\
 "#define PAYLOAD_CL \n"\
-"#define SOBOL \n"\
+"//#define SOBOL \n"\
 "#define MULTISCATTER \n"\
 " \n"\
 "/// Ray descriptor \n"\
@@ -29710,7 +32104,7 @@ static const char g_integrator_pt_opencl[]= \
 "    float4 d; \n"\
 "    /// x - ray mask, y - activity flag \n"\
 "    int2 extra; \n"\
-"    int2 padding; \n"\
+"    float2 padding; \n"\
 "} ray; \n"\
 " \n"\
 "/// Intersection data returned by RadeonRays \n"\
@@ -29764,8 +32158,6 @@ static const char g_integrator_pt_opencl[]= \
 "} Emissive; \n"\
 " \n"\
 " \n"\
-" \n"\
-" \n"\
 "typedef enum _PathFlags \n"\
 "{ \n"\
 "    kNone = 0x0, \n"\
@@ -29815,6 +32207,53 @@ static const char g_integrator_pt_opencl[]= \
 " \n"\
 "} Material; \n"\
 " \n"\
+" \n"\
+"enum LightType \n"\
+"{ \n"\
+"    kPoint = 0x1, \n"\
+"    kDirectional, \n"\
+"    kSpot, \n"\
+"    kArea, \n"\
+"    kIbl \n"\
+"}; \n"\
+" \n"\
+"typedef struct _Light \n"\
+"{ \n"\
+"    int type; \n"\
+" \n"\
+"    union \n"\
+"    { \n"\
+"        // Area light \n"\
+"        struct \n"\
+"        { \n"\
+"            int shapeidx; \n"\
+"            int primidx; \n"\
+"            int matidx; \n"\
+"        }; \n"\
+" \n"\
+"        // IBL \n"\
+"        struct \n"\
+"        { \n"\
+"            int tex; \n"\
+"            int texdiffuse; \n"\
+"            float multiplier; \n"\
+"        }; \n"\
+"         \n"\
+"         \n"\
+"        // Spot \n"\
+"        struct \n"\
+"        { \n"\
+"            float ia; \n"\
+"            float oa; \n"\
+"            float f; \n"\
+"        }; \n"\
+"    }; \n"\
+" \n"\
+"    float3 p; \n"\
+"    float3 d; \n"\
+"    float3 intensity; \n"\
+"} Light; \n"\
+" \n"\
 "typedef struct _Scene \n"\
 "{ \n"\
 "    // Vertices \n"\
@@ -29832,13 +32271,13 @@ static const char g_integrator_pt_opencl[]= \
 "    // Materials \n"\
 "    __global Material const* materials; \n"\
 "    // Emissive objects \n"\
-"    __global Emissive const* emissives; \n"\
+"    __global Light const* lights; \n"\
 "    // Envmap idx \n"\
 "    int envmapidx; \n"\
 "    // Envmap multiplier \n"\
 "    float envmapmul; \n"\
 "    // Number of emissive objects \n"\
-"    int numemissives; \n"\
+"    int num_lights; \n"\
 "} Scene; \n"\
 " \n"\
 "// Hit data \n"\
@@ -29856,7 +32295,7 @@ static const char g_integrator_pt_opencl[]= \
 "    float3 dpdu; \n"\
 "    float3 dpdv; \n"\
 "    float  area; \n"\
-"    // Material  \n"\
+"    // Material \n"\
 "    Material mat; \n"\
 "} DifferentialGeometry; \n"\
 " \n"\
@@ -29912,6 +32351,16 @@ static const char g_integrator_pt_opencl[]= \
 "    r->extra.y = 0; \n"\
 "} \n"\
 " \n"\
+"void Ray_SetExtra(__global ray* r, float2 extra) \n"\
+"{ \n"\
+"    r->padding = extra; \n"\
+"} \n"\
+" \n"\
+"float2 Ray_GetExtra(__global ray const* r) \n"\
+"{ \n"\
+"    return r->padding; \n"\
+"} \n"\
+" \n"\
 "void Ray_Init(__global ray* r, float3 o, float3 d, float maxt, float time, int mask) \n"\
 "{ \n"\
 "    // TODO: Check if it generates MTBUF_XYZW write \n"\
@@ -29922,6 +32371,8 @@ static const char g_integrator_pt_opencl[]= \
 "    r->extra.x = mask; \n"\
 "    r->extra.y = 0xFFFFFFFF; \n"\
 "} \n"\
+" \n"\
+" \n"\
 " \n"\
 "#endif // PAYLOAD_CL \n"\
 " \n"\
@@ -30048,9 +32499,9 @@ static const char g_integrator_pt_opencl[]= \
 "    // Envmap multiplier \n"\
 "    float envmapmul, \n"\
 "    // Emissives \n"\
-"    __global Emissive const* emissives, \n"\
+"    __global Light const* lights, \n"\
 "    // Number of emissive objects \n"\
-"    int numemissives, \n"\
+"    int num_lights, \n"\
 "    // RNG seed \n"\
 "    int rngseed, \n"\
 "    // Sampler state \n"\
@@ -30084,10 +32535,10 @@ static const char g_integrator_pt_opencl[]= \
 "        shapes, \n"\
 "        materialids, \n"\
 "        materials, \n"\
-"        emissives, \n"\
+"        lights, \n"\
 "        envmapidx, \n"\
 "        envmapmul, \n"\
-"        numemissives \n"\
+"        num_lights \n"\
 "    }; \n"\
 " \n"\
 "    if (globalid < *numhits) \n"\
@@ -30139,7 +32590,7 @@ static const char g_integrator_pt_opencl[]= \
 "        float selection_pdf = 0.f; \n"\
 "        float3 wo; \n"\
 " \n"\
-"        int lightidx = Scene_SampleLight(&scene, sample0, &selection_pdf); \n"\
+"        int light_idx = Scene_SampleLight(&scene, sample0, &selection_pdf); \n"\
 " \n"\
 "        // Here we need fake differential geometry for light sampling procedure \n"\
 "        DifferentialGeometry dg; \n"\
@@ -30147,7 +32598,7 @@ static const char g_integrator_pt_opencl[]= \
 "        // since EvaluateVolume has put it there \n"\
 "        dg.p = o + wi * Intersection_GetDistance(isects + hitidx); \n"\
 "        // Get light sample intencity \n"\
-"        float3 le = Light_Sample(lightidx, &scene, &dg, TEXTURE_ARGS, sample1, &wo, &pdf); \n"\
+"        float3 le = Light_Sample(light_idx, &scene, &dg, TEXTURE_ARGS, sample1, &wo, &pdf); \n"\
 " \n"\
 "        // Generate shadow ray \n"\
 "        float shadow_ray_length = 0.999f * length(wo); \n"\
@@ -30234,9 +32685,9 @@ static const char g_integrator_pt_opencl[]= \
 "    // Envmap multiplier \n"\
 "    float envmapmul, \n"\
 "    // Emissives \n"\
-"    __global Emissive const* emissives, \n"\
+"    __global Light const* lights, \n"\
 "    // Number of emissive objects \n"\
-"    int numemissives, \n"\
+"    int num_lights, \n"\
 "    // RNG seed \n"\
 "    int rngseed, \n"\
 "    // Sampler states \n"\
@@ -30272,10 +32723,10 @@ static const char g_integrator_pt_opencl[]= \
 "        shapes, \n"\
 "        materialids, \n"\
 "        materials, \n"\
-"        emissives, \n"\
+"        lights, \n"\
 "        envmapidx, \n"\
 "        envmapmul, \n"\
-"        numemissives \n"\
+"        num_lights \n"\
 "    }; \n"\
 " \n"\
 "    // Only applied to active rays after compaction \n"\
@@ -30331,8 +32782,8 @@ static const char g_integrator_pt_opencl[]= \
 "        // Fill surface data \n"\
 "        DifferentialGeometry diffgeo; \n"\
 "        FillDifferentialGeometry(&scene, &isect, &diffgeo); \n"\
-"        if (bounce == 0) { output_normals[globalid] += (float4)(diffgeo.n.x, diffgeo.n.y, diffgeo.n.z, 0.0f); }\n"\
 " \n"\
+"		if (bounce == 0) { output_normals[globalid] += (float4)(diffgeo.n.x, diffgeo.n.y, diffgeo.n.z, 0.0f); } \n"\
 " \n"\
 "        // Check if we are hitting from the inside \n"\
 "        float ndotwi = dot(diffgeo.n, wi); \n"\
@@ -30366,13 +32817,22 @@ static const char g_integrator_pt_opencl[]= \
 "        { \n"\
 "            if (ndotwi > 0.f) \n"\
 "            { \n"\
-"                // There can be two cases: first we hit after specular vertex or primary ray \n"\
-"                // where MIS can't be applied. In this case we simply pass radiance as is \n"\
-"                // because we were using BRDF based estimator at previous step \n"\
+"                float weight = 1.f; \n"\
+" \n"\
+"                if (bounce > 0 && !Path_IsSpecular(path)) \n"\
+"                { \n"\
+"                    float2 extra = Ray_GetExtra(&rays[hitidx]); \n"\
+"                    float ld = isect.uvwt.w; \n"\
+"                    float denom = extra.y * diffgeo.area; \n"\
+"                    // TODO: num_lights should be num_emissies instead, presence of analytical lights breaks this code \n"\
+"                    float bxdflightpdf = denom > 0.f ? (ld * ld / denom / num_lights) : 0.f; \n"\
+"                    weight = BalanceHeuristic(1, extra.x, 1, bxdflightpdf); \n"\
+"                } \n"\
+"                 \n"\
 "                { \n"\
 "                    // In this case we hit after an application of MIS process at previous step. \n"\
 "                    // That means BRDF weight has been already applied. \n"\
-"                    output[pixelidx] += Path_GetThroughput(path) * Emissive_GetLe(&diffgeo, TEXTURE_ARGS); \n"\
+"                    output[pixelidx] += Path_GetThroughput(path) * Emissive_GetLe(&diffgeo, TEXTURE_ARGS) * weight; \n"\
 "                } \n"\
 "            } \n"\
 " \n"\
@@ -30420,7 +32880,7 @@ static const char g_integrator_pt_opencl[]= \
 "        float bxdfweight = 1.f; \n"\
 "        float lightweight = 1.f; \n"\
 " \n"\
-"        int lightidx = numemissives > 0 ? Scene_SampleLight(&scene, sample0.y, &selection_pdf) : -1; \n"\
+"        int light_idx = num_lights > 0 ? Scene_SampleLight(&scene, sample0.y, &selection_pdf) : -1; \n"\
 " \n"\
 "        float3 throughput = Path_GetThroughput(path); \n"\
 " \n"\
@@ -30428,23 +32888,21 @@ static const char g_integrator_pt_opencl[]= \
 "        float3 bxdf = Bxdf_Sample(&diffgeo, wi, TEXTURE_ARGS, sample2, &bxdfwo, &bxdfpdf); \n"\
 " \n"\
 "        // If we have light to sample we can hopefully do mis \n"\
-"        if (lightidx > -1) \n"\
+"        if (light_idx > -1) \n"\
 "        { \n"\
 "            // Sample light \n"\
-"            float3 le = Light_Sample(lightidx, &scene, &diffgeo, TEXTURE_ARGS, sample1, &lightwo, &lightpdf); \n"\
+"            float3 le = Light_Sample(light_idx, &scene, &diffgeo, TEXTURE_ARGS, sample1, &lightwo, &lightpdf); \n"\
 "            lightbxdfpdf = Bxdf_GetPdf(&diffgeo, wi, normalize(lightwo), TEXTURE_ARGS); \n"\
-"            lightweight = BalanceHeuristic(1, lightpdf, 1, lightbxdfpdf); \n"\
+"            lightweight = Light_IsSingular(&scene.lights[light_idx]) ? 1.f : BalanceHeuristic(1, lightpdf, 1, lightbxdfpdf); \n"\
 " \n"\
-"            // Sample BxDF \n"\
-"            bxdflightpdf = Light_GetPdf(lightidx, &scene, &diffgeo, bxdfwo, TEXTURE_ARGS); \n"\
-"            bxdfweight = BalanceHeuristic(1, bxdfpdf, 1, bxdflightpdf); \n"\
 " \n"\
 "            // Apply MIS to account for both \n"\
 "            if (NON_BLACK(le) && lightpdf > 0.0f && !Bxdf_IsSingular(&diffgeo)) \n"\
 "            { \n"\
 "                wo = lightwo; \n"\
 "                float ndotwo = fabs(dot(diffgeo.n, normalize(wo))); \n"\
-"                radiance = le * Bxdf_Evaluate(&diffgeo, wi, normalize(wo), TEXTURE_ARGS) * throughput * ndotwo * lightweight / lightpdf / selection_pdf; \n"\
+"                radiance = le * Bxdf_Evaluate(&diffgeo, wi, normalize(wo), TEXTURE_ARGS) * throughput * \n"\
+"                    ndotwo * lightweight / lightpdf / selection_pdf; \n"\
 "            } \n"\
 "        } \n"\
 " \n"\
@@ -30492,11 +32950,11 @@ static const char g_integrator_pt_opencl[]= \
 " \n"\
 "        if (Bxdf_IsSingular(&diffgeo)) \n"\
 "        { \n"\
-"            bxdfweight = 1.f; \n"\
+"            Path_SetSpecularFlag(path); \n"\
 "        } \n"\
 " \n"\
 "        bxdfwo = normalize(bxdfwo); \n"\
-"        float3 t = bxdf * fabs(dot(diffgeo.n, bxdfwo)) * bxdfweight; \n"\
+"        float3 t = bxdf * fabs(dot(diffgeo.n, bxdfwo)); \n"\
 " \n"\
 "        // Only continue if we have non-zero throughput & pdf \n"\
 "        if (NON_BLACK(t) && bxdfpdf > 0.f && !rr_stop) \n"\
@@ -30509,6 +32967,7 @@ static const char g_integrator_pt_opencl[]= \
 "            float3 indirect_ray_o = diffgeo.p + CRAZY_LOW_DISTANCE * s * diffgeo.n; \n"\
 " \n"\
 "            Ray_Init(indirectrays + globalid, indirect_ray_o, indirect_ray_dir, CRAZY_HIGH_DISTANCE, 0.f, 0xFFFFFFFF); \n"\
+"            Ray_SetExtra(indirectrays + globalid, make_float2(bxdfpdf, fabs(dot(diffgeo.n, bxdfwo)))); \n"\
 "        } \n"\
 "        else \n"\
 "        { \n"\
@@ -30726,7 +33185,7 @@ static const char g_integrator_pt_opencl[]= \
 "    int envmapidx, \n"\
 "    float envmapmul, \n"\
 "    // \n"\
-"    int numemissives, \n"\
+"    int num_lights, \n"\
 "    __global Path const* paths, \n"\
 "    __global Volume const* volumes, \n"\
 "    // Output values \n"\
@@ -30739,7 +33198,7 @@ static const char g_integrator_pt_opencl[]= \
 "    { \n"\
 "        int pixelidx = pixelindices[globalid]; \n"\
 " \n"\
-"        __global Path* path = paths + pixelidx; \n"\
+"        __global Path const* path = paths + pixelidx; \n"\
 " \n"\
 "        // In case of a miss \n"\
 "        if (isects[globalid].shapeid < 0 && Path_IsAlive(path)) \n"\
@@ -30750,17 +33209,16 @@ static const char g_integrator_pt_opencl[]= \
 "    } \n"\
 "} \n"\
 " \n"\
-" \n"\
 "// JOSH \n"\
 "__kernel void CaptureDepths( \n"\
-"    __global Intersection const* intersections, \n"\
-"    __global int const* numhits, \n"\
-"    __global float* dstdata, \n"\
-"    int count \n"\
-") \n"\
+"                            __global Intersection const* intersections, \n"\
+"                            __global int const* numhits, \n"\
+"                             __global float* dstdata, \n"\
+"                            int count \n"\
+"                             ) \n"\
 "{ \n"\
 "    int gid = get_global_id(0); \n"\
-" \n"\
+"     \n"\
 "    if (gid < *numhits) \n"\
 "    { \n"\
 "        Intersection v = intersections[gid]; \n"\
@@ -30770,7 +33228,6 @@ static const char g_integrator_pt_opencl[]= \
 "    } \n"\
 "} \n"\
 " \n"\
-
 "// Copy data to interop texture if supported \n"\
 "__kernel void AccumulateData( \n"\
 "    __global float4 const* srcdata, \n"\
@@ -30786,77 +33243,6 @@ static const char g_integrator_pt_opencl[]= \
 "        dstdata[gid] += v; \n"\
 "    } \n"\
 "} \n"\
-" \n"\
-"//__kernel void ApplySelectiveBlur( \n"\
-"//    __global float4 const* data, \n"\
-"//    int imgwidth, \n"\
-"//    int imgheight, \n"\
-"//    float alpha, \n"\
-"//    __global float const* k, \n"\
-"//    __global float4* output_data \n"\
-"//    ) \n"\
-"//{ \n"\
-"//#define FILTER_RADIUS 3 \n"\
-"//    int gidx = get_global_id(0); \n"\
-"//    int gidy = get_global_id(1); \n"\
-"//    int gid = gidy * imgwidth + gidx; \n"\
-"//    int gid1 = gidy * imgwidth + gidx + 1; \n"\
-"//    int gid2 = gidy * imgwidth + gidx - 1; \n"\
-"//    int gid3 = (gidy + 1) * imgwidth + gidx; \n"\
-"//    int gid4 = (gidy - 1) * imgwidth + gidx; \n"\
-"// \n"\
-"// \n"\
-"//    if (gidx < imgwidth && gidy < imgheight) \n"\
-"//    { \n"\
-"// \n"\
-"//        int xstart = max(gidx - FILTER_RADIUS, 0); \n"\
-"//        int xend = min(gidx + FILTER_RADIUS, imgwidth); \n"\
-"// \n"\
-"//        int ystart = max(gidy - FILTER_RADIUS, 0); \n"\
-"//        int yend = min(gidy + FILTER_RADIUS, imgheight); \n"\
-"// \n"\
-"//        float3 cv = data[gid].xyz; \n"\
-"//        float3 d1 = fabs(data[gid1].xyz - cv); \n"\
-"//        float3 d2 = fabs(data[gid2].xyz - cv); \n"\
-"//        float3 d3 = fabs(data[gid3].xyz - cv); \n"\
-"//        float3 d4 = fabs(data[gid4].xyz - cv); \n"\
-"// \n"\
-"// \n"\
-"//        /*if (d1.x > alpha || \n"\
-"//            d1.y > alpha || \n"\
-"//            d1.z > alpha || \n"\
-"//            d2.x > alpha || \n"\
-"//            d2.y > alpha || \n"\
-"//            d2.z > alpha || \n"\
-"//            d3.x > alpha || \n"\
-"//            d3.y > alpha || \n"\
-"//            d3.z > alpha || \n"\
-"//            d4.x > alpha || \n"\
-"//            d4.y > alpha || \n"\
-"//            d4.z > alpha \n"\
-"//            ) \n"\
-"// \n"\
-"//        { \n"\
-"//            output_data[gid] = data[gid]; \n"\
-"//            return; \n"\
-"//        }*/ \n"\
-"// \n"\
-"//        float3 v = 0.f; \n"\
-"//        for (int x = xstart; x <= xend; ++x) \n"\
-"//            for (int y = ystart; y <= yend; ++y) \n"\
-"//            { \n"\
-"//                float3 pv = data[y * imgwidth + x].xyz; \n"\
-"//                int fx = x - gidx + FILTER_RADIUS; \n"\
-"//                int fy = y - gidy + FILTER_RADIUS; \n"\
-"//                v += pv * k[fy * 7 + fx]; \n"\
-"//            } \n"\
-"// \n"\
-"//        output_data[gid].xyz = v; \n"\
-"//        output_data[gid].w = data[gid].w; \n"\
-"//    } \n"\
-"//#undef FILTER_RADIUS \n"\
-"//} \n"\
-" \n"\
 " \n"\
 "// Copy data to interop texture if supported \n"\
 "__kernel void CopyDepth( \n"\
@@ -30874,10 +33260,10 @@ static const char g_integrator_pt_opencl[]= \
 "    if (gidx < imgwidth && gidy < imgheight) \n"\
 "    { \n"\
 "        float v = data[gid]; \n"\
-"//        float4 val = clamp(native_powr(v / v.w, 1.f / gamma), 0.f, 1.f); \n"\
 "        write_imagef(img, make_int2(gidx, gidy), (float4)(v, v, v, 1.0f)); \n"\
 "    } \n"\
 "} \n"\
+" \n"\
 "// Copy data to interop texture if supported \n"\
 "__kernel void ApplyGammaAndCopyData( \n"\
 "    __global float4 const* data, \n"\
@@ -30895,7 +33281,7 @@ static const char g_integrator_pt_opencl[]= \
 "    if (gidx < imgwidth && gidy < imgheight) \n"\
 "    { \n"\
 "        float4 v = data[gid]; \n"\
-"//        float4 val = clamp(native_powr(v / v.w, 1.f / gamma), 0.f, 1.f); \n"\
+"        //float4 val = clamp(native_powr(v / v.w, 1.f / gamma), 0.f, 1.f); \n"\
 "        float4 val = max(native_powr(v / v.w, 1.f / gamma), 0.f); \n"\
 "        write_imagef(img, make_int2(gidx, gidy), val); \n"\
 "    } \n"\
@@ -31043,7 +33429,7 @@ static const char g_light_opencl[]= \
 "float4 quaternion_inverse(float4 q) \n"\
 "{ \n"\
 "    float sqnorm = q.x*q.x + q.y*q.y + q.z*q.z + q.w*q.w; \n"\
-"     \n"\
+" \n"\
 "    /// Check if it is singular \n"\
 "    if (sqnorm != 0.f) \n"\
 "    { \n"\
@@ -31065,7 +33451,7 @@ static const char g_light_opencl[]= \
 "} \n"\
 " \n"\
 "/// Linearly interpolate between two values \n"\
-"float3 lerp(float3 a, float3 b, float w) \n"\
+"float4 lerp(float4 a, float4 b, float w) \n"\
 "{ \n"\
 "    return a + w*(b-a); \n"\
 "} \n"\
@@ -31084,7 +33470,7 @@ static const char g_light_opencl[]= \
 "float3 GetOrthoVector(float3 n) \n"\
 "{ \n"\
 "    float3 p; \n"\
-"     \n"\
+" \n"\
 "    if (fabs(n.z) > 0.f) { \n"\
 "        float k = sqrt(n.y*n.y + n.z*n.z); \n"\
 "        p.x = 0; p.y = -n.z/k; p.z = n.y/k; \n"\
@@ -31144,7 +33530,7 @@ static const char g_light_opencl[]= \
 "********************************************************************/ \n"\
 "#ifndef PAYLOAD_CL \n"\
 "#define PAYLOAD_CL \n"\
-"#define SOBOL \n"\
+"//#define SOBOL \n"\
 "#define MULTISCATTER \n"\
 " \n"\
 "/// Ray descriptor \n"\
@@ -31156,7 +33542,7 @@ static const char g_light_opencl[]= \
 "    float4 d; \n"\
 "    /// x - ray mask, y - activity flag \n"\
 "    int2 extra; \n"\
-"    int2 padding; \n"\
+"    float2 padding; \n"\
 "} ray; \n"\
 " \n"\
 "/// Intersection data returned by RadeonRays \n"\
@@ -31210,8 +33596,6 @@ static const char g_light_opencl[]= \
 "} Emissive; \n"\
 " \n"\
 " \n"\
-" \n"\
-" \n"\
 "typedef enum _PathFlags \n"\
 "{ \n"\
 "    kNone = 0x0, \n"\
@@ -31261,6 +33645,53 @@ static const char g_light_opencl[]= \
 " \n"\
 "} Material; \n"\
 " \n"\
+" \n"\
+"enum LightType \n"\
+"{ \n"\
+"    kPoint = 0x1, \n"\
+"    kDirectional, \n"\
+"    kSpot, \n"\
+"    kArea, \n"\
+"    kIbl \n"\
+"}; \n"\
+" \n"\
+"typedef struct _Light \n"\
+"{ \n"\
+"    int type; \n"\
+" \n"\
+"    union \n"\
+"    { \n"\
+"        // Area light \n"\
+"        struct \n"\
+"        { \n"\
+"            int shapeidx; \n"\
+"            int primidx; \n"\
+"            int matidx; \n"\
+"        }; \n"\
+" \n"\
+"        // IBL \n"\
+"        struct \n"\
+"        { \n"\
+"            int tex; \n"\
+"            int texdiffuse; \n"\
+"            float multiplier; \n"\
+"        }; \n"\
+"         \n"\
+"         \n"\
+"        // Spot \n"\
+"        struct \n"\
+"        { \n"\
+"            float ia; \n"\
+"            float oa; \n"\
+"            float f; \n"\
+"        }; \n"\
+"    }; \n"\
+" \n"\
+"    float3 p; \n"\
+"    float3 d; \n"\
+"    float3 intensity; \n"\
+"} Light; \n"\
+" \n"\
 "typedef struct _Scene \n"\
 "{ \n"\
 "    // Vertices \n"\
@@ -31278,13 +33709,13 @@ static const char g_light_opencl[]= \
 "    // Materials \n"\
 "    __global Material const* materials; \n"\
 "    // Emissive objects \n"\
-"    __global Emissive const* emissives; \n"\
+"    __global Light const* lights; \n"\
 "    // Envmap idx \n"\
 "    int envmapidx; \n"\
 "    // Envmap multiplier \n"\
 "    float envmapmul; \n"\
 "    // Number of emissive objects \n"\
-"    int numemissives; \n"\
+"    int num_lights; \n"\
 "} Scene; \n"\
 " \n"\
 "// Hit data \n"\
@@ -31302,7 +33733,7 @@ static const char g_light_opencl[]= \
 "    float3 dpdu; \n"\
 "    float3 dpdv; \n"\
 "    float  area; \n"\
-"    // Material  \n"\
+"    // Material \n"\
 "    Material mat; \n"\
 "} DifferentialGeometry; \n"\
 " \n"\
@@ -31358,6 +33789,16 @@ static const char g_light_opencl[]= \
 "    r->extra.y = 0; \n"\
 "} \n"\
 " \n"\
+"void Ray_SetExtra(__global ray* r, float2 extra) \n"\
+"{ \n"\
+"    r->padding = extra; \n"\
+"} \n"\
+" \n"\
+"float2 Ray_GetExtra(__global ray const* r) \n"\
+"{ \n"\
+"    return r->padding; \n"\
+"} \n"\
+" \n"\
 "void Ray_Init(__global ray* r, float3 o, float3 d, float maxt, float time, int mask) \n"\
 "{ \n"\
 "    // TODO: Check if it generates MTBUF_XYZW write \n"\
@@ -31368,6 +33809,8 @@ static const char g_light_opencl[]= \
 "    r->extra.x = mask; \n"\
 "    r->extra.y = 0xFFFFFFFF; \n"\
 "} \n"\
+" \n"\
+" \n"\
 " \n"\
 "#endif // PAYLOAD_CL \n"\
 "/********************************************************************** \n"\
@@ -31576,7 +34019,7 @@ static const char g_light_opencl[]= \
 "float4 quaternion_inverse(float4 q) \n"\
 "{ \n"\
 "    float sqnorm = q.x*q.x + q.y*q.y + q.z*q.z + q.w*q.w; \n"\
-"     \n"\
+" \n"\
 "    /// Check if it is singular \n"\
 "    if (sqnorm != 0.f) \n"\
 "    { \n"\
@@ -31598,7 +34041,7 @@ static const char g_light_opencl[]= \
 "} \n"\
 " \n"\
 "/// Linearly interpolate between two values \n"\
-"float3 lerp(float3 a, float3 b, float w) \n"\
+"float4 lerp(float4 a, float4 b, float w) \n"\
 "{ \n"\
 "    return a + w*(b-a); \n"\
 "} \n"\
@@ -31617,7 +34060,7 @@ static const char g_light_opencl[]= \
 "float3 GetOrthoVector(float3 n) \n"\
 "{ \n"\
 "    float3 p; \n"\
-"     \n"\
+" \n"\
 "    if (fabs(n.z) > 0.f) { \n"\
 "        float k = sqrt(n.y*n.y + n.z*n.z); \n"\
 "        p.x = 0; p.y = -n.z/k; p.z = n.y/k; \n"\
@@ -31686,88 +34129,88 @@ static const char g_light_opencl[]= \
 "#define TEXTURE_ARGS_IDX(x) x, textures, texturedata \n"\
 " \n"\
 "/// Sample 2D texture \n"\
-"float3 Texture_Sample2D(float2 uv, TEXTURE_ARG_LIST_IDX(texidx)) \n"\
+"float4 Texture_Sample2D(float2 uv, TEXTURE_ARG_LIST_IDX(texidx)) \n"\
 "{ \n"\
 "    // Get width and height \n"\
 "    int width = textures[texidx].w; \n"\
 "    int height = textures[texidx].h; \n"\
-"     \n"\
+" \n"\
 "    // Find the origin of the data in the pool \n"\
 "    __global char const* mydata = texturedata + textures[texidx].dataoffset; \n"\
 " \n"\
 "    // Handle UV wrap \n"\
 "    // TODO: need UV mode support \n"\
 "    uv -= floor(uv); \n"\
-"     \n"\
+" \n"\
 "    // Reverse Y: \n"\
 "    // it is needed as textures are loaded with Y axis going top to down \n"\
 "    // and our axis goes from down to top \n"\
 "    uv.y = 1.f - uv.y; \n"\
-"     \n"\
+" \n"\
 "    // Calculate integer coordinates \n"\
 "    int x0 = clamp((int)floor(uv.x * width), 0, width - 1); \n"\
 "    int y0 = clamp((int)floor(uv.y * height), 0, height - 1); \n"\
-"     \n"\
+" \n"\
 "    // Calculate samples for linear filtering \n"\
 "    int x1 = clamp(x0 + 1, 0,  width - 1); \n"\
 "    int y1 = clamp(y0 + 1, 0, height - 1); \n"\
-"     \n"\
+" \n"\
 "    // Calculate weights for linear filtering \n"\
 "    float wx = uv.x * width - floor(uv.x * width); \n"\
 "    float wy = uv.y * height - floor(uv.y * height); \n"\
-"     \n"\
+" \n"\
 "    switch (textures[texidx].fmt) \n"\
 "    { \n"\
 "        case RGBA32: \n"\
 "        { \n"\
-"            __global float3 const* mydataf = (__global float3 const*)mydata; \n"\
-"             \n"\
+"            __global float4 const* mydataf = (__global float4 const*)mydata; \n"\
+" \n"\
 "            // Get 4 values for linear filtering \n"\
-"            float3 val00 = *(mydataf + width * y0 + x0); \n"\
-"            float3 val01 = *(mydataf + width * y0 + x1); \n"\
-"            float3 val10 = *(mydataf + width * y1 + x0); \n"\
-"            float3 val11 = *(mydataf + width * y1 + x1); \n"\
-"             \n"\
+"            float4 val00 = *(mydataf + width * y0 + x0); \n"\
+"            float4 val01 = *(mydataf + width * y0 + x1); \n"\
+"            float4 val10 = *(mydataf + width * y1 + x0); \n"\
+"            float4 val11 = *(mydataf + width * y1 + x1); \n"\
+" \n"\
 "            // Filter and return the result \n"\
 "            return lerp(lerp(val00, val01, wx), lerp(val10, val11, wx), wy); \n"\
 "        } \n"\
-"             \n"\
+" \n"\
 "        case RGBA16: \n"\
 "        { \n"\
 "            __global half const* mydatah = (__global half const*)mydata; \n"\
-"             \n"\
+" \n"\
 "            // Get 4 values \n"\
-"            float3 val00 = vload_half4(width * y0 + x0, mydatah).xyz; \n"\
-"            float3 val01 = vload_half4(width * y0 + x1, mydatah).xyz; \n"\
-"            float3 val10 = vload_half4(width * y1 + x0, mydatah).xyz; \n"\
-"            float3 val11 = vload_half4(width * y1 + x1, mydatah).xyz; \n"\
-"             \n"\
+"            float4 val00 = vload_half4(width * y0 + x0, mydatah); \n"\
+"            float4 val01 = vload_half4(width * y0 + x1, mydatah); \n"\
+"            float4 val10 = vload_half4(width * y1 + x0, mydatah); \n"\
+"            float4 val11 = vload_half4(width * y1 + x1, mydatah); \n"\
+" \n"\
 "            // Filter and return the result \n"\
 "            return lerp(lerp(val00, val01, wx), lerp(val10, val11, wx), wy); \n"\
 "        } \n"\
-"             \n"\
+" \n"\
 "        case RGBA8: \n"\
 "        { \n"\
 "            __global uchar4 const* mydatac = (__global uchar4 const*)mydata; \n"\
-"             \n"\
+" \n"\
 "            // Get 4 values and convert to float \n"\
 "            uchar4 valu00 = *(mydatac + width * y0 + x0); \n"\
 "            uchar4 valu01 = *(mydatac + width * y0 + x1); \n"\
 "            uchar4 valu10 = *(mydatac + width * y1 + x0); \n"\
 "            uchar4 valu11 = *(mydatac + width * y1 + x1); \n"\
-"             \n"\
-"            float3 val00 = make_float3((float)valu00.x / 255.f, (float)valu00.y / 255.f, (float)valu00.z / 255.f); \n"\
-"            float3 val01 = make_float3((float)valu01.x / 255.f, (float)valu01.y / 255.f, (float)valu01.z / 255.f); \n"\
-"            float3 val10 = make_float3((float)valu10.x / 255.f, (float)valu10.y / 255.f, (float)valu10.z / 255.f); \n"\
-"            float3 val11 = make_float3((float)valu11.x / 255.f, (float)valu11.y / 255.f, (float)valu11.z / 255.f); \n"\
-"             \n"\
+" \n"\
+"            float4 val00 = make_float4((float)valu00.x / 255.f, (float)valu00.y / 255.f, (float)valu00.z / 255.f, (float)valu00.w / 255.f); \n"\
+"            float4 val01 = make_float4((float)valu01.x / 255.f, (float)valu01.y / 255.f, (float)valu01.z / 255.f, (float)valu01.w / 255.f); \n"\
+"            float4 val10 = make_float4((float)valu10.x / 255.f, (float)valu10.y / 255.f, (float)valu10.z / 255.f, (float)valu10.w / 255.f); \n"\
+"            float4 val11 = make_float4((float)valu11.x / 255.f, (float)valu11.y / 255.f, (float)valu11.z / 255.f, (float)valu11.w / 255.f); \n"\
+" \n"\
 "            // Filter and return the result \n"\
 "            return lerp(lerp(val00, val01, wx), lerp(val10, val11, wx), wy); \n"\
 "        } \n"\
-"             \n"\
+" \n"\
 "        default: \n"\
 "        { \n"\
-"            return make_float3(0.f, 0.f, 0.f); \n"\
+"            return make_float4(0.f, 0.f, 0.f, 0.f); \n"\
 "        } \n"\
 "    } \n"\
 "} \n"\
@@ -31778,14 +34221,14 @@ static const char g_light_opencl[]= \
 "    // Transform to spherical coords \n"\
 "    float r, phi, theta; \n"\
 "    CartesianToSpherical(d, &r, &phi, &theta); \n"\
-"     \n"\
+" \n"\
 "    // Map to [0,1]x[0,1] range and reverse Y axis \n"\
 "    float2 uv; \n"\
 "    uv.x = phi / (2*PI); \n"\
 "    uv.y = 1.f - theta / PI; \n"\
-"     \n"\
+" \n"\
 "    // Sample the texture \n"\
-"    return native_powr(Texture_Sample2D(uv, TEXTURE_ARGS_IDX(texidx)), 1.f / 1.f); \n"\
+"    return Texture_Sample2D(uv, TEXTURE_ARGS_IDX(texidx)).xyz; \n"\
 "} \n"\
 " \n"\
 "/// Get data from parameter value or texture \n"\
@@ -31802,9 +34245,30 @@ static const char g_light_opencl[]= \
 "    if (texidx != -1) \n"\
 "    { \n"\
 "        // Sample texture \n"\
+"        return native_powr(Texture_Sample2D(uv, TEXTURE_ARGS_IDX(texidx)).xyz, 2.2f); \n"\
+"    } \n"\
+" \n"\
+"    // Return fixed color otherwise \n"\
+"    return v; \n"\
+"} \n"\
+" \n"\
+"/// Get data from parameter value or texture \n"\
+"float4 Texture_GetValue4f( \n"\
+"                // Value \n"\
+"                float4 v, \n"\
+"                // Texture coordinate \n"\
+"                float2 uv, \n"\
+"                // Texture args \n"\
+"                TEXTURE_ARG_LIST_IDX(texidx) \n"\
+"                ) \n"\
+"{ \n"\
+"    // If texture present sample from texture \n"\
+"    if (texidx != -1) \n"\
+"    { \n"\
+"        // Sample texture \n"\
 "        return native_powr(Texture_Sample2D(uv, TEXTURE_ARGS_IDX(texidx)), 2.2f); \n"\
 "    } \n"\
-"     \n"\
+" \n"\
 "    // Return fixed color otherwise \n"\
 "    return v; \n"\
 "} \n"\
@@ -31825,7 +34289,7 @@ static const char g_light_opencl[]= \
 "        // Sample texture \n"\
 "        return Texture_Sample2D(uv, TEXTURE_ARGS_IDX(texidx)).x; \n"\
 "    } \n"\
-"     \n"\
+" \n"\
 "    // Return fixed color otherwise \n"\
 "    return v; \n"\
 "} \n"\
@@ -31860,11 +34324,11 @@ static const char g_light_opencl[]= \
 "        __global float3 const* mydataf = (__global float3 const*)mydata; \n"\
 " \n"\
 "        // Sobel filter \n"\
-"        const float tex00 = (*(mydataf + width * (t0 - 1) + (s0-1))).x;  \n"\
+"        const float tex00 = (*(mydataf + width * (t0 - 1) + (s0-1))).x; \n"\
 "        const float tex10 = (*(mydataf + width * (t0 - 1) + (s0))).x; \n"\
-"        const float tex20 = (*(mydataf + width * (t0 - 1) + (s0 + 1))).x;  \n"\
+"        const float tex20 = (*(mydataf + width * (t0 - 1) + (s0 + 1))).x; \n"\
 " \n"\
-"        const float tex01 = (*(mydataf + width * (t0) + (s0 - 1))).x;  \n"\
+"        const float tex01 = (*(mydataf + width * (t0) + (s0 - 1))).x; \n"\
 "        const float tex21 = (*(mydataf + width * (t0) + (s0 + 1))).x; \n"\
 " \n"\
 "        const float tex02 = (*(mydataf + width * (t0 + 1) + (s0 - 1))).x; \n"\
@@ -31886,8 +34350,8 @@ static const char g_light_opencl[]= \
 "        const float tex10 = vload_half4(width * (t0 - 1) + (s0), mydatah).x; \n"\
 "        const float tex20 = vload_half4(width * (t0 - 1) + (s0 + 1), mydatah).x; \n"\
 " \n"\
-"        const float tex01 = vload_half4(width * (t0)+(s0 - 1), mydatah).x;  \n"\
-"        const float tex21 = vload_half4(width * (t0)+(s0 + 1), mydatah).x;  \n"\
+"        const float tex01 = vload_half4(width * (t0)+(s0 - 1), mydatah).x; \n"\
+"        const float tex21 = vload_half4(width * (t0)+(s0 + 1), mydatah).x; \n"\
 " \n"\
 "        const float tex02 = vload_half4(width * (t0 + 1) + (s0 - 1), mydatah).x; \n"\
 "        const float tex12 = vload_half4(width * (t0 + 1) + (s0), mydatah).x; \n"\
@@ -31944,7 +34408,8 @@ static const char g_light_opencl[]= \
 " \n"\
 "#endif // TEXTURE_CL \n"\
 " \n"\
-"int IntersectTriangle(ray const* r, float3 v1, float3 v2, float3 v3, float* a, float* b) \n"\
+" \n"\
+"bool IntersectTriangle(ray const* r, float3 v1, float3 v2, float3 v3, float* a, float* b) \n"\
 "{ \n"\
 "    const float3 e1 = v2 - v1; \n"\
 "    const float3 e2 = v3 - v1; \n"\
@@ -31956,15 +34421,15 @@ static const char g_light_opencl[]= \
 "    const float  b2 = dot(r->d.xyz, s2) * invd; \n"\
 "    const float temp = dot(e2, s2) * invd; \n"\
 " \n"\
-"    if (b1 < 0.f || b1 > 1.f || b2 < 0.f || b1 + b2 > 1.f || temp < 0.f || temp > r->o.w) \n"\
+"    if (b1 < 0.f || b1 > 1.f || b2 < 0.f || b1 + b2 > 1.f) \n"\
 "    { \n"\
-"        return 0; \n"\
+"        return false; \n"\
 "    } \n"\
 "    else \n"\
 "    { \n"\
 "        *a = b1; \n"\
 "        *b = b2; \n"\
-"        return 1; \n"\
+"        return true; \n"\
 "    } \n"\
 "} \n"\
 " \n"\
@@ -31972,7 +34437,8 @@ static const char g_light_opencl[]= \
 " Environment light \n"\
 " */ \n"\
 "/// Get intensity for a given direction \n"\
-"float3 EnvironmentLight_GetLe( \n"\
+"float3 EnvironmentLight_GetLe(// Light \n"\
+"                              Light const* light, \n"\
 "                              // Scene \n"\
 "                              Scene const* scene, \n"\
 "                              // Geometry \n"\
@@ -31985,12 +34451,14 @@ static const char g_light_opencl[]= \
 "{ \n"\
 "    // Sample envmap \n"\
 "    *wo *= 100000.f; \n"\
-"    //  \n"\
+"    // \n"\
 "    return scene->envmapmul * Texture_SampleEnvMap(normalize(*wo), TEXTURE_ARGS_IDX(scene->envmapidx)); \n"\
 "} \n"\
 " \n"\
 "/// Sample direction to the light \n"\
-"float3 EnvironmentLight_Sample(// Scene \n"\
+"float3 EnvironmentLight_Sample(// Light \n"\
+"                               Light const* light, \n"\
+"                               // Scene \n"\
 "                               Scene const* scene, \n"\
 "                               // Geometry \n"\
 "                               DifferentialGeometry const* dg, \n"\
@@ -32008,16 +34476,19 @@ static const char g_light_opencl[]= \
 " \n"\
 "    // Generate direction \n"\
 "    *wo = 100000.f * d; \n"\
-"     \n"\
+" \n"\
 "    // Envmap PDF \n"\
 "    *pdf = fabs(dot(dg->n, normalize(d))) / PI; \n"\
-"     \n"\
+" \n"\
 "    // Sample envmap \n"\
 "    return scene->envmapmul * Texture_SampleEnvMap(d, TEXTURE_ARGS_IDX(scene->envmapidx)); \n"\
 "} \n"\
 " \n"\
 "/// Get PDF for a given direction \n"\
-"float EnvironmentLight_GetPdf(// Scene \n"\
+"float EnvironmentLight_GetPdf( \n"\
+"                              // Light \n"\
+"                              Light const* light, \n"\
+"                              // Scene \n"\
 "                              Scene const* scene, \n"\
 "                              // Geometry \n"\
 "                              DifferentialGeometry const* dg, \n"\
@@ -32036,7 +34507,7 @@ static const char g_light_opencl[]= \
 " */ \n"\
 "// Get intensity for a given direction \n"\
 "float3 AreaLight_GetLe(// Emissive object \n"\
-"                       Emissive const* light, \n"\
+"                       Light const* light, \n"\
 "                       // Scene \n"\
 "                       Scene const* scene, \n"\
 "                       // Geometry \n"\
@@ -32048,8 +34519,8 @@ static const char g_light_opencl[]= \
 "                       ) \n"\
 "{ \n"\
 "    ray r; \n"\
-"    r.o.xyz = dg->p + normalize(*wo) * 0.01f; \n"\
-"    r.d.xyz = *wo; \n"\
+"    r.o.xyz = dg->p; \n"\
+"    r.d.xyz = normalize(*wo); \n"\
 " \n"\
 "    int shapeidx = light->shapeidx; \n"\
 "    int primidx = light->primidx; \n"\
@@ -32077,8 +34548,9 @@ static const char g_light_opencl[]= \
 "    float2 uv1 = scene->uvs[shape.startvtx + i1]; \n"\
 "    float2 uv2 = scene->uvs[shape.startvtx + i2]; \n"\
 " \n"\
-"     \n"\
+" \n"\
 "    // Intersect ray against this area light \n"\
+" \n"\
 "    float a, b; \n"\
 "    if (IntersectTriangle(&r, v0, v1, v2, &a, &b)) \n"\
 "    { \n"\
@@ -32088,23 +34560,14 @@ static const char g_light_opencl[]= \
 " \n"\
 "        float3 d = p - dg->p; \n"\
 "        float  ld = length(d); \n"\
+"        *wo = p - dg->p; \n"\
 " \n"\
 "        int matidx = scene->materialids[shape.startidx / 3 + primidx]; \n"\
 "        Material mat = scene->materials[matidx]; \n"\
 " \n"\
 "        const float3 ke = Texture_GetValue3f(mat.kx.xyz, tx, TEXTURE_ARGS_IDX(mat.kxmapidx)); \n"\
 "        float ndotv = dot(n, -(normalize(d))); \n"\
-" \n"\
-"        if (ndotv > 0.f) \n"\
-"        { \n"\
-"            *wo = d; \n"\
-"            float denom = ld * ld; \n"\
-"            return  denom > 0.f ? ke * ndotv / denom : 0.f; \n"\
-"        } \n"\
-"        else \n"\
-"        { \n"\
-"            return 0.f; \n"\
-"        } \n"\
+"        return  ke; \n"\
 "    } \n"\
 "    else \n"\
 "    { \n"\
@@ -32114,7 +34577,7 @@ static const char g_light_opencl[]= \
 " \n"\
 "/// Sample direction to the light \n"\
 "float3 AreaLight_Sample(// Emissive object \n"\
-"                        Emissive const* light, \n"\
+"                        Light const* light, \n"\
 "                        // Scene \n"\
 "                        Scene const* scene, \n"\
 "                        // Geometry \n"\
@@ -32130,7 +34593,7 @@ static const char g_light_opencl[]= \
 "{ \n"\
 "    int shapeidx = light->shapeidx; \n"\
 "    int primidx = light->primidx; \n"\
-"    \n"\
+" \n"\
 "    // Extract shape data \n"\
 "    Shape shape = scene->shapes[shapeidx]; \n"\
 " \n"\
@@ -32175,9 +34638,9 @@ static const char g_light_opencl[]= \
 "    Material mat = scene->materials[matidx]; \n"\
 " \n"\
 "    const float3 ke = Texture_GetValue3f(mat.kx.xyz, tx, TEXTURE_ARGS_IDX(mat.kxmapidx)); \n"\
-"  \n"\
+" \n"\
 "    float3 v = -normalize(*wo); \n"\
-"     \n"\
+" \n"\
 "    float ndotv = dot(n, v); \n"\
 " \n"\
 "    if (ndotv > 0.f) \n"\
@@ -32194,7 +34657,7 @@ static const char g_light_opencl[]= \
 " \n"\
 "/// Get PDF for a given direction \n"\
 "float AreaLight_GetPdf(// Emissive object \n"\
-"                       Emissive const* light, \n"\
+"                       Light const* light, \n"\
 "                       // Scene \n"\
 "                       Scene const* scene, \n"\
 "                       // Geometry \n"\
@@ -32206,7 +34669,7 @@ static const char g_light_opencl[]= \
 "                       ) \n"\
 "{ \n"\
 "    ray r; \n"\
-"    r.o.xyz = dg->p + normalize(wo) * 0.001f; \n"\
+"    r.o.xyz = dg->p; \n"\
 "    r.d.xyz = wo; \n"\
 " \n"\
 "    int shapeidx = light->shapeidx; \n"\
@@ -32254,6 +34717,185 @@ static const char g_light_opencl[]= \
 "    } \n"\
 "} \n"\
 " \n"\
+"/* \n"\
+"Directional light \n"\
+"*/ \n"\
+"// Get intensity for a given direction \n"\
+"float3 DirectionalLight_GetLe(// Emissive object \n"\
+"    Light const* light, \n"\
+"    // Scene \n"\
+"    Scene const* scene, \n"\
+"    // Geometry \n"\
+"    DifferentialGeometry const* dg, \n"\
+"    // Direction to light source \n"\
+"    float3* wo, \n"\
+"    // Textures \n"\
+"    TEXTURE_ARG_LIST \n"\
+") \n"\
+"{ \n"\
+"    return 0.f; \n"\
+"} \n"\
+" \n"\
+"/// Sample direction to the light \n"\
+"float3 DirectionalLight_Sample(// Emissive object \n"\
+"    Light const* light, \n"\
+"    // Scene \n"\
+"    Scene const* scene, \n"\
+"    // Geometry \n"\
+"    DifferentialGeometry const* dg, \n"\
+"    // Textures \n"\
+"    TEXTURE_ARG_LIST, \n"\
+"    // Sample \n"\
+"    float2 sample, \n"\
+"    // Direction to light source \n"\
+"    float3* wo, \n"\
+"    // PDF \n"\
+"    float* pdf) \n"\
+"{ \n"\
+"    *wo = 100000.f * -light->d; \n"\
+"    *pdf = 1.f; \n"\
+"    return light->intensity; \n"\
+"} \n"\
+" \n"\
+"/// Get PDF for a given direction \n"\
+"float DirectionalLight_GetPdf(// Emissive object \n"\
+"    Light const* light, \n"\
+"    // Scene \n"\
+"    Scene const* scene, \n"\
+"    // Geometry \n"\
+"    DifferentialGeometry const* dg, \n"\
+"    // Direction to light source \n"\
+"    float3 wo, \n"\
+"    // Textures \n"\
+"    TEXTURE_ARG_LIST \n"\
+") \n"\
+"{ \n"\
+"    return 0.f; \n"\
+"} \n"\
+" \n"\
+"/* \n"\
+" Point light \n"\
+" */ \n"\
+"// Get intensity for a given direction \n"\
+"float3 PointLight_GetLe(// Emissive object \n"\
+"                              Light const* light, \n"\
+"                              // Scene \n"\
+"                              Scene const* scene, \n"\
+"                              // Geometry \n"\
+"                              DifferentialGeometry const* dg, \n"\
+"                              // Direction to light source \n"\
+"                              float3* wo, \n"\
+"                              // Textures \n"\
+"                              TEXTURE_ARG_LIST \n"\
+"                              ) \n"\
+"{ \n"\
+"    return 0.f; \n"\
+"} \n"\
+" \n"\
+"/// Sample direction to the light \n"\
+"float3 PointLight_Sample(// Emissive object \n"\
+"                               Light const* light, \n"\
+"                               // Scene \n"\
+"                               Scene const* scene, \n"\
+"                               // Geometry \n"\
+"                               DifferentialGeometry const* dg, \n"\
+"                               // Textures \n"\
+"                               TEXTURE_ARG_LIST, \n"\
+"                               // Sample \n"\
+"                               float2 sample, \n"\
+"                               // Direction to light source \n"\
+"                               float3* wo, \n"\
+"                               // PDF \n"\
+"                               float* pdf) \n"\
+"{ \n"\
+"    *wo = light->p - dg->p; \n"\
+"    *pdf = 1.f; \n"\
+"    return light->intensity; \n"\
+"} \n"\
+" \n"\
+"/// Get PDF for a given direction \n"\
+"float PointLight_GetPdf(// Emissive object \n"\
+"                              Light const* light, \n"\
+"                              // Scene \n"\
+"                              Scene const* scene, \n"\
+"                              // Geometry \n"\
+"                              DifferentialGeometry const* dg, \n"\
+"                              // Direction to light source \n"\
+"                              float3 wo, \n"\
+"                              // Textures \n"\
+"                              TEXTURE_ARG_LIST \n"\
+"                              ) \n"\
+"{ \n"\
+"    return 0.f; \n"\
+"} \n"\
+" \n"\
+"/* \n"\
+" Spot light \n"\
+" */ \n"\
+"// Get intensity for a given direction \n"\
+"float3 SpotLight_GetLe(// Emissive object \n"\
+"                        Light const* light, \n"\
+"                        // Scene \n"\
+"                        Scene const* scene, \n"\
+"                        // Geometry \n"\
+"                        DifferentialGeometry const* dg, \n"\
+"                        // Direction to light source \n"\
+"                        float3* wo, \n"\
+"                        // Textures \n"\
+"                        TEXTURE_ARG_LIST \n"\
+"                        ) \n"\
+"{ \n"\
+"    return 0.f; \n"\
+"} \n"\
+" \n"\
+"/// Sample direction to the light \n"\
+"float3 SpotLight_Sample(// Emissive object \n"\
+"                         Light const* light, \n"\
+"                         // Scene \n"\
+"                         Scene const* scene, \n"\
+"                         // Geometry \n"\
+"                         DifferentialGeometry const* dg, \n"\
+"                         // Textures \n"\
+"                         TEXTURE_ARG_LIST, \n"\
+"                         // Sample \n"\
+"                         float2 sample, \n"\
+"                         // Direction to light source \n"\
+"                         float3* wo, \n"\
+"                         // PDF \n"\
+"                         float* pdf) \n"\
+"{ \n"\
+"    *wo = light->p - dg->p; \n"\
+"    float ddotwo = dot(-normalize(*wo), light->d); \n"\
+"     \n"\
+"    if (ddotwo > light->oa) \n"\
+"    { \n"\
+"        *pdf = 1.f; \n"\
+"        return ddotwo > light->ia ? light->intensity : light->intensity * (1.f - (light->ia - ddotwo) / (light->ia - light->oa)); \n"\
+"    } \n"\
+"    else \n"\
+"    { \n"\
+"        *pdf = 0.f; \n"\
+"        return 0.f; \n"\
+"    } \n"\
+"} \n"\
+" \n"\
+"/// Get PDF for a given direction \n"\
+"float SpotLight_GetPdf(// Emissive object \n"\
+"                        Light const* light, \n"\
+"                        // Scene \n"\
+"                        Scene const* scene, \n"\
+"                        // Geometry \n"\
+"                        DifferentialGeometry const* dg, \n"\
+"                        // Direction to light source \n"\
+"                        float3 wo, \n"\
+"                        // Textures \n"\
+"                        TEXTURE_ARG_LIST \n"\
+"                        ) \n"\
+"{ \n"\
+"    return 0.f; \n"\
+"} \n"\
+" \n"\
+" \n"\
 " \n"\
 " \n"\
 "/* \n"\
@@ -32273,16 +34915,23 @@ static const char g_light_opencl[]= \
 "                   TEXTURE_ARG_LIST \n"\
 "                   ) \n"\
 "{ \n"\
-"    int numemissives = scene->numemissives; \n"\
-"    if (idx == numemissives) \n"\
+"    Light light = scene->lights[idx]; \n"\
+" \n"\
+"    switch(light.type) \n"\
 "    { \n"\
-"        return EnvironmentLight_GetLe(scene, dg, wo, TEXTURE_ARGS); \n"\
+"        case kIbl: \n"\
+"            return EnvironmentLight_GetLe(&light, scene, dg, wo, TEXTURE_ARGS); \n"\
+"        case kArea: \n"\
+"            return AreaLight_GetLe(&light, scene, dg, wo, TEXTURE_ARGS); \n"\
+"        case kDirectional: \n"\
+"            return DirectionalLight_GetLe(&light, scene, dg, wo, TEXTURE_ARGS); \n"\
+"        case kPoint: \n"\
+"            return PointLight_GetLe(&light, scene, dg, wo, TEXTURE_ARGS); \n"\
+"        case kSpot: \n"\
+"            return SpotLight_GetLe(&light, scene, dg, wo, TEXTURE_ARGS); \n"\
 "    } \n"\
-"    else \n"\
-"    { \n"\
-"        Emissive emissive = scene->emissives[idx]; \n"\
-"        return AreaLight_GetLe(&emissive, scene, dg, wo, TEXTURE_ARGS); \n"\
-"    } \n"\
+" \n"\
+"    return make_float3(0.f, 0.f, 0.f); \n"\
 "} \n"\
 " \n"\
 "/// Sample direction to the light \n"\
@@ -32301,16 +34950,24 @@ static const char g_light_opencl[]= \
 "                    // PDF \n"\
 "                    float* pdf) \n"\
 "{ \n"\
-"    int numemissives = scene->numemissives; \n"\
-"    if (idx == numemissives) \n"\
+"    Light light = scene->lights[idx]; \n"\
+" \n"\
+"    switch(light.type) \n"\
 "    { \n"\
-"        return EnvironmentLight_Sample(scene, dg, TEXTURE_ARGS, sample, wo, pdf); \n"\
+"        case kIbl: \n"\
+"            return EnvironmentLight_Sample(&light, scene, dg, TEXTURE_ARGS, sample, wo, pdf); \n"\
+"        case kArea: \n"\
+"            return AreaLight_Sample(&light, scene, dg, TEXTURE_ARGS, sample, wo, pdf); \n"\
+"        case kDirectional: \n"\
+"            return DirectionalLight_Sample(&light, scene, dg, TEXTURE_ARGS, sample, wo, pdf); \n"\
+"        case kPoint: \n"\
+"            return PointLight_Sample(&light, scene, dg, TEXTURE_ARGS, sample, wo, pdf); \n"\
+"        case kSpot: \n"\
+"            return SpotLight_Sample(&light, scene, dg, TEXTURE_ARGS, sample, wo, pdf); \n"\
 "    } \n"\
-"    else \n"\
-"    { \n"\
-"        Emissive emissive = scene->emissives[idx]; \n"\
-"        return AreaLight_Sample(&emissive, scene, dg, TEXTURE_ARGS, sample, wo, pdf); \n"\
-"    } \n"\
+" \n"\
+"    *pdf = 0.f; \n"\
+"    return make_float3(0.f, 0.f, 0.f); \n"\
 "} \n"\
 " \n"\
 "/// Get PDF for a given direction \n"\
@@ -32326,16 +34983,31 @@ static const char g_light_opencl[]= \
 "                   TEXTURE_ARG_LIST \n"\
 "                   ) \n"\
 "{ \n"\
-"    int numemissives = scene->numemissives; \n"\
-"    if (idx == numemissives) \n"\
+"    Light light = scene->lights[idx]; \n"\
+" \n"\
+"    switch(light.type) \n"\
 "    { \n"\
-"        return EnvironmentLight_GetPdf(scene, dg, wo, TEXTURE_ARGS); \n"\
+"        case kIbl: \n"\
+"            return EnvironmentLight_GetPdf(&light, scene, dg, wo, TEXTURE_ARGS); \n"\
+"        case kArea: \n"\
+"            return AreaLight_GetPdf(&light, scene, dg, wo, TEXTURE_ARGS); \n"\
+"        case kDirectional: \n"\
+"            return DirectionalLight_GetPdf(&light, scene, dg, wo, TEXTURE_ARGS); \n"\
+"        case kPoint: \n"\
+"            return PointLight_GetPdf(&light, scene, dg, wo, TEXTURE_ARGS); \n"\
+"        case kSpot: \n"\
+"            return SpotLight_GetPdf(&light, scene, dg, wo, TEXTURE_ARGS); \n"\
 "    } \n"\
-"    else \n"\
-"    { \n"\
-"        Emissive emissive = scene->emissives[idx]; \n"\
-"        return AreaLight_GetPdf(&emissive, scene, dg, wo, TEXTURE_ARGS); \n"\
-"    } \n"\
+" \n"\
+"    return 0.f; \n"\
+"} \n"\
+" \n"\
+"/// Check if the light is singular \n"\
+"bool Light_IsSingular(__global Light const* light) \n"\
+"{ \n"\
+"    return light->type == kPoint || \n"\
+"        light->type == kSpot || \n"\
+"        light->type == kDirectional; \n"\
 "} \n"\
 " \n"\
 "#endif // LIGHT_CLnv \n"\
@@ -32482,7 +35154,7 @@ static const char g_material_opencl[]= \
 "float4 quaternion_inverse(float4 q) \n"\
 "{ \n"\
 "    float sqnorm = q.x*q.x + q.y*q.y + q.z*q.z + q.w*q.w; \n"\
-"     \n"\
+" \n"\
 "    /// Check if it is singular \n"\
 "    if (sqnorm != 0.f) \n"\
 "    { \n"\
@@ -32504,7 +35176,7 @@ static const char g_material_opencl[]= \
 "} \n"\
 " \n"\
 "/// Linearly interpolate between two values \n"\
-"float3 lerp(float3 a, float3 b, float w) \n"\
+"float4 lerp(float4 a, float4 b, float w) \n"\
 "{ \n"\
 "    return a + w*(b-a); \n"\
 "} \n"\
@@ -32523,7 +35195,7 @@ static const char g_material_opencl[]= \
 "float3 GetOrthoVector(float3 n) \n"\
 "{ \n"\
 "    float3 p; \n"\
-"     \n"\
+" \n"\
 "    if (fabs(n.z) > 0.f) { \n"\
 "        float k = sqrt(n.y*n.y + n.z*n.z); \n"\
 "        p.x = 0; p.y = -n.z/k; p.z = n.y/k; \n"\
@@ -32766,7 +35438,7 @@ static const char g_material_opencl[]= \
 "float4 quaternion_inverse(float4 q) \n"\
 "{ \n"\
 "    float sqnorm = q.x*q.x + q.y*q.y + q.z*q.z + q.w*q.w; \n"\
-"     \n"\
+" \n"\
 "    /// Check if it is singular \n"\
 "    if (sqnorm != 0.f) \n"\
 "    { \n"\
@@ -32788,7 +35460,7 @@ static const char g_material_opencl[]= \
 "} \n"\
 " \n"\
 "/// Linearly interpolate between two values \n"\
-"float3 lerp(float3 a, float3 b, float w) \n"\
+"float4 lerp(float4 a, float4 b, float w) \n"\
 "{ \n"\
 "    return a + w*(b-a); \n"\
 "} \n"\
@@ -32807,7 +35479,7 @@ static const char g_material_opencl[]= \
 "float3 GetOrthoVector(float3 n) \n"\
 "{ \n"\
 "    float3 p; \n"\
-"     \n"\
+" \n"\
 "    if (fabs(n.z) > 0.f) { \n"\
 "        float k = sqrt(n.y*n.y + n.z*n.z); \n"\
 "        p.x = 0; p.y = -n.z/k; p.z = n.y/k; \n"\
@@ -32876,88 +35548,88 @@ static const char g_material_opencl[]= \
 "#define TEXTURE_ARGS_IDX(x) x, textures, texturedata \n"\
 " \n"\
 "/// Sample 2D texture \n"\
-"float3 Texture_Sample2D(float2 uv, TEXTURE_ARG_LIST_IDX(texidx)) \n"\
+"float4 Texture_Sample2D(float2 uv, TEXTURE_ARG_LIST_IDX(texidx)) \n"\
 "{ \n"\
 "    // Get width and height \n"\
 "    int width = textures[texidx].w; \n"\
 "    int height = textures[texidx].h; \n"\
-"     \n"\
+" \n"\
 "    // Find the origin of the data in the pool \n"\
 "    __global char const* mydata = texturedata + textures[texidx].dataoffset; \n"\
 " \n"\
 "    // Handle UV wrap \n"\
 "    // TODO: need UV mode support \n"\
 "    uv -= floor(uv); \n"\
-"     \n"\
+" \n"\
 "    // Reverse Y: \n"\
 "    // it is needed as textures are loaded with Y axis going top to down \n"\
 "    // and our axis goes from down to top \n"\
 "    uv.y = 1.f - uv.y; \n"\
-"     \n"\
+" \n"\
 "    // Calculate integer coordinates \n"\
 "    int x0 = clamp((int)floor(uv.x * width), 0, width - 1); \n"\
 "    int y0 = clamp((int)floor(uv.y * height), 0, height - 1); \n"\
-"     \n"\
+" \n"\
 "    // Calculate samples for linear filtering \n"\
 "    int x1 = clamp(x0 + 1, 0,  width - 1); \n"\
 "    int y1 = clamp(y0 + 1, 0, height - 1); \n"\
-"     \n"\
+" \n"\
 "    // Calculate weights for linear filtering \n"\
 "    float wx = uv.x * width - floor(uv.x * width); \n"\
 "    float wy = uv.y * height - floor(uv.y * height); \n"\
-"     \n"\
+" \n"\
 "    switch (textures[texidx].fmt) \n"\
 "    { \n"\
 "        case RGBA32: \n"\
 "        { \n"\
-"            __global float3 const* mydataf = (__global float3 const*)mydata; \n"\
-"             \n"\
+"            __global float4 const* mydataf = (__global float4 const*)mydata; \n"\
+" \n"\
 "            // Get 4 values for linear filtering \n"\
-"            float3 val00 = *(mydataf + width * y0 + x0); \n"\
-"            float3 val01 = *(mydataf + width * y0 + x1); \n"\
-"            float3 val10 = *(mydataf + width * y1 + x0); \n"\
-"            float3 val11 = *(mydataf + width * y1 + x1); \n"\
-"             \n"\
+"            float4 val00 = *(mydataf + width * y0 + x0); \n"\
+"            float4 val01 = *(mydataf + width * y0 + x1); \n"\
+"            float4 val10 = *(mydataf + width * y1 + x0); \n"\
+"            float4 val11 = *(mydataf + width * y1 + x1); \n"\
+" \n"\
 "            // Filter and return the result \n"\
 "            return lerp(lerp(val00, val01, wx), lerp(val10, val11, wx), wy); \n"\
 "        } \n"\
-"             \n"\
+" \n"\
 "        case RGBA16: \n"\
 "        { \n"\
 "            __global half const* mydatah = (__global half const*)mydata; \n"\
-"             \n"\
+" \n"\
 "            // Get 4 values \n"\
-"            float3 val00 = vload_half4(width * y0 + x0, mydatah).xyz; \n"\
-"            float3 val01 = vload_half4(width * y0 + x1, mydatah).xyz; \n"\
-"            float3 val10 = vload_half4(width * y1 + x0, mydatah).xyz; \n"\
-"            float3 val11 = vload_half4(width * y1 + x1, mydatah).xyz; \n"\
-"             \n"\
+"            float4 val00 = vload_half4(width * y0 + x0, mydatah); \n"\
+"            float4 val01 = vload_half4(width * y0 + x1, mydatah); \n"\
+"            float4 val10 = vload_half4(width * y1 + x0, mydatah); \n"\
+"            float4 val11 = vload_half4(width * y1 + x1, mydatah); \n"\
+" \n"\
 "            // Filter and return the result \n"\
 "            return lerp(lerp(val00, val01, wx), lerp(val10, val11, wx), wy); \n"\
 "        } \n"\
-"             \n"\
+" \n"\
 "        case RGBA8: \n"\
 "        { \n"\
 "            __global uchar4 const* mydatac = (__global uchar4 const*)mydata; \n"\
-"             \n"\
+" \n"\
 "            // Get 4 values and convert to float \n"\
 "            uchar4 valu00 = *(mydatac + width * y0 + x0); \n"\
 "            uchar4 valu01 = *(mydatac + width * y0 + x1); \n"\
 "            uchar4 valu10 = *(mydatac + width * y1 + x0); \n"\
 "            uchar4 valu11 = *(mydatac + width * y1 + x1); \n"\
-"             \n"\
-"            float3 val00 = make_float3((float)valu00.x / 255.f, (float)valu00.y / 255.f, (float)valu00.z / 255.f); \n"\
-"            float3 val01 = make_float3((float)valu01.x / 255.f, (float)valu01.y / 255.f, (float)valu01.z / 255.f); \n"\
-"            float3 val10 = make_float3((float)valu10.x / 255.f, (float)valu10.y / 255.f, (float)valu10.z / 255.f); \n"\
-"            float3 val11 = make_float3((float)valu11.x / 255.f, (float)valu11.y / 255.f, (float)valu11.z / 255.f); \n"\
-"             \n"\
+" \n"\
+"            float4 val00 = make_float4((float)valu00.x / 255.f, (float)valu00.y / 255.f, (float)valu00.z / 255.f, (float)valu00.w / 255.f); \n"\
+"            float4 val01 = make_float4((float)valu01.x / 255.f, (float)valu01.y / 255.f, (float)valu01.z / 255.f, (float)valu01.w / 255.f); \n"\
+"            float4 val10 = make_float4((float)valu10.x / 255.f, (float)valu10.y / 255.f, (float)valu10.z / 255.f, (float)valu10.w / 255.f); \n"\
+"            float4 val11 = make_float4((float)valu11.x / 255.f, (float)valu11.y / 255.f, (float)valu11.z / 255.f, (float)valu11.w / 255.f); \n"\
+" \n"\
 "            // Filter and return the result \n"\
 "            return lerp(lerp(val00, val01, wx), lerp(val10, val11, wx), wy); \n"\
 "        } \n"\
-"             \n"\
+" \n"\
 "        default: \n"\
 "        { \n"\
-"            return make_float3(0.f, 0.f, 0.f); \n"\
+"            return make_float4(0.f, 0.f, 0.f, 0.f); \n"\
 "        } \n"\
 "    } \n"\
 "} \n"\
@@ -32968,14 +35640,14 @@ static const char g_material_opencl[]= \
 "    // Transform to spherical coords \n"\
 "    float r, phi, theta; \n"\
 "    CartesianToSpherical(d, &r, &phi, &theta); \n"\
-"     \n"\
+" \n"\
 "    // Map to [0,1]x[0,1] range and reverse Y axis \n"\
 "    float2 uv; \n"\
 "    uv.x = phi / (2*PI); \n"\
 "    uv.y = 1.f - theta / PI; \n"\
-"     \n"\
+" \n"\
 "    // Sample the texture \n"\
-"    return native_powr(Texture_Sample2D(uv, TEXTURE_ARGS_IDX(texidx)), 1.f / 1.f); \n"\
+"    return Texture_Sample2D(uv, TEXTURE_ARGS_IDX(texidx)).xyz; \n"\
 "} \n"\
 " \n"\
 "/// Get data from parameter value or texture \n"\
@@ -32992,9 +35664,30 @@ static const char g_material_opencl[]= \
 "    if (texidx != -1) \n"\
 "    { \n"\
 "        // Sample texture \n"\
+"        return native_powr(Texture_Sample2D(uv, TEXTURE_ARGS_IDX(texidx)).xyz, 2.2f); \n"\
+"    } \n"\
+" \n"\
+"    // Return fixed color otherwise \n"\
+"    return v; \n"\
+"} \n"\
+" \n"\
+"/// Get data from parameter value or texture \n"\
+"float4 Texture_GetValue4f( \n"\
+"                // Value \n"\
+"                float4 v, \n"\
+"                // Texture coordinate \n"\
+"                float2 uv, \n"\
+"                // Texture args \n"\
+"                TEXTURE_ARG_LIST_IDX(texidx) \n"\
+"                ) \n"\
+"{ \n"\
+"    // If texture present sample from texture \n"\
+"    if (texidx != -1) \n"\
+"    { \n"\
+"        // Sample texture \n"\
 "        return native_powr(Texture_Sample2D(uv, TEXTURE_ARGS_IDX(texidx)), 2.2f); \n"\
 "    } \n"\
-"     \n"\
+" \n"\
 "    // Return fixed color otherwise \n"\
 "    return v; \n"\
 "} \n"\
@@ -33015,7 +35708,7 @@ static const char g_material_opencl[]= \
 "        // Sample texture \n"\
 "        return Texture_Sample2D(uv, TEXTURE_ARGS_IDX(texidx)).x; \n"\
 "    } \n"\
-"     \n"\
+" \n"\
 "    // Return fixed color otherwise \n"\
 "    return v; \n"\
 "} \n"\
@@ -33050,11 +35743,11 @@ static const char g_material_opencl[]= \
 "        __global float3 const* mydataf = (__global float3 const*)mydata; \n"\
 " \n"\
 "        // Sobel filter \n"\
-"        const float tex00 = (*(mydataf + width * (t0 - 1) + (s0-1))).x;  \n"\
+"        const float tex00 = (*(mydataf + width * (t0 - 1) + (s0-1))).x; \n"\
 "        const float tex10 = (*(mydataf + width * (t0 - 1) + (s0))).x; \n"\
-"        const float tex20 = (*(mydataf + width * (t0 - 1) + (s0 + 1))).x;  \n"\
+"        const float tex20 = (*(mydataf + width * (t0 - 1) + (s0 + 1))).x; \n"\
 " \n"\
-"        const float tex01 = (*(mydataf + width * (t0) + (s0 - 1))).x;  \n"\
+"        const float tex01 = (*(mydataf + width * (t0) + (s0 - 1))).x; \n"\
 "        const float tex21 = (*(mydataf + width * (t0) + (s0 + 1))).x; \n"\
 " \n"\
 "        const float tex02 = (*(mydataf + width * (t0 + 1) + (s0 - 1))).x; \n"\
@@ -33076,8 +35769,8 @@ static const char g_material_opencl[]= \
 "        const float tex10 = vload_half4(width * (t0 - 1) + (s0), mydatah).x; \n"\
 "        const float tex20 = vload_half4(width * (t0 - 1) + (s0 + 1), mydatah).x; \n"\
 " \n"\
-"        const float tex01 = vload_half4(width * (t0)+(s0 - 1), mydatah).x;  \n"\
-"        const float tex21 = vload_half4(width * (t0)+(s0 + 1), mydatah).x;  \n"\
+"        const float tex01 = vload_half4(width * (t0)+(s0 - 1), mydatah).x; \n"\
+"        const float tex21 = vload_half4(width * (t0)+(s0 + 1), mydatah).x; \n"\
 " \n"\
 "        const float tex02 = vload_half4(width * (t0 + 1) + (s0 - 1), mydatah).x; \n"\
 "        const float tex12 = vload_half4(width * (t0 + 1) + (s0), mydatah).x; \n"\
@@ -33156,7 +35849,7 @@ static const char g_material_opencl[]= \
 "********************************************************************/ \n"\
 "#ifndef PAYLOAD_CL \n"\
 "#define PAYLOAD_CL \n"\
-"#define SOBOL \n"\
+"//#define SOBOL \n"\
 "#define MULTISCATTER \n"\
 " \n"\
 "/// Ray descriptor \n"\
@@ -33168,7 +35861,7 @@ static const char g_material_opencl[]= \
 "    float4 d; \n"\
 "    /// x - ray mask, y - activity flag \n"\
 "    int2 extra; \n"\
-"    int2 padding; \n"\
+"    float2 padding; \n"\
 "} ray; \n"\
 " \n"\
 "/// Intersection data returned by RadeonRays \n"\
@@ -33222,8 +35915,6 @@ static const char g_material_opencl[]= \
 "} Emissive; \n"\
 " \n"\
 " \n"\
-" \n"\
-" \n"\
 "typedef enum _PathFlags \n"\
 "{ \n"\
 "    kNone = 0x0, \n"\
@@ -33273,6 +35964,53 @@ static const char g_material_opencl[]= \
 " \n"\
 "} Material; \n"\
 " \n"\
+" \n"\
+"enum LightType \n"\
+"{ \n"\
+"    kPoint = 0x1, \n"\
+"    kDirectional, \n"\
+"    kSpot, \n"\
+"    kArea, \n"\
+"    kIbl \n"\
+"}; \n"\
+" \n"\
+"typedef struct _Light \n"\
+"{ \n"\
+"    int type; \n"\
+" \n"\
+"    union \n"\
+"    { \n"\
+"        // Area light \n"\
+"        struct \n"\
+"        { \n"\
+"            int shapeidx; \n"\
+"            int primidx; \n"\
+"            int matidx; \n"\
+"        }; \n"\
+" \n"\
+"        // IBL \n"\
+"        struct \n"\
+"        { \n"\
+"            int tex; \n"\
+"            int texdiffuse; \n"\
+"            float multiplier; \n"\
+"        }; \n"\
+"         \n"\
+"         \n"\
+"        // Spot \n"\
+"        struct \n"\
+"        { \n"\
+"            float ia; \n"\
+"            float oa; \n"\
+"            float f; \n"\
+"        }; \n"\
+"    }; \n"\
+" \n"\
+"    float3 p; \n"\
+"    float3 d; \n"\
+"    float3 intensity; \n"\
+"} Light; \n"\
+" \n"\
 "typedef struct _Scene \n"\
 "{ \n"\
 "    // Vertices \n"\
@@ -33290,13 +36028,13 @@ static const char g_material_opencl[]= \
 "    // Materials \n"\
 "    __global Material const* materials; \n"\
 "    // Emissive objects \n"\
-"    __global Emissive const* emissives; \n"\
+"    __global Light const* lights; \n"\
 "    // Envmap idx \n"\
 "    int envmapidx; \n"\
 "    // Envmap multiplier \n"\
 "    float envmapmul; \n"\
 "    // Number of emissive objects \n"\
-"    int numemissives; \n"\
+"    int num_lights; \n"\
 "} Scene; \n"\
 " \n"\
 "// Hit data \n"\
@@ -33314,7 +36052,7 @@ static const char g_material_opencl[]= \
 "    float3 dpdu; \n"\
 "    float3 dpdv; \n"\
 "    float  area; \n"\
-"    // Material  \n"\
+"    // Material \n"\
 "    Material mat; \n"\
 "} DifferentialGeometry; \n"\
 " \n"\
@@ -33370,6 +36108,16 @@ static const char g_material_opencl[]= \
 "    r->extra.y = 0; \n"\
 "} \n"\
 " \n"\
+"void Ray_SetExtra(__global ray* r, float2 extra) \n"\
+"{ \n"\
+"    r->padding = extra; \n"\
+"} \n"\
+" \n"\
+"float2 Ray_GetExtra(__global ray const* r) \n"\
+"{ \n"\
+"    return r->padding; \n"\
+"} \n"\
+" \n"\
 "void Ray_Init(__global ray* r, float3 o, float3 d, float maxt, float time, int mask) \n"\
 "{ \n"\
 "    // TODO: Check if it generates MTBUF_XYZW write \n"\
@@ -33380,6 +36128,8 @@ static const char g_material_opencl[]= \
 "    r->extra.x = mask; \n"\
 "    r->extra.y = 0xFFFFFFFF; \n"\
 "} \n"\
+" \n"\
+" \n"\
 " \n"\
 "#endif // PAYLOAD_CL \n"\
 "/********************************************************************** \n"\
@@ -33523,7 +36273,7 @@ static const char g_material_opencl[]= \
 "float4 quaternion_inverse(float4 q) \n"\
 "{ \n"\
 "    float sqnorm = q.x*q.x + q.y*q.y + q.z*q.z + q.w*q.w; \n"\
-"     \n"\
+" \n"\
 "    /// Check if it is singular \n"\
 "    if (sqnorm != 0.f) \n"\
 "    { \n"\
@@ -33545,7 +36295,7 @@ static const char g_material_opencl[]= \
 "} \n"\
 " \n"\
 "/// Linearly interpolate between two values \n"\
-"float3 lerp(float3 a, float3 b, float w) \n"\
+"float4 lerp(float4 a, float4 b, float w) \n"\
 "{ \n"\
 "    return a + w*(b-a); \n"\
 "} \n"\
@@ -33564,7 +36314,7 @@ static const char g_material_opencl[]= \
 "float3 GetOrthoVector(float3 n) \n"\
 "{ \n"\
 "    float3 p; \n"\
-"     \n"\
+" \n"\
 "    if (fabs(n.z) > 0.f) { \n"\
 "        float k = sqrt(n.y*n.y + n.z*n.z); \n"\
 "        p.x = 0; p.y = -n.z/k; p.z = n.y/k; \n"\
@@ -33807,7 +36557,7 @@ static const char g_material_opencl[]= \
 "float4 quaternion_inverse(float4 q) \n"\
 "{ \n"\
 "    float sqnorm = q.x*q.x + q.y*q.y + q.z*q.z + q.w*q.w; \n"\
-"     \n"\
+" \n"\
 "    /// Check if it is singular \n"\
 "    if (sqnorm != 0.f) \n"\
 "    { \n"\
@@ -33829,7 +36579,7 @@ static const char g_material_opencl[]= \
 "} \n"\
 " \n"\
 "/// Linearly interpolate between two values \n"\
-"float3 lerp(float3 a, float3 b, float w) \n"\
+"float4 lerp(float4 a, float4 b, float w) \n"\
 "{ \n"\
 "    return a + w*(b-a); \n"\
 "} \n"\
@@ -33848,7 +36598,7 @@ static const char g_material_opencl[]= \
 "float3 GetOrthoVector(float3 n) \n"\
 "{ \n"\
 "    float3 p; \n"\
-"     \n"\
+" \n"\
 "    if (fabs(n.z) > 0.f) { \n"\
 "        float k = sqrt(n.y*n.y + n.z*n.z); \n"\
 "        p.x = 0; p.y = -n.z/k; p.z = n.y/k; \n"\
@@ -33917,88 +36667,88 @@ static const char g_material_opencl[]= \
 "#define TEXTURE_ARGS_IDX(x) x, textures, texturedata \n"\
 " \n"\
 "/// Sample 2D texture \n"\
-"float3 Texture_Sample2D(float2 uv, TEXTURE_ARG_LIST_IDX(texidx)) \n"\
+"float4 Texture_Sample2D(float2 uv, TEXTURE_ARG_LIST_IDX(texidx)) \n"\
 "{ \n"\
 "    // Get width and height \n"\
 "    int width = textures[texidx].w; \n"\
 "    int height = textures[texidx].h; \n"\
-"     \n"\
+" \n"\
 "    // Find the origin of the data in the pool \n"\
 "    __global char const* mydata = texturedata + textures[texidx].dataoffset; \n"\
 " \n"\
 "    // Handle UV wrap \n"\
 "    // TODO: need UV mode support \n"\
 "    uv -= floor(uv); \n"\
-"     \n"\
+" \n"\
 "    // Reverse Y: \n"\
 "    // it is needed as textures are loaded with Y axis going top to down \n"\
 "    // and our axis goes from down to top \n"\
 "    uv.y = 1.f - uv.y; \n"\
-"     \n"\
+" \n"\
 "    // Calculate integer coordinates \n"\
 "    int x0 = clamp((int)floor(uv.x * width), 0, width - 1); \n"\
 "    int y0 = clamp((int)floor(uv.y * height), 0, height - 1); \n"\
-"     \n"\
+" \n"\
 "    // Calculate samples for linear filtering \n"\
 "    int x1 = clamp(x0 + 1, 0,  width - 1); \n"\
 "    int y1 = clamp(y0 + 1, 0, height - 1); \n"\
-"     \n"\
+" \n"\
 "    // Calculate weights for linear filtering \n"\
 "    float wx = uv.x * width - floor(uv.x * width); \n"\
 "    float wy = uv.y * height - floor(uv.y * height); \n"\
-"     \n"\
+" \n"\
 "    switch (textures[texidx].fmt) \n"\
 "    { \n"\
 "        case RGBA32: \n"\
 "        { \n"\
-"            __global float3 const* mydataf = (__global float3 const*)mydata; \n"\
-"             \n"\
+"            __global float4 const* mydataf = (__global float4 const*)mydata; \n"\
+" \n"\
 "            // Get 4 values for linear filtering \n"\
-"            float3 val00 = *(mydataf + width * y0 + x0); \n"\
-"            float3 val01 = *(mydataf + width * y0 + x1); \n"\
-"            float3 val10 = *(mydataf + width * y1 + x0); \n"\
-"            float3 val11 = *(mydataf + width * y1 + x1); \n"\
-"             \n"\
+"            float4 val00 = *(mydataf + width * y0 + x0); \n"\
+"            float4 val01 = *(mydataf + width * y0 + x1); \n"\
+"            float4 val10 = *(mydataf + width * y1 + x0); \n"\
+"            float4 val11 = *(mydataf + width * y1 + x1); \n"\
+" \n"\
 "            // Filter and return the result \n"\
 "            return lerp(lerp(val00, val01, wx), lerp(val10, val11, wx), wy); \n"\
 "        } \n"\
-"             \n"\
+" \n"\
 "        case RGBA16: \n"\
 "        { \n"\
 "            __global half const* mydatah = (__global half const*)mydata; \n"\
-"             \n"\
+" \n"\
 "            // Get 4 values \n"\
-"            float3 val00 = vload_half4(width * y0 + x0, mydatah).xyz; \n"\
-"            float3 val01 = vload_half4(width * y0 + x1, mydatah).xyz; \n"\
-"            float3 val10 = vload_half4(width * y1 + x0, mydatah).xyz; \n"\
-"            float3 val11 = vload_half4(width * y1 + x1, mydatah).xyz; \n"\
-"             \n"\
+"            float4 val00 = vload_half4(width * y0 + x0, mydatah); \n"\
+"            float4 val01 = vload_half4(width * y0 + x1, mydatah); \n"\
+"            float4 val10 = vload_half4(width * y1 + x0, mydatah); \n"\
+"            float4 val11 = vload_half4(width * y1 + x1, mydatah); \n"\
+" \n"\
 "            // Filter and return the result \n"\
 "            return lerp(lerp(val00, val01, wx), lerp(val10, val11, wx), wy); \n"\
 "        } \n"\
-"             \n"\
+" \n"\
 "        case RGBA8: \n"\
 "        { \n"\
 "            __global uchar4 const* mydatac = (__global uchar4 const*)mydata; \n"\
-"             \n"\
+" \n"\
 "            // Get 4 values and convert to float \n"\
 "            uchar4 valu00 = *(mydatac + width * y0 + x0); \n"\
 "            uchar4 valu01 = *(mydatac + width * y0 + x1); \n"\
 "            uchar4 valu10 = *(mydatac + width * y1 + x0); \n"\
 "            uchar4 valu11 = *(mydatac + width * y1 + x1); \n"\
-"             \n"\
-"            float3 val00 = make_float3((float)valu00.x / 255.f, (float)valu00.y / 255.f, (float)valu00.z / 255.f); \n"\
-"            float3 val01 = make_float3((float)valu01.x / 255.f, (float)valu01.y / 255.f, (float)valu01.z / 255.f); \n"\
-"            float3 val10 = make_float3((float)valu10.x / 255.f, (float)valu10.y / 255.f, (float)valu10.z / 255.f); \n"\
-"            float3 val11 = make_float3((float)valu11.x / 255.f, (float)valu11.y / 255.f, (float)valu11.z / 255.f); \n"\
-"             \n"\
+" \n"\
+"            float4 val00 = make_float4((float)valu00.x / 255.f, (float)valu00.y / 255.f, (float)valu00.z / 255.f, (float)valu00.w / 255.f); \n"\
+"            float4 val01 = make_float4((float)valu01.x / 255.f, (float)valu01.y / 255.f, (float)valu01.z / 255.f, (float)valu01.w / 255.f); \n"\
+"            float4 val10 = make_float4((float)valu10.x / 255.f, (float)valu10.y / 255.f, (float)valu10.z / 255.f, (float)valu10.w / 255.f); \n"\
+"            float4 val11 = make_float4((float)valu11.x / 255.f, (float)valu11.y / 255.f, (float)valu11.z / 255.f, (float)valu11.w / 255.f); \n"\
+" \n"\
 "            // Filter and return the result \n"\
 "            return lerp(lerp(val00, val01, wx), lerp(val10, val11, wx), wy); \n"\
 "        } \n"\
-"             \n"\
+" \n"\
 "        default: \n"\
 "        { \n"\
-"            return make_float3(0.f, 0.f, 0.f); \n"\
+"            return make_float4(0.f, 0.f, 0.f, 0.f); \n"\
 "        } \n"\
 "    } \n"\
 "} \n"\
@@ -34009,14 +36759,14 @@ static const char g_material_opencl[]= \
 "    // Transform to spherical coords \n"\
 "    float r, phi, theta; \n"\
 "    CartesianToSpherical(d, &r, &phi, &theta); \n"\
-"     \n"\
+" \n"\
 "    // Map to [0,1]x[0,1] range and reverse Y axis \n"\
 "    float2 uv; \n"\
 "    uv.x = phi / (2*PI); \n"\
 "    uv.y = 1.f - theta / PI; \n"\
-"     \n"\
+" \n"\
 "    // Sample the texture \n"\
-"    return native_powr(Texture_Sample2D(uv, TEXTURE_ARGS_IDX(texidx)), 1.f / 1.f); \n"\
+"    return Texture_Sample2D(uv, TEXTURE_ARGS_IDX(texidx)).xyz; \n"\
 "} \n"\
 " \n"\
 "/// Get data from parameter value or texture \n"\
@@ -34033,9 +36783,30 @@ static const char g_material_opencl[]= \
 "    if (texidx != -1) \n"\
 "    { \n"\
 "        // Sample texture \n"\
+"        return native_powr(Texture_Sample2D(uv, TEXTURE_ARGS_IDX(texidx)).xyz, 2.2f); \n"\
+"    } \n"\
+" \n"\
+"    // Return fixed color otherwise \n"\
+"    return v; \n"\
+"} \n"\
+" \n"\
+"/// Get data from parameter value or texture \n"\
+"float4 Texture_GetValue4f( \n"\
+"                // Value \n"\
+"                float4 v, \n"\
+"                // Texture coordinate \n"\
+"                float2 uv, \n"\
+"                // Texture args \n"\
+"                TEXTURE_ARG_LIST_IDX(texidx) \n"\
+"                ) \n"\
+"{ \n"\
+"    // If texture present sample from texture \n"\
+"    if (texidx != -1) \n"\
+"    { \n"\
+"        // Sample texture \n"\
 "        return native_powr(Texture_Sample2D(uv, TEXTURE_ARGS_IDX(texidx)), 2.2f); \n"\
 "    } \n"\
-"     \n"\
+" \n"\
 "    // Return fixed color otherwise \n"\
 "    return v; \n"\
 "} \n"\
@@ -34056,7 +36827,7 @@ static const char g_material_opencl[]= \
 "        // Sample texture \n"\
 "        return Texture_Sample2D(uv, TEXTURE_ARGS_IDX(texidx)).x; \n"\
 "    } \n"\
-"     \n"\
+" \n"\
 "    // Return fixed color otherwise \n"\
 "    return v; \n"\
 "} \n"\
@@ -34091,11 +36862,11 @@ static const char g_material_opencl[]= \
 "        __global float3 const* mydataf = (__global float3 const*)mydata; \n"\
 " \n"\
 "        // Sobel filter \n"\
-"        const float tex00 = (*(mydataf + width * (t0 - 1) + (s0-1))).x;  \n"\
+"        const float tex00 = (*(mydataf + width * (t0 - 1) + (s0-1))).x; \n"\
 "        const float tex10 = (*(mydataf + width * (t0 - 1) + (s0))).x; \n"\
-"        const float tex20 = (*(mydataf + width * (t0 - 1) + (s0 + 1))).x;  \n"\
+"        const float tex20 = (*(mydataf + width * (t0 - 1) + (s0 + 1))).x; \n"\
 " \n"\
-"        const float tex01 = (*(mydataf + width * (t0) + (s0 - 1))).x;  \n"\
+"        const float tex01 = (*(mydataf + width * (t0) + (s0 - 1))).x; \n"\
 "        const float tex21 = (*(mydataf + width * (t0) + (s0 + 1))).x; \n"\
 " \n"\
 "        const float tex02 = (*(mydataf + width * (t0 + 1) + (s0 - 1))).x; \n"\
@@ -34117,8 +36888,8 @@ static const char g_material_opencl[]= \
 "        const float tex10 = vload_half4(width * (t0 - 1) + (s0), mydatah).x; \n"\
 "        const float tex20 = vload_half4(width * (t0 - 1) + (s0 + 1), mydatah).x; \n"\
 " \n"\
-"        const float tex01 = vload_half4(width * (t0)+(s0 - 1), mydatah).x;  \n"\
-"        const float tex21 = vload_half4(width * (t0)+(s0 + 1), mydatah).x;  \n"\
+"        const float tex01 = vload_half4(width * (t0)+(s0 - 1), mydatah).x; \n"\
+"        const float tex21 = vload_half4(width * (t0)+(s0 + 1), mydatah).x; \n"\
 " \n"\
 "        const float tex02 = vload_half4(width * (t0 + 1) + (s0 - 1), mydatah).x; \n"\
 "        const float tex12 = vload_half4(width * (t0 + 1) + (s0), mydatah).x; \n"\
@@ -34197,7 +36968,7 @@ static const char g_material_opencl[]= \
 "********************************************************************/ \n"\
 "#ifndef PAYLOAD_CL \n"\
 "#define PAYLOAD_CL \n"\
-"#define SOBOL \n"\
+"//#define SOBOL \n"\
 "#define MULTISCATTER \n"\
 " \n"\
 "/// Ray descriptor \n"\
@@ -34209,7 +36980,7 @@ static const char g_material_opencl[]= \
 "    float4 d; \n"\
 "    /// x - ray mask, y - activity flag \n"\
 "    int2 extra; \n"\
-"    int2 padding; \n"\
+"    float2 padding; \n"\
 "} ray; \n"\
 " \n"\
 "/// Intersection data returned by RadeonRays \n"\
@@ -34263,8 +37034,6 @@ static const char g_material_opencl[]= \
 "} Emissive; \n"\
 " \n"\
 " \n"\
-" \n"\
-" \n"\
 "typedef enum _PathFlags \n"\
 "{ \n"\
 "    kNone = 0x0, \n"\
@@ -34314,6 +37083,53 @@ static const char g_material_opencl[]= \
 " \n"\
 "} Material; \n"\
 " \n"\
+" \n"\
+"enum LightType \n"\
+"{ \n"\
+"    kPoint = 0x1, \n"\
+"    kDirectional, \n"\
+"    kSpot, \n"\
+"    kArea, \n"\
+"    kIbl \n"\
+"}; \n"\
+" \n"\
+"typedef struct _Light \n"\
+"{ \n"\
+"    int type; \n"\
+" \n"\
+"    union \n"\
+"    { \n"\
+"        // Area light \n"\
+"        struct \n"\
+"        { \n"\
+"            int shapeidx; \n"\
+"            int primidx; \n"\
+"            int matidx; \n"\
+"        }; \n"\
+" \n"\
+"        // IBL \n"\
+"        struct \n"\
+"        { \n"\
+"            int tex; \n"\
+"            int texdiffuse; \n"\
+"            float multiplier; \n"\
+"        }; \n"\
+"         \n"\
+"         \n"\
+"        // Spot \n"\
+"        struct \n"\
+"        { \n"\
+"            float ia; \n"\
+"            float oa; \n"\
+"            float f; \n"\
+"        }; \n"\
+"    }; \n"\
+" \n"\
+"    float3 p; \n"\
+"    float3 d; \n"\
+"    float3 intensity; \n"\
+"} Light; \n"\
+" \n"\
 "typedef struct _Scene \n"\
 "{ \n"\
 "    // Vertices \n"\
@@ -34331,13 +37147,13 @@ static const char g_material_opencl[]= \
 "    // Materials \n"\
 "    __global Material const* materials; \n"\
 "    // Emissive objects \n"\
-"    __global Emissive const* emissives; \n"\
+"    __global Light const* lights; \n"\
 "    // Envmap idx \n"\
 "    int envmapidx; \n"\
 "    // Envmap multiplier \n"\
 "    float envmapmul; \n"\
 "    // Number of emissive objects \n"\
-"    int numemissives; \n"\
+"    int num_lights; \n"\
 "} Scene; \n"\
 " \n"\
 "// Hit data \n"\
@@ -34355,7 +37171,7 @@ static const char g_material_opencl[]= \
 "    float3 dpdu; \n"\
 "    float3 dpdv; \n"\
 "    float  area; \n"\
-"    // Material  \n"\
+"    // Material \n"\
 "    Material mat; \n"\
 "} DifferentialGeometry; \n"\
 " \n"\
@@ -34411,6 +37227,16 @@ static const char g_material_opencl[]= \
 "    r->extra.y = 0; \n"\
 "} \n"\
 " \n"\
+"void Ray_SetExtra(__global ray* r, float2 extra) \n"\
+"{ \n"\
+"    r->padding = extra; \n"\
+"} \n"\
+" \n"\
+"float2 Ray_GetExtra(__global ray const* r) \n"\
+"{ \n"\
+"    return r->padding; \n"\
+"} \n"\
+" \n"\
 "void Ray_Init(__global ray* r, float3 o, float3 d, float maxt, float time, int mask) \n"\
 "{ \n"\
 "    // TODO: Check if it generates MTBUF_XYZW write \n"\
@@ -34421,6 +37247,8 @@ static const char g_material_opencl[]= \
 "    r->extra.x = mask; \n"\
 "    r->extra.y = 0xFFFFFFFF; \n"\
 "} \n"\
+" \n"\
+" \n"\
 " \n"\
 "#endif // PAYLOAD_CL \n"\
 " \n"\
@@ -35973,8 +38801,9 @@ static const char g_material_opencl[]= \
 "#else \n"\
 "                float sample = UniformSampler_Sample2D(rng).x; \n"\
 "#endif \n"\
+"                float weight = Texture_GetValue1f(mat.ns, dg->uv, TEXTURE_ARGS_IDX(mat.nsmapidx)); \n"\
 " \n"\
-"                if (sample < mat.ns) \n"\
+"                if (sample < weight) \n"\
 "                { \n"\
 "                    // Sample top \n"\
 "                    int idx = mat.brdftopidx; \n"\
@@ -36142,7 +38971,7 @@ static const char g_normalmap_opencl[]= \
 "float4 quaternion_inverse(float4 q) \n"\
 "{ \n"\
 "    float sqnorm = q.x*q.x + q.y*q.y + q.z*q.z + q.w*q.w; \n"\
-"     \n"\
+" \n"\
 "    /// Check if it is singular \n"\
 "    if (sqnorm != 0.f) \n"\
 "    { \n"\
@@ -36164,7 +38993,7 @@ static const char g_normalmap_opencl[]= \
 "} \n"\
 " \n"\
 "/// Linearly interpolate between two values \n"\
-"float3 lerp(float3 a, float3 b, float w) \n"\
+"float4 lerp(float4 a, float4 b, float w) \n"\
 "{ \n"\
 "    return a + w*(b-a); \n"\
 "} \n"\
@@ -36183,7 +39012,7 @@ static const char g_normalmap_opencl[]= \
 "float3 GetOrthoVector(float3 n) \n"\
 "{ \n"\
 "    float3 p; \n"\
-"     \n"\
+" \n"\
 "    if (fabs(n.z) > 0.f) { \n"\
 "        float k = sqrt(n.y*n.y + n.z*n.z); \n"\
 "        p.x = 0; p.y = -n.z/k; p.z = n.y/k; \n"\
@@ -36361,7 +39190,7 @@ static const char g_normalmap_opencl[]= \
 "float4 quaternion_inverse(float4 q) \n"\
 "{ \n"\
 "    float sqnorm = q.x*q.x + q.y*q.y + q.z*q.z + q.w*q.w; \n"\
-"     \n"\
+" \n"\
 "    /// Check if it is singular \n"\
 "    if (sqnorm != 0.f) \n"\
 "    { \n"\
@@ -36383,7 +39212,7 @@ static const char g_normalmap_opencl[]= \
 "} \n"\
 " \n"\
 "/// Linearly interpolate between two values \n"\
-"float3 lerp(float3 a, float3 b, float w) \n"\
+"float4 lerp(float4 a, float4 b, float w) \n"\
 "{ \n"\
 "    return a + w*(b-a); \n"\
 "} \n"\
@@ -36402,7 +39231,7 @@ static const char g_normalmap_opencl[]= \
 "float3 GetOrthoVector(float3 n) \n"\
 "{ \n"\
 "    float3 p; \n"\
-"     \n"\
+" \n"\
 "    if (fabs(n.z) > 0.f) { \n"\
 "        float k = sqrt(n.y*n.y + n.z*n.z); \n"\
 "        p.x = 0; p.y = -n.z/k; p.z = n.y/k; \n"\
@@ -36471,88 +39300,88 @@ static const char g_normalmap_opencl[]= \
 "#define TEXTURE_ARGS_IDX(x) x, textures, texturedata \n"\
 " \n"\
 "/// Sample 2D texture \n"\
-"float3 Texture_Sample2D(float2 uv, TEXTURE_ARG_LIST_IDX(texidx)) \n"\
+"float4 Texture_Sample2D(float2 uv, TEXTURE_ARG_LIST_IDX(texidx)) \n"\
 "{ \n"\
 "    // Get width and height \n"\
 "    int width = textures[texidx].w; \n"\
 "    int height = textures[texidx].h; \n"\
-"     \n"\
+" \n"\
 "    // Find the origin of the data in the pool \n"\
 "    __global char const* mydata = texturedata + textures[texidx].dataoffset; \n"\
 " \n"\
 "    // Handle UV wrap \n"\
 "    // TODO: need UV mode support \n"\
 "    uv -= floor(uv); \n"\
-"     \n"\
+" \n"\
 "    // Reverse Y: \n"\
 "    // it is needed as textures are loaded with Y axis going top to down \n"\
 "    // and our axis goes from down to top \n"\
 "    uv.y = 1.f - uv.y; \n"\
-"     \n"\
+" \n"\
 "    // Calculate integer coordinates \n"\
 "    int x0 = clamp((int)floor(uv.x * width), 0, width - 1); \n"\
 "    int y0 = clamp((int)floor(uv.y * height), 0, height - 1); \n"\
-"     \n"\
+" \n"\
 "    // Calculate samples for linear filtering \n"\
 "    int x1 = clamp(x0 + 1, 0,  width - 1); \n"\
 "    int y1 = clamp(y0 + 1, 0, height - 1); \n"\
-"     \n"\
+" \n"\
 "    // Calculate weights for linear filtering \n"\
 "    float wx = uv.x * width - floor(uv.x * width); \n"\
 "    float wy = uv.y * height - floor(uv.y * height); \n"\
-"     \n"\
+" \n"\
 "    switch (textures[texidx].fmt) \n"\
 "    { \n"\
 "        case RGBA32: \n"\
 "        { \n"\
-"            __global float3 const* mydataf = (__global float3 const*)mydata; \n"\
-"             \n"\
+"            __global float4 const* mydataf = (__global float4 const*)mydata; \n"\
+" \n"\
 "            // Get 4 values for linear filtering \n"\
-"            float3 val00 = *(mydataf + width * y0 + x0); \n"\
-"            float3 val01 = *(mydataf + width * y0 + x1); \n"\
-"            float3 val10 = *(mydataf + width * y1 + x0); \n"\
-"            float3 val11 = *(mydataf + width * y1 + x1); \n"\
-"             \n"\
+"            float4 val00 = *(mydataf + width * y0 + x0); \n"\
+"            float4 val01 = *(mydataf + width * y0 + x1); \n"\
+"            float4 val10 = *(mydataf + width * y1 + x0); \n"\
+"            float4 val11 = *(mydataf + width * y1 + x1); \n"\
+" \n"\
 "            // Filter and return the result \n"\
 "            return lerp(lerp(val00, val01, wx), lerp(val10, val11, wx), wy); \n"\
 "        } \n"\
-"             \n"\
+" \n"\
 "        case RGBA16: \n"\
 "        { \n"\
 "            __global half const* mydatah = (__global half const*)mydata; \n"\
-"             \n"\
+" \n"\
 "            // Get 4 values \n"\
-"            float3 val00 = vload_half4(width * y0 + x0, mydatah).xyz; \n"\
-"            float3 val01 = vload_half4(width * y0 + x1, mydatah).xyz; \n"\
-"            float3 val10 = vload_half4(width * y1 + x0, mydatah).xyz; \n"\
-"            float3 val11 = vload_half4(width * y1 + x1, mydatah).xyz; \n"\
-"             \n"\
+"            float4 val00 = vload_half4(width * y0 + x0, mydatah); \n"\
+"            float4 val01 = vload_half4(width * y0 + x1, mydatah); \n"\
+"            float4 val10 = vload_half4(width * y1 + x0, mydatah); \n"\
+"            float4 val11 = vload_half4(width * y1 + x1, mydatah); \n"\
+" \n"\
 "            // Filter and return the result \n"\
 "            return lerp(lerp(val00, val01, wx), lerp(val10, val11, wx), wy); \n"\
 "        } \n"\
-"             \n"\
+" \n"\
 "        case RGBA8: \n"\
 "        { \n"\
 "            __global uchar4 const* mydatac = (__global uchar4 const*)mydata; \n"\
-"             \n"\
+" \n"\
 "            // Get 4 values and convert to float \n"\
 "            uchar4 valu00 = *(mydatac + width * y0 + x0); \n"\
 "            uchar4 valu01 = *(mydatac + width * y0 + x1); \n"\
 "            uchar4 valu10 = *(mydatac + width * y1 + x0); \n"\
 "            uchar4 valu11 = *(mydatac + width * y1 + x1); \n"\
-"             \n"\
-"            float3 val00 = make_float3((float)valu00.x / 255.f, (float)valu00.y / 255.f, (float)valu00.z / 255.f); \n"\
-"            float3 val01 = make_float3((float)valu01.x / 255.f, (float)valu01.y / 255.f, (float)valu01.z / 255.f); \n"\
-"            float3 val10 = make_float3((float)valu10.x / 255.f, (float)valu10.y / 255.f, (float)valu10.z / 255.f); \n"\
-"            float3 val11 = make_float3((float)valu11.x / 255.f, (float)valu11.y / 255.f, (float)valu11.z / 255.f); \n"\
-"             \n"\
+" \n"\
+"            float4 val00 = make_float4((float)valu00.x / 255.f, (float)valu00.y / 255.f, (float)valu00.z / 255.f, (float)valu00.w / 255.f); \n"\
+"            float4 val01 = make_float4((float)valu01.x / 255.f, (float)valu01.y / 255.f, (float)valu01.z / 255.f, (float)valu01.w / 255.f); \n"\
+"            float4 val10 = make_float4((float)valu10.x / 255.f, (float)valu10.y / 255.f, (float)valu10.z / 255.f, (float)valu10.w / 255.f); \n"\
+"            float4 val11 = make_float4((float)valu11.x / 255.f, (float)valu11.y / 255.f, (float)valu11.z / 255.f, (float)valu11.w / 255.f); \n"\
+" \n"\
 "            // Filter and return the result \n"\
 "            return lerp(lerp(val00, val01, wx), lerp(val10, val11, wx), wy); \n"\
 "        } \n"\
-"             \n"\
+" \n"\
 "        default: \n"\
 "        { \n"\
-"            return make_float3(0.f, 0.f, 0.f); \n"\
+"            return make_float4(0.f, 0.f, 0.f, 0.f); \n"\
 "        } \n"\
 "    } \n"\
 "} \n"\
@@ -36563,14 +39392,14 @@ static const char g_normalmap_opencl[]= \
 "    // Transform to spherical coords \n"\
 "    float r, phi, theta; \n"\
 "    CartesianToSpherical(d, &r, &phi, &theta); \n"\
-"     \n"\
+" \n"\
 "    // Map to [0,1]x[0,1] range and reverse Y axis \n"\
 "    float2 uv; \n"\
 "    uv.x = phi / (2*PI); \n"\
 "    uv.y = 1.f - theta / PI; \n"\
-"     \n"\
+" \n"\
 "    // Sample the texture \n"\
-"    return native_powr(Texture_Sample2D(uv, TEXTURE_ARGS_IDX(texidx)), 1.f / 1.f); \n"\
+"    return Texture_Sample2D(uv, TEXTURE_ARGS_IDX(texidx)).xyz; \n"\
 "} \n"\
 " \n"\
 "/// Get data from parameter value or texture \n"\
@@ -36587,9 +39416,30 @@ static const char g_normalmap_opencl[]= \
 "    if (texidx != -1) \n"\
 "    { \n"\
 "        // Sample texture \n"\
+"        return native_powr(Texture_Sample2D(uv, TEXTURE_ARGS_IDX(texidx)).xyz, 2.2f); \n"\
+"    } \n"\
+" \n"\
+"    // Return fixed color otherwise \n"\
+"    return v; \n"\
+"} \n"\
+" \n"\
+"/// Get data from parameter value or texture \n"\
+"float4 Texture_GetValue4f( \n"\
+"                // Value \n"\
+"                float4 v, \n"\
+"                // Texture coordinate \n"\
+"                float2 uv, \n"\
+"                // Texture args \n"\
+"                TEXTURE_ARG_LIST_IDX(texidx) \n"\
+"                ) \n"\
+"{ \n"\
+"    // If texture present sample from texture \n"\
+"    if (texidx != -1) \n"\
+"    { \n"\
+"        // Sample texture \n"\
 "        return native_powr(Texture_Sample2D(uv, TEXTURE_ARGS_IDX(texidx)), 2.2f); \n"\
 "    } \n"\
-"     \n"\
+" \n"\
 "    // Return fixed color otherwise \n"\
 "    return v; \n"\
 "} \n"\
@@ -36610,7 +39460,7 @@ static const char g_normalmap_opencl[]= \
 "        // Sample texture \n"\
 "        return Texture_Sample2D(uv, TEXTURE_ARGS_IDX(texidx)).x; \n"\
 "    } \n"\
-"     \n"\
+" \n"\
 "    // Return fixed color otherwise \n"\
 "    return v; \n"\
 "} \n"\
@@ -36645,11 +39495,11 @@ static const char g_normalmap_opencl[]= \
 "        __global float3 const* mydataf = (__global float3 const*)mydata; \n"\
 " \n"\
 "        // Sobel filter \n"\
-"        const float tex00 = (*(mydataf + width * (t0 - 1) + (s0-1))).x;  \n"\
+"        const float tex00 = (*(mydataf + width * (t0 - 1) + (s0-1))).x; \n"\
 "        const float tex10 = (*(mydataf + width * (t0 - 1) + (s0))).x; \n"\
-"        const float tex20 = (*(mydataf + width * (t0 - 1) + (s0 + 1))).x;  \n"\
+"        const float tex20 = (*(mydataf + width * (t0 - 1) + (s0 + 1))).x; \n"\
 " \n"\
-"        const float tex01 = (*(mydataf + width * (t0) + (s0 - 1))).x;  \n"\
+"        const float tex01 = (*(mydataf + width * (t0) + (s0 - 1))).x; \n"\
 "        const float tex21 = (*(mydataf + width * (t0) + (s0 + 1))).x; \n"\
 " \n"\
 "        const float tex02 = (*(mydataf + width * (t0 + 1) + (s0 - 1))).x; \n"\
@@ -36671,8 +39521,8 @@ static const char g_normalmap_opencl[]= \
 "        const float tex10 = vload_half4(width * (t0 - 1) + (s0), mydatah).x; \n"\
 "        const float tex20 = vload_half4(width * (t0 - 1) + (s0 + 1), mydatah).x; \n"\
 " \n"\
-"        const float tex01 = vload_half4(width * (t0)+(s0 - 1), mydatah).x;  \n"\
-"        const float tex21 = vload_half4(width * (t0)+(s0 + 1), mydatah).x;  \n"\
+"        const float tex01 = vload_half4(width * (t0)+(s0 - 1), mydatah).x; \n"\
+"        const float tex21 = vload_half4(width * (t0)+(s0 + 1), mydatah).x; \n"\
 " \n"\
 "        const float tex02 = vload_half4(width * (t0 + 1) + (s0 - 1), mydatah).x; \n"\
 "        const float tex12 = vload_half4(width * (t0 + 1) + (s0), mydatah).x; \n"\
@@ -36751,7 +39601,7 @@ static const char g_normalmap_opencl[]= \
 "********************************************************************/ \n"\
 "#ifndef PAYLOAD_CL \n"\
 "#define PAYLOAD_CL \n"\
-"#define SOBOL \n"\
+"//#define SOBOL \n"\
 "#define MULTISCATTER \n"\
 " \n"\
 "/// Ray descriptor \n"\
@@ -36763,7 +39613,7 @@ static const char g_normalmap_opencl[]= \
 "    float4 d; \n"\
 "    /// x - ray mask, y - activity flag \n"\
 "    int2 extra; \n"\
-"    int2 padding; \n"\
+"    float2 padding; \n"\
 "} ray; \n"\
 " \n"\
 "/// Intersection data returned by RadeonRays \n"\
@@ -36817,8 +39667,6 @@ static const char g_normalmap_opencl[]= \
 "} Emissive; \n"\
 " \n"\
 " \n"\
-" \n"\
-" \n"\
 "typedef enum _PathFlags \n"\
 "{ \n"\
 "    kNone = 0x0, \n"\
@@ -36868,6 +39716,53 @@ static const char g_normalmap_opencl[]= \
 " \n"\
 "} Material; \n"\
 " \n"\
+" \n"\
+"enum LightType \n"\
+"{ \n"\
+"    kPoint = 0x1, \n"\
+"    kDirectional, \n"\
+"    kSpot, \n"\
+"    kArea, \n"\
+"    kIbl \n"\
+"}; \n"\
+" \n"\
+"typedef struct _Light \n"\
+"{ \n"\
+"    int type; \n"\
+" \n"\
+"    union \n"\
+"    { \n"\
+"        // Area light \n"\
+"        struct \n"\
+"        { \n"\
+"            int shapeidx; \n"\
+"            int primidx; \n"\
+"            int matidx; \n"\
+"        }; \n"\
+" \n"\
+"        // IBL \n"\
+"        struct \n"\
+"        { \n"\
+"            int tex; \n"\
+"            int texdiffuse; \n"\
+"            float multiplier; \n"\
+"        }; \n"\
+"         \n"\
+"         \n"\
+"        // Spot \n"\
+"        struct \n"\
+"        { \n"\
+"            float ia; \n"\
+"            float oa; \n"\
+"            float f; \n"\
+"        }; \n"\
+"    }; \n"\
+" \n"\
+"    float3 p; \n"\
+"    float3 d; \n"\
+"    float3 intensity; \n"\
+"} Light; \n"\
+" \n"\
 "typedef struct _Scene \n"\
 "{ \n"\
 "    // Vertices \n"\
@@ -36885,13 +39780,13 @@ static const char g_normalmap_opencl[]= \
 "    // Materials \n"\
 "    __global Material const* materials; \n"\
 "    // Emissive objects \n"\
-"    __global Emissive const* emissives; \n"\
+"    __global Light const* lights; \n"\
 "    // Envmap idx \n"\
 "    int envmapidx; \n"\
 "    // Envmap multiplier \n"\
 "    float envmapmul; \n"\
 "    // Number of emissive objects \n"\
-"    int numemissives; \n"\
+"    int num_lights; \n"\
 "} Scene; \n"\
 " \n"\
 "// Hit data \n"\
@@ -36909,7 +39804,7 @@ static const char g_normalmap_opencl[]= \
 "    float3 dpdu; \n"\
 "    float3 dpdv; \n"\
 "    float  area; \n"\
-"    // Material  \n"\
+"    // Material \n"\
 "    Material mat; \n"\
 "} DifferentialGeometry; \n"\
 " \n"\
@@ -36965,6 +39860,16 @@ static const char g_normalmap_opencl[]= \
 "    r->extra.y = 0; \n"\
 "} \n"\
 " \n"\
+"void Ray_SetExtra(__global ray* r, float2 extra) \n"\
+"{ \n"\
+"    r->padding = extra; \n"\
+"} \n"\
+" \n"\
+"float2 Ray_GetExtra(__global ray const* r) \n"\
+"{ \n"\
+"    return r->padding; \n"\
+"} \n"\
+" \n"\
 "void Ray_Init(__global ray* r, float3 o, float3 d, float maxt, float time, int mask) \n"\
 "{ \n"\
 "    // TODO: Check if it generates MTBUF_XYZW write \n"\
@@ -36976,6 +39881,8 @@ static const char g_normalmap_opencl[]= \
 "    r->extra.y = 0xFFFFFFFF; \n"\
 "} \n"\
 " \n"\
+" \n"\
+" \n"\
 "#endif // PAYLOAD_CL \n"\
 " \n"\
 "void ApplyNormalMap(DifferentialGeometry* dg, TEXTURE_ARG_LIST) \n"\
@@ -36984,8 +39891,8 @@ static const char g_normalmap_opencl[]= \
 "    if (nmapidx != -1) \n"\
 "    { \n"\
 "        // Now n, dpdu, dpdv is orthonormal basis \n"\
-"        float3 mappednormal = 2.f * Texture_Sample2D(dg->uv, TEXTURE_ARGS_IDX(nmapidx)) - make_float3(1.f, 1.f, 1.f); \n"\
-"     \n"\
+"        float3 mappednormal = 2.f * Texture_Sample2D(dg->uv, TEXTURE_ARGS_IDX(nmapidx)).xyz - make_float3(1.f, 1.f, 1.f); \n"\
+" \n"\
 "        // Return mapped version \n"\
 "        dg->n = normalize(mappednormal.z *  dg->n * 0.5f + mappednormal.x * dg->dpdu + mappednormal.y * dg->dpdv); \n"\
 "    } \n"\
@@ -37054,7 +39961,7 @@ static const char g_path_opencl[]= \
 "********************************************************************/ \n"\
 "#ifndef PAYLOAD_CL \n"\
 "#define PAYLOAD_CL \n"\
-"#define SOBOL \n"\
+"//#define SOBOL \n"\
 "#define MULTISCATTER \n"\
 " \n"\
 "/// Ray descriptor \n"\
@@ -37066,7 +39973,7 @@ static const char g_path_opencl[]= \
 "    float4 d; \n"\
 "    /// x - ray mask, y - activity flag \n"\
 "    int2 extra; \n"\
-"    int2 padding; \n"\
+"    float2 padding; \n"\
 "} ray; \n"\
 " \n"\
 "/// Intersection data returned by RadeonRays \n"\
@@ -37120,8 +40027,6 @@ static const char g_path_opencl[]= \
 "} Emissive; \n"\
 " \n"\
 " \n"\
-" \n"\
-" \n"\
 "typedef enum _PathFlags \n"\
 "{ \n"\
 "    kNone = 0x0, \n"\
@@ -37171,6 +40076,53 @@ static const char g_path_opencl[]= \
 " \n"\
 "} Material; \n"\
 " \n"\
+" \n"\
+"enum LightType \n"\
+"{ \n"\
+"    kPoint = 0x1, \n"\
+"    kDirectional, \n"\
+"    kSpot, \n"\
+"    kArea, \n"\
+"    kIbl \n"\
+"}; \n"\
+" \n"\
+"typedef struct _Light \n"\
+"{ \n"\
+"    int type; \n"\
+" \n"\
+"    union \n"\
+"    { \n"\
+"        // Area light \n"\
+"        struct \n"\
+"        { \n"\
+"            int shapeidx; \n"\
+"            int primidx; \n"\
+"            int matidx; \n"\
+"        }; \n"\
+" \n"\
+"        // IBL \n"\
+"        struct \n"\
+"        { \n"\
+"            int tex; \n"\
+"            int texdiffuse; \n"\
+"            float multiplier; \n"\
+"        }; \n"\
+"         \n"\
+"         \n"\
+"        // Spot \n"\
+"        struct \n"\
+"        { \n"\
+"            float ia; \n"\
+"            float oa; \n"\
+"            float f; \n"\
+"        }; \n"\
+"    }; \n"\
+" \n"\
+"    float3 p; \n"\
+"    float3 d; \n"\
+"    float3 intensity; \n"\
+"} Light; \n"\
+" \n"\
 "typedef struct _Scene \n"\
 "{ \n"\
 "    // Vertices \n"\
@@ -37188,13 +40140,13 @@ static const char g_path_opencl[]= \
 "    // Materials \n"\
 "    __global Material const* materials; \n"\
 "    // Emissive objects \n"\
-"    __global Emissive const* emissives; \n"\
+"    __global Light const* lights; \n"\
 "    // Envmap idx \n"\
 "    int envmapidx; \n"\
 "    // Envmap multiplier \n"\
 "    float envmapmul; \n"\
 "    // Number of emissive objects \n"\
-"    int numemissives; \n"\
+"    int num_lights; \n"\
 "} Scene; \n"\
 " \n"\
 "// Hit data \n"\
@@ -37212,7 +40164,7 @@ static const char g_path_opencl[]= \
 "    float3 dpdu; \n"\
 "    float3 dpdv; \n"\
 "    float  area; \n"\
-"    // Material  \n"\
+"    // Material \n"\
 "    Material mat; \n"\
 "} DifferentialGeometry; \n"\
 " \n"\
@@ -37268,6 +40220,16 @@ static const char g_path_opencl[]= \
 "    r->extra.y = 0; \n"\
 "} \n"\
 " \n"\
+"void Ray_SetExtra(__global ray* r, float2 extra) \n"\
+"{ \n"\
+"    r->padding = extra; \n"\
+"} \n"\
+" \n"\
+"float2 Ray_GetExtra(__global ray const* r) \n"\
+"{ \n"\
+"    return r->padding; \n"\
+"} \n"\
+" \n"\
 "void Ray_Init(__global ray* r, float3 o, float3 d, float maxt, float time, int mask) \n"\
 "{ \n"\
 "    // TODO: Check if it generates MTBUF_XYZW write \n"\
@@ -37278,6 +40240,8 @@ static const char g_path_opencl[]= \
 "    r->extra.x = mask; \n"\
 "    r->extra.y = 0xFFFFFFFF; \n"\
 "} \n"\
+" \n"\
+" \n"\
 " \n"\
 "#endif // PAYLOAD_CL \n"\
 " \n"\
@@ -37386,7 +40350,7 @@ static const char g_payload_opencl[]= \
 "********************************************************************/ \n"\
 "#ifndef PAYLOAD_CL \n"\
 "#define PAYLOAD_CL \n"\
-"#define SOBOL \n"\
+"//#define SOBOL \n"\
 "#define MULTISCATTER \n"\
 " \n"\
 "/// Ray descriptor \n"\
@@ -37398,7 +40362,7 @@ static const char g_payload_opencl[]= \
 "    float4 d; \n"\
 "    /// x - ray mask, y - activity flag \n"\
 "    int2 extra; \n"\
-"    int2 padding; \n"\
+"    float2 padding; \n"\
 "} ray; \n"\
 " \n"\
 "/// Intersection data returned by RadeonRays \n"\
@@ -37452,8 +40416,6 @@ static const char g_payload_opencl[]= \
 "} Emissive; \n"\
 " \n"\
 " \n"\
-" \n"\
-" \n"\
 "typedef enum _PathFlags \n"\
 "{ \n"\
 "    kNone = 0x0, \n"\
@@ -37503,6 +40465,53 @@ static const char g_payload_opencl[]= \
 " \n"\
 "} Material; \n"\
 " \n"\
+" \n"\
+"enum LightType \n"\
+"{ \n"\
+"    kPoint = 0x1, \n"\
+"    kDirectional, \n"\
+"    kSpot, \n"\
+"    kArea, \n"\
+"    kIbl \n"\
+"}; \n"\
+" \n"\
+"typedef struct _Light \n"\
+"{ \n"\
+"    int type; \n"\
+" \n"\
+"    union \n"\
+"    { \n"\
+"        // Area light \n"\
+"        struct \n"\
+"        { \n"\
+"            int shapeidx; \n"\
+"            int primidx; \n"\
+"            int matidx; \n"\
+"        }; \n"\
+" \n"\
+"        // IBL \n"\
+"        struct \n"\
+"        { \n"\
+"            int tex; \n"\
+"            int texdiffuse; \n"\
+"            float multiplier; \n"\
+"        }; \n"\
+"         \n"\
+"         \n"\
+"        // Spot \n"\
+"        struct \n"\
+"        { \n"\
+"            float ia; \n"\
+"            float oa; \n"\
+"            float f; \n"\
+"        }; \n"\
+"    }; \n"\
+" \n"\
+"    float3 p; \n"\
+"    float3 d; \n"\
+"    float3 intensity; \n"\
+"} Light; \n"\
+" \n"\
 "typedef struct _Scene \n"\
 "{ \n"\
 "    // Vertices \n"\
@@ -37520,13 +40529,13 @@ static const char g_payload_opencl[]= \
 "    // Materials \n"\
 "    __global Material const* materials; \n"\
 "    // Emissive objects \n"\
-"    __global Emissive const* emissives; \n"\
+"    __global Light const* lights; \n"\
 "    // Envmap idx \n"\
 "    int envmapidx; \n"\
 "    // Envmap multiplier \n"\
 "    float envmapmul; \n"\
 "    // Number of emissive objects \n"\
-"    int numemissives; \n"\
+"    int num_lights; \n"\
 "} Scene; \n"\
 " \n"\
 "// Hit data \n"\
@@ -37544,7 +40553,7 @@ static const char g_payload_opencl[]= \
 "    float3 dpdu; \n"\
 "    float3 dpdv; \n"\
 "    float  area; \n"\
-"    // Material  \n"\
+"    // Material \n"\
 "    Material mat; \n"\
 "} DifferentialGeometry; \n"\
 " \n"\
@@ -37600,6 +40609,16 @@ static const char g_payload_opencl[]= \
 "    r->extra.y = 0; \n"\
 "} \n"\
 " \n"\
+"void Ray_SetExtra(__global ray* r, float2 extra) \n"\
+"{ \n"\
+"    r->padding = extra; \n"\
+"} \n"\
+" \n"\
+"float2 Ray_GetExtra(__global ray const* r) \n"\
+"{ \n"\
+"    return r->padding; \n"\
+"} \n"\
+" \n"\
 "void Ray_Init(__global ray* r, float3 o, float3 d, float maxt, float time, int mask) \n"\
 "{ \n"\
 "    // TODO: Check if it generates MTBUF_XYZW write \n"\
@@ -37610,6 +40629,8 @@ static const char g_payload_opencl[]= \
 "    r->extra.x = mask; \n"\
 "    r->extra.y = 0xFFFFFFFF; \n"\
 "} \n"\
+" \n"\
+" \n"\
 " \n"\
 "#endif // PAYLOAD_CL \n"\
 ;
@@ -37822,7 +40843,7 @@ static const char g_sampling_opencl[]= \
 "float4 quaternion_inverse(float4 q) \n"\
 "{ \n"\
 "    float sqnorm = q.x*q.x + q.y*q.y + q.z*q.z + q.w*q.w; \n"\
-"     \n"\
+" \n"\
 "    /// Check if it is singular \n"\
 "    if (sqnorm != 0.f) \n"\
 "    { \n"\
@@ -37844,7 +40865,7 @@ static const char g_sampling_opencl[]= \
 "} \n"\
 " \n"\
 "/// Linearly interpolate between two values \n"\
-"float3 lerp(float3 a, float3 b, float w) \n"\
+"float4 lerp(float4 a, float4 b, float w) \n"\
 "{ \n"\
 "    return a + w*(b-a); \n"\
 "} \n"\
@@ -37863,7 +40884,7 @@ static const char g_sampling_opencl[]= \
 "float3 GetOrthoVector(float3 n) \n"\
 "{ \n"\
 "    float3 p; \n"\
-"     \n"\
+" \n"\
 "    if (fabs(n.z) > 0.f) { \n"\
 "        float k = sqrt(n.y*n.y + n.z*n.z); \n"\
 "        p.x = 0; p.y = -n.z/k; p.z = n.y/k; \n"\
@@ -38140,8 +41161,6 @@ static const char g_scene_opencl[]= \
 "#ifndef SCENE_CL \n"\
 "#define SCENE_CL \n"\
 " \n"\
-"//#include \"../App/CL/utils.cl\" \n"\
-"//#include \"../App/CL/payload.cl\" \n"\
 " \n"\
 "/// Fill DifferentialGeometry structure based on intersection info from RadeonRays \n"\
 "void FillDifferentialGeometry(// Scene \n"\
@@ -38240,10 +41259,10 @@ static const char g_scene_opencl[]= \
 " \n"\
 "int Scene_SampleLight(Scene const* scene, float sample, float* pdf) \n"\
 "{ \n"\
-"    int numlights = scene->numemissives; \n"\
-"    int lightidx = clamp((int)(sample * numlights), 0, numlights - 1); \n"\
-"    *pdf = 1.f / numlights; \n"\
-"    return lightidx; \n"\
+"    int num_lights = scene->num_lights; \n"\
+"    int light_idx = clamp((int)(sample * num_lights), 0, num_lights - 1); \n"\
+"    *pdf = 1.f / num_lights; \n"\
+"    return light_idx; \n"\
 "} \n"\
 " \n"\
 " \n"\
@@ -38855,7 +41874,7 @@ static const char g_texture_opencl[]= \
 "float4 quaternion_inverse(float4 q) \n"\
 "{ \n"\
 "    float sqnorm = q.x*q.x + q.y*q.y + q.z*q.z + q.w*q.w; \n"\
-"     \n"\
+" \n"\
 "    /// Check if it is singular \n"\
 "    if (sqnorm != 0.f) \n"\
 "    { \n"\
@@ -38877,7 +41896,7 @@ static const char g_texture_opencl[]= \
 "} \n"\
 " \n"\
 "/// Linearly interpolate between two values \n"\
-"float3 lerp(float3 a, float3 b, float w) \n"\
+"float4 lerp(float4 a, float4 b, float w) \n"\
 "{ \n"\
 "    return a + w*(b-a); \n"\
 "} \n"\
@@ -38896,7 +41915,7 @@ static const char g_texture_opencl[]= \
 "float3 GetOrthoVector(float3 n) \n"\
 "{ \n"\
 "    float3 p; \n"\
-"     \n"\
+" \n"\
 "    if (fabs(n.z) > 0.f) { \n"\
 "        float k = sqrt(n.y*n.y + n.z*n.z); \n"\
 "        p.x = 0; p.y = -n.z/k; p.z = n.y/k; \n"\
@@ -38965,88 +41984,88 @@ static const char g_texture_opencl[]= \
 "#define TEXTURE_ARGS_IDX(x) x, textures, texturedata \n"\
 " \n"\
 "/// Sample 2D texture \n"\
-"float3 Texture_Sample2D(float2 uv, TEXTURE_ARG_LIST_IDX(texidx)) \n"\
+"float4 Texture_Sample2D(float2 uv, TEXTURE_ARG_LIST_IDX(texidx)) \n"\
 "{ \n"\
 "    // Get width and height \n"\
 "    int width = textures[texidx].w; \n"\
 "    int height = textures[texidx].h; \n"\
-"     \n"\
+" \n"\
 "    // Find the origin of the data in the pool \n"\
 "    __global char const* mydata = texturedata + textures[texidx].dataoffset; \n"\
 " \n"\
 "    // Handle UV wrap \n"\
 "    // TODO: need UV mode support \n"\
 "    uv -= floor(uv); \n"\
-"     \n"\
+" \n"\
 "    // Reverse Y: \n"\
 "    // it is needed as textures are loaded with Y axis going top to down \n"\
 "    // and our axis goes from down to top \n"\
 "    uv.y = 1.f - uv.y; \n"\
-"     \n"\
+" \n"\
 "    // Calculate integer coordinates \n"\
 "    int x0 = clamp((int)floor(uv.x * width), 0, width - 1); \n"\
 "    int y0 = clamp((int)floor(uv.y * height), 0, height - 1); \n"\
-"     \n"\
+" \n"\
 "    // Calculate samples for linear filtering \n"\
 "    int x1 = clamp(x0 + 1, 0,  width - 1); \n"\
 "    int y1 = clamp(y0 + 1, 0, height - 1); \n"\
-"     \n"\
+" \n"\
 "    // Calculate weights for linear filtering \n"\
 "    float wx = uv.x * width - floor(uv.x * width); \n"\
 "    float wy = uv.y * height - floor(uv.y * height); \n"\
-"     \n"\
+" \n"\
 "    switch (textures[texidx].fmt) \n"\
 "    { \n"\
 "        case RGBA32: \n"\
 "        { \n"\
-"            __global float3 const* mydataf = (__global float3 const*)mydata; \n"\
-"             \n"\
+"            __global float4 const* mydataf = (__global float4 const*)mydata; \n"\
+" \n"\
 "            // Get 4 values for linear filtering \n"\
-"            float3 val00 = *(mydataf + width * y0 + x0); \n"\
-"            float3 val01 = *(mydataf + width * y0 + x1); \n"\
-"            float3 val10 = *(mydataf + width * y1 + x0); \n"\
-"            float3 val11 = *(mydataf + width * y1 + x1); \n"\
-"             \n"\
+"            float4 val00 = *(mydataf + width * y0 + x0); \n"\
+"            float4 val01 = *(mydataf + width * y0 + x1); \n"\
+"            float4 val10 = *(mydataf + width * y1 + x0); \n"\
+"            float4 val11 = *(mydataf + width * y1 + x1); \n"\
+" \n"\
 "            // Filter and return the result \n"\
 "            return lerp(lerp(val00, val01, wx), lerp(val10, val11, wx), wy); \n"\
 "        } \n"\
-"             \n"\
+" \n"\
 "        case RGBA16: \n"\
 "        { \n"\
 "            __global half const* mydatah = (__global half const*)mydata; \n"\
-"             \n"\
+" \n"\
 "            // Get 4 values \n"\
-"            float3 val00 = vload_half4(width * y0 + x0, mydatah).xyz; \n"\
-"            float3 val01 = vload_half4(width * y0 + x1, mydatah).xyz; \n"\
-"            float3 val10 = vload_half4(width * y1 + x0, mydatah).xyz; \n"\
-"            float3 val11 = vload_half4(width * y1 + x1, mydatah).xyz; \n"\
-"             \n"\
+"            float4 val00 = vload_half4(width * y0 + x0, mydatah); \n"\
+"            float4 val01 = vload_half4(width * y0 + x1, mydatah); \n"\
+"            float4 val10 = vload_half4(width * y1 + x0, mydatah); \n"\
+"            float4 val11 = vload_half4(width * y1 + x1, mydatah); \n"\
+" \n"\
 "            // Filter and return the result \n"\
 "            return lerp(lerp(val00, val01, wx), lerp(val10, val11, wx), wy); \n"\
 "        } \n"\
-"             \n"\
+" \n"\
 "        case RGBA8: \n"\
 "        { \n"\
 "            __global uchar4 const* mydatac = (__global uchar4 const*)mydata; \n"\
-"             \n"\
+" \n"\
 "            // Get 4 values and convert to float \n"\
 "            uchar4 valu00 = *(mydatac + width * y0 + x0); \n"\
 "            uchar4 valu01 = *(mydatac + width * y0 + x1); \n"\
 "            uchar4 valu10 = *(mydatac + width * y1 + x0); \n"\
 "            uchar4 valu11 = *(mydatac + width * y1 + x1); \n"\
-"             \n"\
-"            float3 val00 = make_float3((float)valu00.x / 255.f, (float)valu00.y / 255.f, (float)valu00.z / 255.f); \n"\
-"            float3 val01 = make_float3((float)valu01.x / 255.f, (float)valu01.y / 255.f, (float)valu01.z / 255.f); \n"\
-"            float3 val10 = make_float3((float)valu10.x / 255.f, (float)valu10.y / 255.f, (float)valu10.z / 255.f); \n"\
-"            float3 val11 = make_float3((float)valu11.x / 255.f, (float)valu11.y / 255.f, (float)valu11.z / 255.f); \n"\
-"             \n"\
+" \n"\
+"            float4 val00 = make_float4((float)valu00.x / 255.f, (float)valu00.y / 255.f, (float)valu00.z / 255.f, (float)valu00.w / 255.f); \n"\
+"            float4 val01 = make_float4((float)valu01.x / 255.f, (float)valu01.y / 255.f, (float)valu01.z / 255.f, (float)valu01.w / 255.f); \n"\
+"            float4 val10 = make_float4((float)valu10.x / 255.f, (float)valu10.y / 255.f, (float)valu10.z / 255.f, (float)valu10.w / 255.f); \n"\
+"            float4 val11 = make_float4((float)valu11.x / 255.f, (float)valu11.y / 255.f, (float)valu11.z / 255.f, (float)valu11.w / 255.f); \n"\
+" \n"\
 "            // Filter and return the result \n"\
 "            return lerp(lerp(val00, val01, wx), lerp(val10, val11, wx), wy); \n"\
 "        } \n"\
-"             \n"\
+" \n"\
 "        default: \n"\
 "        { \n"\
-"            return make_float3(0.f, 0.f, 0.f); \n"\
+"            return make_float4(0.f, 0.f, 0.f, 0.f); \n"\
 "        } \n"\
 "    } \n"\
 "} \n"\
@@ -39057,14 +42076,14 @@ static const char g_texture_opencl[]= \
 "    // Transform to spherical coords \n"\
 "    float r, phi, theta; \n"\
 "    CartesianToSpherical(d, &r, &phi, &theta); \n"\
-"     \n"\
+" \n"\
 "    // Map to [0,1]x[0,1] range and reverse Y axis \n"\
 "    float2 uv; \n"\
 "    uv.x = phi / (2*PI); \n"\
 "    uv.y = 1.f - theta / PI; \n"\
-"     \n"\
+" \n"\
 "    // Sample the texture \n"\
-"    return native_powr(Texture_Sample2D(uv, TEXTURE_ARGS_IDX(texidx)), 1.f / 1.f); \n"\
+"    return Texture_Sample2D(uv, TEXTURE_ARGS_IDX(texidx)).xyz; \n"\
 "} \n"\
 " \n"\
 "/// Get data from parameter value or texture \n"\
@@ -39081,9 +42100,30 @@ static const char g_texture_opencl[]= \
 "    if (texidx != -1) \n"\
 "    { \n"\
 "        // Sample texture \n"\
+"        return native_powr(Texture_Sample2D(uv, TEXTURE_ARGS_IDX(texidx)).xyz, 2.2f); \n"\
+"    } \n"\
+" \n"\
+"    // Return fixed color otherwise \n"\
+"    return v; \n"\
+"} \n"\
+" \n"\
+"/// Get data from parameter value or texture \n"\
+"float4 Texture_GetValue4f( \n"\
+"                // Value \n"\
+"                float4 v, \n"\
+"                // Texture coordinate \n"\
+"                float2 uv, \n"\
+"                // Texture args \n"\
+"                TEXTURE_ARG_LIST_IDX(texidx) \n"\
+"                ) \n"\
+"{ \n"\
+"    // If texture present sample from texture \n"\
+"    if (texidx != -1) \n"\
+"    { \n"\
+"        // Sample texture \n"\
 "        return native_powr(Texture_Sample2D(uv, TEXTURE_ARGS_IDX(texidx)), 2.2f); \n"\
 "    } \n"\
-"     \n"\
+" \n"\
 "    // Return fixed color otherwise \n"\
 "    return v; \n"\
 "} \n"\
@@ -39104,7 +42144,7 @@ static const char g_texture_opencl[]= \
 "        // Sample texture \n"\
 "        return Texture_Sample2D(uv, TEXTURE_ARGS_IDX(texidx)).x; \n"\
 "    } \n"\
-"     \n"\
+" \n"\
 "    // Return fixed color otherwise \n"\
 "    return v; \n"\
 "} \n"\
@@ -39139,11 +42179,11 @@ static const char g_texture_opencl[]= \
 "        __global float3 const* mydataf = (__global float3 const*)mydata; \n"\
 " \n"\
 "        // Sobel filter \n"\
-"        const float tex00 = (*(mydataf + width * (t0 - 1) + (s0-1))).x;  \n"\
+"        const float tex00 = (*(mydataf + width * (t0 - 1) + (s0-1))).x; \n"\
 "        const float tex10 = (*(mydataf + width * (t0 - 1) + (s0))).x; \n"\
-"        const float tex20 = (*(mydataf + width * (t0 - 1) + (s0 + 1))).x;  \n"\
+"        const float tex20 = (*(mydataf + width * (t0 - 1) + (s0 + 1))).x; \n"\
 " \n"\
-"        const float tex01 = (*(mydataf + width * (t0) + (s0 - 1))).x;  \n"\
+"        const float tex01 = (*(mydataf + width * (t0) + (s0 - 1))).x; \n"\
 "        const float tex21 = (*(mydataf + width * (t0) + (s0 + 1))).x; \n"\
 " \n"\
 "        const float tex02 = (*(mydataf + width * (t0 + 1) + (s0 - 1))).x; \n"\
@@ -39165,8 +42205,8 @@ static const char g_texture_opencl[]= \
 "        const float tex10 = vload_half4(width * (t0 - 1) + (s0), mydatah).x; \n"\
 "        const float tex20 = vload_half4(width * (t0 - 1) + (s0 + 1), mydatah).x; \n"\
 " \n"\
-"        const float tex01 = vload_half4(width * (t0)+(s0 - 1), mydatah).x;  \n"\
-"        const float tex21 = vload_half4(width * (t0)+(s0 + 1), mydatah).x;  \n"\
+"        const float tex01 = vload_half4(width * (t0)+(s0 - 1), mydatah).x; \n"\
+"        const float tex21 = vload_half4(width * (t0)+(s0 + 1), mydatah).x; \n"\
 " \n"\
 "        const float tex02 = vload_half4(width * (t0 + 1) + (s0 - 1), mydatah).x; \n"\
 "        const float tex12 = vload_half4(width * (t0 + 1) + (s0), mydatah).x; \n"\
@@ -39341,7 +42381,7 @@ static const char g_utils_opencl[]= \
 "float4 quaternion_inverse(float4 q) \n"\
 "{ \n"\
 "    float sqnorm = q.x*q.x + q.y*q.y + q.z*q.z + q.w*q.w; \n"\
-"     \n"\
+" \n"\
 "    /// Check if it is singular \n"\
 "    if (sqnorm != 0.f) \n"\
 "    { \n"\
@@ -39363,7 +42403,7 @@ static const char g_utils_opencl[]= \
 "} \n"\
 " \n"\
 "/// Linearly interpolate between two values \n"\
-"float3 lerp(float3 a, float3 b, float w) \n"\
+"float4 lerp(float4 a, float4 b, float w) \n"\
 "{ \n"\
 "    return a + w*(b-a); \n"\
 "} \n"\
@@ -39382,7 +42422,7 @@ static const char g_utils_opencl[]= \
 "float3 GetOrthoVector(float3 n) \n"\
 "{ \n"\
 "    float3 p; \n"\
-"     \n"\
+" \n"\
 "    if (fabs(n.z) > 0.f) { \n"\
 "        float k = sqrt(n.y*n.y + n.z*n.z); \n"\
 "        p.x = 0; p.y = -n.z/k; p.z = n.y/k; \n"\
@@ -39468,7 +42508,7 @@ static const char g_volumetrics_opencl[]= \
 "********************************************************************/ \n"\
 "#ifndef PAYLOAD_CL \n"\
 "#define PAYLOAD_CL \n"\
-"#define SOBOL \n"\
+"//#define SOBOL \n"\
 "#define MULTISCATTER \n"\
 " \n"\
 "/// Ray descriptor \n"\
@@ -39480,7 +42520,7 @@ static const char g_volumetrics_opencl[]= \
 "    float4 d; \n"\
 "    /// x - ray mask, y - activity flag \n"\
 "    int2 extra; \n"\
-"    int2 padding; \n"\
+"    float2 padding; \n"\
 "} ray; \n"\
 " \n"\
 "/// Intersection data returned by RadeonRays \n"\
@@ -39534,8 +42574,6 @@ static const char g_volumetrics_opencl[]= \
 "} Emissive; \n"\
 " \n"\
 " \n"\
-" \n"\
-" \n"\
 "typedef enum _PathFlags \n"\
 "{ \n"\
 "    kNone = 0x0, \n"\
@@ -39585,6 +42623,53 @@ static const char g_volumetrics_opencl[]= \
 " \n"\
 "} Material; \n"\
 " \n"\
+" \n"\
+"enum LightType \n"\
+"{ \n"\
+"    kPoint = 0x1, \n"\
+"    kDirectional, \n"\
+"    kSpot, \n"\
+"    kArea, \n"\
+"    kIbl \n"\
+"}; \n"\
+" \n"\
+"typedef struct _Light \n"\
+"{ \n"\
+"    int type; \n"\
+" \n"\
+"    union \n"\
+"    { \n"\
+"        // Area light \n"\
+"        struct \n"\
+"        { \n"\
+"            int shapeidx; \n"\
+"            int primidx; \n"\
+"            int matidx; \n"\
+"        }; \n"\
+" \n"\
+"        // IBL \n"\
+"        struct \n"\
+"        { \n"\
+"            int tex; \n"\
+"            int texdiffuse; \n"\
+"            float multiplier; \n"\
+"        }; \n"\
+"         \n"\
+"         \n"\
+"        // Spot \n"\
+"        struct \n"\
+"        { \n"\
+"            float ia; \n"\
+"            float oa; \n"\
+"            float f; \n"\
+"        }; \n"\
+"    }; \n"\
+" \n"\
+"    float3 p; \n"\
+"    float3 d; \n"\
+"    float3 intensity; \n"\
+"} Light; \n"\
+" \n"\
 "typedef struct _Scene \n"\
 "{ \n"\
 "    // Vertices \n"\
@@ -39602,13 +42687,13 @@ static const char g_volumetrics_opencl[]= \
 "    // Materials \n"\
 "    __global Material const* materials; \n"\
 "    // Emissive objects \n"\
-"    __global Emissive const* emissives; \n"\
+"    __global Light const* lights; \n"\
 "    // Envmap idx \n"\
 "    int envmapidx; \n"\
 "    // Envmap multiplier \n"\
 "    float envmapmul; \n"\
 "    // Number of emissive objects \n"\
-"    int numemissives; \n"\
+"    int num_lights; \n"\
 "} Scene; \n"\
 " \n"\
 "// Hit data \n"\
@@ -39626,7 +42711,7 @@ static const char g_volumetrics_opencl[]= \
 "    float3 dpdu; \n"\
 "    float3 dpdv; \n"\
 "    float  area; \n"\
-"    // Material  \n"\
+"    // Material \n"\
 "    Material mat; \n"\
 "} DifferentialGeometry; \n"\
 " \n"\
@@ -39682,6 +42767,16 @@ static const char g_volumetrics_opencl[]= \
 "    r->extra.y = 0; \n"\
 "} \n"\
 " \n"\
+"void Ray_SetExtra(__global ray* r, float2 extra) \n"\
+"{ \n"\
+"    r->padding = extra; \n"\
+"} \n"\
+" \n"\
+"float2 Ray_GetExtra(__global ray const* r) \n"\
+"{ \n"\
+"    return r->padding; \n"\
+"} \n"\
+" \n"\
 "void Ray_Init(__global ray* r, float3 o, float3 d, float maxt, float time, int mask) \n"\
 "{ \n"\
 "    // TODO: Check if it generates MTBUF_XYZW write \n"\
@@ -39692,6 +42787,8 @@ static const char g_volumetrics_opencl[]= \
 "    r->extra.x = mask; \n"\
 "    r->extra.y = 0xFFFFFFFF; \n"\
 "} \n"\
+" \n"\
+" \n"\
 " \n"\
 "#endif // PAYLOAD_CL \n"\
 "/********************************************************************** \n"\
@@ -39741,7 +42838,7 @@ static const char g_volumetrics_opencl[]= \
 "********************************************************************/ \n"\
 "#ifndef PAYLOAD_CL \n"\
 "#define PAYLOAD_CL \n"\
-"#define SOBOL \n"\
+"//#define SOBOL \n"\
 "#define MULTISCATTER \n"\
 " \n"\
 "/// Ray descriptor \n"\
@@ -39753,7 +42850,7 @@ static const char g_volumetrics_opencl[]= \
 "    float4 d; \n"\
 "    /// x - ray mask, y - activity flag \n"\
 "    int2 extra; \n"\
-"    int2 padding; \n"\
+"    float2 padding; \n"\
 "} ray; \n"\
 " \n"\
 "/// Intersection data returned by RadeonRays \n"\
@@ -39807,8 +42904,6 @@ static const char g_volumetrics_opencl[]= \
 "} Emissive; \n"\
 " \n"\
 " \n"\
-" \n"\
-" \n"\
 "typedef enum _PathFlags \n"\
 "{ \n"\
 "    kNone = 0x0, \n"\
@@ -39858,6 +42953,53 @@ static const char g_volumetrics_opencl[]= \
 " \n"\
 "} Material; \n"\
 " \n"\
+" \n"\
+"enum LightType \n"\
+"{ \n"\
+"    kPoint = 0x1, \n"\
+"    kDirectional, \n"\
+"    kSpot, \n"\
+"    kArea, \n"\
+"    kIbl \n"\
+"}; \n"\
+" \n"\
+"typedef struct _Light \n"\
+"{ \n"\
+"    int type; \n"\
+" \n"\
+"    union \n"\
+"    { \n"\
+"        // Area light \n"\
+"        struct \n"\
+"        { \n"\
+"            int shapeidx; \n"\
+"            int primidx; \n"\
+"            int matidx; \n"\
+"        }; \n"\
+" \n"\
+"        // IBL \n"\
+"        struct \n"\
+"        { \n"\
+"            int tex; \n"\
+"            int texdiffuse; \n"\
+"            float multiplier; \n"\
+"        }; \n"\
+"         \n"\
+"         \n"\
+"        // Spot \n"\
+"        struct \n"\
+"        { \n"\
+"            float ia; \n"\
+"            float oa; \n"\
+"            float f; \n"\
+"        }; \n"\
+"    }; \n"\
+" \n"\
+"    float3 p; \n"\
+"    float3 d; \n"\
+"    float3 intensity; \n"\
+"} Light; \n"\
+" \n"\
 "typedef struct _Scene \n"\
 "{ \n"\
 "    // Vertices \n"\
@@ -39875,13 +43017,13 @@ static const char g_volumetrics_opencl[]= \
 "    // Materials \n"\
 "    __global Material const* materials; \n"\
 "    // Emissive objects \n"\
-"    __global Emissive const* emissives; \n"\
+"    __global Light const* lights; \n"\
 "    // Envmap idx \n"\
 "    int envmapidx; \n"\
 "    // Envmap multiplier \n"\
 "    float envmapmul; \n"\
 "    // Number of emissive objects \n"\
-"    int numemissives; \n"\
+"    int num_lights; \n"\
 "} Scene; \n"\
 " \n"\
 "// Hit data \n"\
@@ -39899,7 +43041,7 @@ static const char g_volumetrics_opencl[]= \
 "    float3 dpdu; \n"\
 "    float3 dpdv; \n"\
 "    float  area; \n"\
-"    // Material  \n"\
+"    // Material \n"\
 "    Material mat; \n"\
 "} DifferentialGeometry; \n"\
 " \n"\
@@ -39955,6 +43097,16 @@ static const char g_volumetrics_opencl[]= \
 "    r->extra.y = 0; \n"\
 "} \n"\
 " \n"\
+"void Ray_SetExtra(__global ray* r, float2 extra) \n"\
+"{ \n"\
+"    r->padding = extra; \n"\
+"} \n"\
+" \n"\
+"float2 Ray_GetExtra(__global ray const* r) \n"\
+"{ \n"\
+"    return r->padding; \n"\
+"} \n"\
+" \n"\
 "void Ray_Init(__global ray* r, float3 o, float3 d, float maxt, float time, int mask) \n"\
 "{ \n"\
 "    // TODO: Check if it generates MTBUF_XYZW write \n"\
@@ -39965,6 +43117,8 @@ static const char g_volumetrics_opencl[]= \
 "    r->extra.x = mask; \n"\
 "    r->extra.y = 0xFFFFFFFF; \n"\
 "} \n"\
+" \n"\
+" \n"\
 " \n"\
 "#endif // PAYLOAD_CL \n"\
 " \n"\

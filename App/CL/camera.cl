@@ -251,6 +251,8 @@ __kernel void PerspectiveCameraDof_GeneratePaths(
     }
 }
 
+#define M_PI 3.14159265358979323846
+
 /// Ray generation kernel for spherical camera.
 ///
 __kernel void SphericalCamera_GeneratePaths(
