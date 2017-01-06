@@ -62,8 +62,8 @@ private:
     
 	mush::radeonConfig _config;
 
-	unsigned int _tick = 0;
-	unsigned int _per_frame = 20;
+	int _tick = 0;
+	int _per_frame = 20;
 };
 
 #endif /* radeonProcessor_hpp */

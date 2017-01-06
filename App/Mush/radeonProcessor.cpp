@@ -18,7 +18,8 @@
 #include "api.hpp"
 
 radeonProcessor::radeonProcessor(const mush::radeonConfig& config) : mush::imageProcessor(), _config(config) {
-    
+	_per_frame = config.num_samples;
+	_config.num_samples = -1;
 }
 
 radeonProcessor::~radeonProcessor() {
@@ -84,12 +85,10 @@ void radeonProcessor::process() {
 	if (_tick == _per_frame) {
 		_output_copy->process();
 		_copy->removeRepeat();
+		_tick = -1;
 	}
 
 	_tick++;
-	if (_tick > _per_frame) {
-		_tick = 0;
-	}
 }
 
 void radeonProcessor::go() {
