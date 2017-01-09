@@ -56,6 +56,8 @@ namespace mush {
 			//environment_height = 720;
 
 			camera = camera_type::perspective;
+
+			model_scale = 1.0f;
         }
          
         
@@ -92,6 +94,7 @@ namespace mush {
 		//int environment_height;
         
 		camera_type camera;
+		float model_scale;
     };
 }
 

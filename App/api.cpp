@@ -147,6 +147,8 @@ static bool     g_is_mouse_tracking = false;
 static float2   g_mouse_pos = float2(0, 0);
 static float2   g_mouse_delta = float2(0, 0);
 
+float g_scale = 1.0f;
+
 
 void setup(const mush::radeonConfig& config) {
 	g_path = config.path;
@@ -172,6 +174,8 @@ void setup(const mush::radeonConfig& config) {
     g_environment_map_path = config.environment_map_path;
 
 	g_camera_type = config.camera;
+
+	g_scale = config.model_scale;
 }
 
 void init_cl(bool share_opencl, cl_context c, cl_device_id d, cl_command_queue q) {
@@ -311,7 +315,7 @@ void InitData()
     basepath += "/";
     std::string filename = basepath + g_modelname;
     
-    g_scene.reset(Baikal::Scene::LoadFromObj(filename, basepath));
+    g_scene.reset(Baikal::Scene::LoadFromObj(filename, basepath, g_scale));
     
     g_scene->camera_.reset(new PerspectiveCamera(
                                                  g_camera_pos

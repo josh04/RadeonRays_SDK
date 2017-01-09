@@ -122,7 +122,7 @@ static void LoadTexture(std::string const& filename, Scene::Texture& texture, st
     delete input;
 }
 
-Scene* Scene::LoadFromObj(std::string const& filename, std::string const& basepath)
+Scene* Scene::LoadFromObj(std::string const& filename, std::string const& basepath, const float scale)
 {
     using namespace tinyobj;
 
@@ -130,12 +130,22 @@ Scene* Scene::LoadFromObj(std::string const& filename, std::string const& basepa
     std::vector<shape_t> objshapes;
     std::vector<material_t> objmaterials;
 
+	material_t default_material;
+	default_material.diffuse[0] = 0.5f;
+	default_material.diffuse[1] = 0.5f;
+	default_material.diffuse[2] = 0.5f;
+
+	default_material.ior = 1.52f;
+
+
     // Try loading file
     std::string res = LoadObj(objshapes, objmaterials, filename.c_str(), basepath.c_str());
     if (res != "")
     {
         throw std::runtime_error(res);
     }
+
+	objmaterials.push_back(default_material);
 
     // Allocate scene
     Scene* scene(new Scene);
@@ -1196,7 +1206,7 @@ Scene* Scene::LoadFromObj(std::string const& filename, std::string const& basepa
         // Enumerate and copy vertex data
         for (int i = 0; i < pos_count; ++i)
         {
-            scene->vertices_.push_back(float3(objshapes[s].mesh.positions[3 * i], objshapes[s].mesh.positions[3 * i + 1], objshapes[s].mesh.positions[3 * i + 2]));
+            scene->vertices_.push_back(float3(objshapes[s].mesh.positions[3 * i] * scale, objshapes[s].mesh.positions[3 * i + 1] * scale, objshapes[s].mesh.positions[3 * i + 2] * scale));
         }
 
         for (int i = 0; i < (int)objshapes[s].mesh.normals.size() / 3; ++i)

@@ -33,7 +33,7 @@ namespace Baikal
     {
     public:
         // Load the scene from OBJ file
-        static Scene* LoadFromObj(std::string const& filename, std::string const& basepath = "");
+        static Scene* LoadFromObj(std::string const& filename, std::string const& basepath = "", const float scale = 1.0f);
 
         Scene() : dirty_(kCamera)
         {

@@ -155,7 +155,7 @@ class radeonEventHandler : public azure::Eventable {
             
             if (_shift_pressed) {
                 kMovementSpeed = kMovementSpeed / 20.0f;
-                kMouseSensitivity = kMouseSensitivity / 20.0f;
+                //kMouseSensitivity = kMouseSensitivity / 20.0f;
             }
             
             float delta_x = _mouse_delta_x * kMouseSensitivity;
