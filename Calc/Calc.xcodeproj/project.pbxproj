@@ -1,0 +1,361 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 46;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		243760FA2AF76C00566F4EA6981F7800A36AA09899B26800 /* device_vkw.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 5BB2D3D6155658005588E10162B94C00171F50B2D8D84E00 /* device_vkw.cpp */; };
+		369AAD6949AEEC0068D29B15B6D6FC00B5CDED07B869E800 /* device_clw.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 27005EAE51BAB00020D66BD99F1DA600E26CDB8B153CA800 /* device_clw.cpp */; };
+		4BBBB78CB9EB8400FC9E50A7B2B64800B2D7619E3D2AA800 /* libCLW64D.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 1121AA06BA7508002886580DEDF44800BB781A1B05EE2800 /* libCLW64D.a */; };
+		518E08FDE2E764006507CFBF3E28B8004A3E7F0C11830400 /* calc.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E0B5AD9786C1A800F6CF14519DD44800FB0F44C88DF04000 /* calc.cpp */; };
+		7E90B3FB1325A000C6393816577448008021A771999B8000 /* calc_clw.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3969AC4331AA540013370F60537602007F026A05902B2C00 /* calc_clw.cpp */; };
+		B14205553E185800F8EA897082670000B2D2F8CBC48E3800 /* calc_vkw.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A32DD120AC8348007CFB343DCE4EF400E8C68EE30B042000 /* calc_vkw.cpp */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		3CA784E420217E0015EDC2E119877F00A23402360D22E000 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 7C9EFC76C5AE18005E895DAC5BD72C00BB67E0F71D3D8800 /* CLW.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = B33BA949C84CD8007132480F6B3B0000EA43F8A5FA60E000;
+			remoteInfo = libCLW64D.a;
+		};
+		3F19C61A725BF000186004176BC1F200A4A6436C5F5D5000 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 7C9EFC76C5AE18005E895DAC5BD72C00BB67E0F71D3D8800 /* CLW.xcodeproj */;
+			proxyType = 1;
+			remoteGlobalIDString = 1CB4CEA6B2D9B000E466F27E2464C800B1C492FED365F000;
+			remoteInfo = libCLW64D.a;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXFileReference section */
+		122EEBAB42D02D00CFB2C0E98B41100060F33552CFDFE400 /* calc_vkw.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = calc_vkw.h; path = src/calc_vkw.h; sourceTree = "<group>"; };
+		19E45B740F8E43001BF2591035B47200310083039CBB6A00 /* calc_vk.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = calc_vk.h; path = inc/calc_vk.h; sourceTree = "<group>"; };
+		27005EAE51BAB00020D66BD99F1DA600E26CDB8B153CA800 /* device_clw.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = device_clw.cpp; path = src/device_clw.cpp; sourceTree = "<group>"; };
+		2E8829FC246C4C008558D194637FA007420E7BE82ED2400 /* except_clw.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = except_clw.h; path = src/except_clw.h; sourceTree = "<group>"; };
+		3969AC4331AA540013370F60537602007F026A05902B2C00 /* calc_clw.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = calc_clw.cpp; path = src/calc_clw.cpp; sourceTree = "<group>"; };
+		3EAAE63B8C629400FC2EBB79D4D378008D6F2FE319724800 /* event_vk.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = event_vk.h; path = src/event_vk.h; sourceTree = "<group>"; };
+		441DC194AC269C005A37284EC33938005E7758C5B3553400 /* buffer.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = buffer.h; path = inc/buffer.h; sourceTree = "<group>"; };
+		5625AE160C7580006C3F14D023881C00707F454713A41800 /* except.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = except.h; path = inc/except.h; sourceTree = "<group>"; };
+		56ED1E3B79B1580093A625BF47D4A8008A9C8082CEE30000 /* calc_clw_common.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = calc_clw_common.h; path = src/calc_clw_common.h; sourceTree = "<group>"; };
+		5BB2D3D6155658005588E10162B94C00171F50B2D8D84E00 /* device_vkw.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = device_vkw.cpp; path = src/device_vkw.cpp; sourceTree = "<group>"; };
+		6029A501A4388C0039F7081EC6043C00A5C262C402B96800 /* primitives.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = primitives.h; path = inc/primitives.h; sourceTree = "<group>"; };
+		632C297FA55C94003CF98C9CC7284000A8C4E74203DD6800 /* executable.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = executable.h; path = inc/executable.h; sourceTree = "<group>"; };
+		7B836B2390B66000919CD1DDA7C9000095DD025497E4F800 /* device.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = device.h; path = inc/device.h; sourceTree = "<group>"; };
+		7C9EFC76C5AE18005E895DAC5BD72C00BB67E0F71D3D8800 /* CLW.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = CLW.xcodeproj; path = ../CLW/CLW.xcodeproj; sourceTree = SOURCE_ROOT; };
+		82D8A10588908800B0A6BEF7B0CB400093D5F2C49866D000 /* device_vk.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = device_vk.h; path = inc/device_vk.h; sourceTree = "<group>"; };
+		880F4365B0ECD800AC1E2527458990096CE7B39B2FC4000 /* calc_common.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = calc_common.h; path = inc/calc_common.h; sourceTree = "<group>"; };
+		8F081EDA46FB98004C8BF4188F6C7C00DDCC6881D40B5000 /* calc_clw.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = calc_clw.h; path = src/calc_clw.h; sourceTree = "<group>"; };
+		97FCA5A63D25D8001AAF449300919800A6BBDD7A3F354000 /* function_vk.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = function_vk.h; path = src/function_vk.h; sourceTree = "<group>"; };
+		A32DD120AC8348007CFB343DCE4EF400E8C68EE30B042000 /* calc_vkw.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = calc_vkw.cpp; path = src/calc_vkw.cpp; sourceTree = "<group>"; };
+		A515CE42AB998000D2E3EC34D3D43800B6132001BB6FC000 /* except_vk.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = except_vk.h; path = src/except_vk.h; sourceTree = "<group>"; };
+		B213D480DD358800700A73468023B000E91C23DD0F499000 /* event.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = event.h; path = inc/event.h; sourceTree = "<group>"; };
+		B4FEB10E7B4A380031C928887BFD3400CD10EBF0EFDF0800 /* libCalc64D.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libCalc64D.a; sourceTree = BUILT_PRODUCTS_DIR; };
+		B74375F605C0C800E51193E82DFB8000C840C7B515971000 /* common_vk.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = common_vk.h; path = src/common_vk.h; sourceTree = "<group>"; };
+		B9A4CC522B648000912651492ED550008019A3B9B041F000 /* calc.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = calc.h; path = inc/calc.h; sourceTree = "<group>"; };
+		C7B7D38812643800A18536A5342FE800D50914A70E51000 /* device_vkw.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = device_vkw.h; path = src/device_vkw.h; sourceTree = "<group>"; };
+		D98A5BA56AB4D000A11860D99CAE1800220982C1168D5200 /* executable_vk.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = executable_vk.h; path = src/executable_vk.h; sourceTree = "<group>"; };
+		E011AE5AF7F33000B9DF117819BEE00025AA6C1D56740600 /* device_clw.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = device_clw.h; path = src/device_clw.h; sourceTree = "<group>"; };
+		E0B5AD9786C1A800F6CF14519DD44800FB0F44C88DF04000 /* calc.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = calc.cpp; path = src/calc.cpp; sourceTree = "<group>"; };
+		E64777B0A5FBD800141595A2CE368F00F744C96FB5D22000 /* buffer_vk.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = buffer_vk.h; path = inc/buffer_vk.h; sourceTree = "<group>"; };
+		F11A6303DCC10000F32860A002E730008368A9369EE2700 /* calc_cl.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = calc_cl.h; path = inc/calc_cl.h; sourceTree = "<group>"; };
+		FFB1EBBC09CDF0002D8009AE3208AA0010AF3D7B19A43700 /* device_cl.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = device_cl.h; path = inc/device_cl.h; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		6D61947BA8BDB400455DBF4CD7640800164DD91230A56400 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				4BBBB78CB9EB8400FC9E50A7B2B64800B2D7619E3D2AA800 /* libCLW64D.a in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		4AEDC40756128800B5481413C7593800908F7765554B8000 /* Calc */ = {
+			isa = PBXGroup;
+			children = (
+				5B274D78BE5C6C0091C82C23AA4D7800D1A9B5E2FC851000 /* inc */,
+				8E1F9F995775D800C4C07E444366E0004A20803959E7A40 /* src */,
+				DE2FD571A6C938008E134D4D9B3FB000BA17F9BDEA135000 /* Products */,
+				DE2FDC7F9D9690008E13545B920D0800BA1800CBE0E0A800 /* Projects */,
+			);
+			name = Calc;
+			sourceTree = "<group>";
+		};
+		5B274D78BE5C6C0091C82C23AA4D7800D1A9B5E2FC851000 /* inc */ = {
+			isa = PBXGroup;
+			children = (
+				441DC194AC269C005A37284EC33938005E7758C5B3553400 /* buffer.h */,
+				E64777B0A5FBD800141595A2CE368F00F744C96FB5D22000 /* buffer_vk.h */,
+				B9A4CC522B648000912651492ED550008019A3B9B041F000 /* calc.h */,
+				F11A6303DCC10000F32860A002E730008368A9369EE2700 /* calc_cl.h */,
+				880F4365B0ECD800AC1E2527458990096CE7B39B2FC4000 /* calc_common.h */,
+				19E45B740F8E43001BF2591035B47200310083039CBB6A00 /* calc_vk.h */,
+				7B836B2390B66000919CD1DDA7C9000095DD025497E4F800 /* device.h */,
+				FFB1EBBC09CDF0002D8009AE3208AA0010AF3D7B19A43700 /* device_cl.h */,
+				82D8A10588908800B0A6BEF7B0CB400093D5F2C49866D000 /* device_vk.h */,
+				B213D480DD358800700A73468023B000E91C23DD0F499000 /* event.h */,
+				5625AE160C7580006C3F14D023881C00707F454713A41800 /* except.h */,
+				632C297FA55C94003CF98C9CC7284000A8C4E74203DD6800 /* executable.h */,
+				6029A501A4388C0039F7081EC6043C00A5C262C402B96800 /* primitives.h */,
+			);
+			name = inc;
+			sourceTree = "<group>";
+		};
+		8E1F9F995775D800C4C07E444366E0004A20803959E7A40 /* src */ = {
+			isa = PBXGroup;
+			children = (
+				E0B5AD9786C1A800F6CF14519DD44800FB0F44C88DF04000 /* calc.cpp */,
+				3969AC4331AA540013370F60537602007F026A05902B2C00 /* calc_clw.cpp */,
+				8F081EDA46FB98004C8BF4188F6C7C00DDCC6881D40B5000 /* calc_clw.h */,
+				56ED1E3B79B1580093A625BF47D4A8008A9C8082CEE30000 /* calc_clw_common.h */,
+				A32DD120AC8348007CFB343DCE4EF400E8C68EE30B042000 /* calc_vkw.cpp */,
+				122EEBAB42D02D00CFB2C0E98B41100060F33552CFDFE400 /* calc_vkw.h */,
+				B74375F605C0C800E51193E82DFB8000C840C7B515971000 /* common_vk.h */,
+				27005EAE51BAB00020D66BD99F1DA600E26CDB8B153CA800 /* device_clw.cpp */,
+				E011AE5AF7F33000B9DF117819BEE00025AA6C1D56740600 /* device_clw.h */,
+				5BB2D3D6155658005588E10162B94C00171F50B2D8D84E00 /* device_vkw.cpp */,
+				C7B7D38812643800A18536A5342FE800D50914A70E51000 /* device_vkw.h */,
+				3EAAE63B8C629400FC2EBB79D4D378008D6F2FE319724800 /* event_vk.h */,
+				2E8829FC246C4C008558D194637FA007420E7BE82ED2400 /* except_clw.h */,
+				A515CE42AB998000D2E3EC34D3D43800B6132001BB6FC000 /* except_vk.h */,
+				D98A5BA56AB4D000A11860D99CAE1800220982C1168D5200 /* executable_vk.h */,
+				97FCA5A63D25D8001AAF449300919800A6BBDD7A3F354000 /* function_vk.h */,
+			);
+			name = src;
+			sourceTree = "<group>";
+		};
+		DE2FD571A6C938008E134D4D9B3FB000BA17F9BDEA135000 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				B4FEB10E7B4A380031C928887BFD3400CD10EBF0EFDF0800 /* libCalc64D.a */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		DE2FDC7F9D9690008E13545B920D0800BA1800CBE0E0A800 /* Projects */ = {
+			isa = PBXGroup;
+			children = (
+				7C9EFC76C5AE18005E895DAC5BD72C00BB67E0F71D3D8800 /* CLW.xcodeproj */,
+			);
+			name = Projects;
+			sourceTree = "<group>";
+		};
+		FA1497690E04F000102DFE2325178900146E2E9A15338400 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				1121AA06BA7508002886580DEDF44800BB781A1B05EE2800 /* libCLW64D.a */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		CF2F14B46AB2D0008D25B37A0DA0F80063764109CC6D800 /* Calc */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 6D61947A96F8FC00455DBF4BC59F5000164DD9111EE0AC00 /* Build configuration list for PBXNativeTarget "Calc" */;
+			buildPhases = (
+				6D61947F18A53800455DBF50474B8800164DD915A08CE400 /* Resources */,
+				6D61947F82525000455DBF50B0F8A400164DD9160A39FE00 /* Sources */,
+				6D61947BA8BDB400455DBF4CD7640800164DD91230A56400 /* Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				FA27919FFBBD28001040F85A12CFC600148128D102EBC100 /* PBXTargetDependency */,
+			);
+			name = Calc;
+			productName = Calc;
+			productReference = B4FEB10E7B4A380031C928887BFD3400CD10EBF0EFDF0800 /* libCalc64D.a */;
+			productType = "com.apple.product-type.library.static";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		08FB7793FE84155DC02AAC07 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+			};
+			buildConfigurationList = 1DEB928908733DD80010E9CD /* Build configuration list for PBXProject "Calc" */;
+			compatibilityVersion = "Xcode 3.2";
+			developmentRegion = English;
+			hasScannedForEncodings = 1;
+			knownRegions = (
+				en,
+			);
+			mainGroup = 4AEDC40756128800B5481413C7593800908F7765554B8000 /* Calc */;
+			projectDirPath = "";
+			projectReferences = (
+				{
+					ProductGroup = FA1497690E04F000102DFE2325178900146E2E9A15338400 /* Products */;
+					ProjectRef = 7C9EFC76C5AE18005E895DAC5BD72C00BB67E0F71D3D8800 /* CLW.xcodeproj */;
+				},
+			);
+			projectRoot = "";
+			targets = (
+				CF2F14B46AB2D0008D25B37A0DA0F80063764109CC6D800 /* Calc */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXReferenceProxy section */
+		1121AA06BA7508002886580DEDF44800BB781A1B05EE2800 /* libCLW64D.a */ = {
+			isa = PBXReferenceProxy;
+			fileType = archive.ar;
+			path = libCLW64D.a;
+			remoteRef = 3CA784E420217E0015EDC2E119877F00A23402360D22E000 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+/* End PBXReferenceProxy section */
+
+/* Begin PBXResourcesBuildPhase section */
+		6D61947F18A53800455DBF50474B8800164DD915A08CE400 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		6D61947F82525000455DBF50B0F8A400164DD9160A39FE00 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				518E08FDE2E764006507CFBF3E28B8004A3E7F0C11830400 /* calc.cpp in Sources */,
+				7E90B3FB1325A000C6393816577448008021A771999B8000 /* calc_clw.cpp in Sources */,
+				B14205553E185800F8EA897082670000B2D2F8CBC48E3800 /* calc_vkw.cpp in Sources */,
+				369AAD6949AEEC0068D29B15B6D6FC00B5CDED07B869E800 /* device_clw.cpp in Sources */,
+				243760FA2AF76C00566F4EA6981F7800A36AA09899B26800 /* device_vkw.cpp in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		FA27919FFBBD28001040F85A12CFC600148128D102EBC100 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = libCLW64D.a;
+			targetProxy = 3F19C61A725BF000186004176BC1F200A4A6436C5F5D5000 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin XCBuildConfiguration section */
+		4CBBBD5677350400F9759521AFEFC800853F67963F870000 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CONFIGURATION_BUILD_DIR = "$(SYMROOT)";
+				CONFIGURATION_TEMP_DIR = "$(OBJROOT)";
+				COPY_PHASE_STRIP = NO;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_ENABLE_FIX_AND_CONTINUE = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"PRORAY_UNITTEST=1",
+					"USE_OPENCL=1",
+					_DEBUG,
+					CALC_STATIC_LIBRARY,
+				);
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				OBJROOT = obj/x64/Debug;
+				ONLY_ACTIVE_ARCH = YES;
+				OTHER_LDFLAGS = (
+					"-framework",
+					OpenCL,
+				);
+				SYMROOT = ../Bin/Debug/x64;
+				USER_HEADER_SEARCH_PATHS = ".. ../3rdParty/include . inc ../CLW";
+			};
+			name = Debug;
+		};
+		6AECA6770CEA2C002D7B9DF35F705800D303DFCA31B4C000 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CONFIGURATION_BUILD_DIR = "$(SYMROOT)";
+				CONFIGURATION_TEMP_DIR = "$(OBJROOT)";
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_OPTIMIZATION_LEVEL = 3;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"PRORAY_UNITTEST=1",
+					"USE_OPENCL=1",
+					NDEBUG,
+					CALC_STATIC_LIBRARY,
+				);
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				OBJROOT = obj/x64/Release;
+				ONLY_ACTIVE_ARCH = NO;
+				OTHER_LDFLAGS = (
+					"-framework",
+					OpenCL,
+				);
+				SYMROOT = ../Bin/Release/x64;
+				USER_HEADER_SEARCH_PATHS = ".. ../3rdParty/include . inc ../CLW";
+			};
+			name = Release;
+		};
+		891A15F1629A18009C93DCB2BDDB700081CA8BFF9135B800 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CONFIGURATION_BUILD_DIR = ../Bin/Release/x64;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				GCC_C_LANGUAGE_STANDARD = "compiler-default";
+				GCC_DYNAMIC_NO_PIC = NO;
+				INSTALL_PATH = /usr/local/lib;
+				PRODUCT_NAME = Calc64;
+			};
+			name = Release;
+		};
+		CC9CA7963708A800B42E83CD669A7800FD44313741A7B800 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CONFIGURATION_BUILD_DIR = ../Bin/Debug/x64;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				GCC_C_LANGUAGE_STANDARD = "compiler-default";
+				GCC_DYNAMIC_NO_PIC = NO;
+				INSTALL_PATH = /usr/local/lib;
+				PRODUCT_NAME = Calc64D;
+			};
+			name = Debug;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		1DEB928908733DD80010E9CD /* Build configuration list for PBXProject "Calc" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				4CBBBD5677350400F9759521AFEFC800853F67963F870000 /* Debug */,
+				6AECA6770CEA2C002D7B9DF35F705800D303DFCA31B4C000 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		6D61947A96F8FC00455DBF4BC59F5000164DD9111EE0AC00 /* Build configuration list for PBXNativeTarget "Calc" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				CC9CA7963708A800B42E83CD669A7800FD44313741A7B800 /* Debug */,
+				891A15F1629A18009C93DCB2BDDB700081CA8BFF9135B800 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 08FB7793FE84155DC02AAC07 /* Project object */;
+}

@@ -1,0 +1,318 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 46;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		217FA39467E0AC00692827AFAC2F50002310970AEE568A00 /* CLWProgram.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 7D09134AEC4B2C0056D676680E16DC00C2A1D10D4ACC0000 /* CLWProgram.cpp */; };
+		277468A2D483BE00E0C3145D45A660007FD87333FB6D0C00 /* CLWDevice.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6F41D42E4066D0034C23B350C41260017F16F01F3DCB300 /* CLWDevice.cpp */; };
+		7AD83EDA43C47C00C280C2F5881320007C693250CA3A5800 /* CLWImage2D.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E50444D12BB86000BED1A7EE4D8410002A9D02938A393A00 /* CLWImage2D.cpp */; };
+		7D002E0842D3C400BFA94403E4BD60008F23EC84DBE47000 /* ParameterHolder.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1DDA00CCB46261005A9308508285B4005189631409940800 /* ParameterHolder.cpp */; };
+		85EBCC656ABCE00017324FD12D7D3F00AFF91C6C8AB22000 /* ReferenceCounter.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B91D25B543E918008361D6528301C00962E3726AC1D4800 /* ReferenceCounter.cpp */; };
+		9218D31CF9BF6000D4C1E9189BA90000A43C919992D01000 /* CLWCommandQueue.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D3E42A699639D000109D31ED645D21007938CB0EB6B7340 /* CLWCommandQueue.cpp */; };
+		99F018A42DA60800533EC45E9EC8A400F2542335548F5000 /* CLWKernel.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B3D2AFC2D0296000E1A0CDB4F8641800C4D00181DFFFA800 /* CLWKernel.cpp */; };
+		A6203DCDFB9D500DE3BFBDA7247A000B3FDAF0EDB204000 /* CLWPlatform.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 62A211FC20146400E554B0E8E3802800716149D02223CC00 /* CLWPlatform.cpp */; };
+		BB1DE1DD2DB76000EFB5947227792000E419FA5261782000 /* CLWEvent.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 76C08515944A7C0034445A53DCBB5E00C584CEBD215A3000 /* CLWEvent.cpp */; };
+		D31514B51BD88800F918208D75D9A000985B27163D209800 /* CLWParallelPrimitives.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 28E4D3066F1B3E00E2FBC3EA89E7B000949C23F18DB84000 /* CLWParallelPrimitives.cpp */; };
+		EA0240D38690880031AAC4EECADF3000EB93344A0D066800 /* CLWContext.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 73F5353A3887B8004DC298575A536800B98DF2FC97089000 /* CLWContext.cpp */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		1136A7ED09E57700D8C4AD213BDEC00059B5CF08B5BDFC00 /* CLWCommandQueue.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CLWCommandQueue.h; sourceTree = "<group>"; };
+		14F11704414AA7008E26BA3E537480007A8C4A7087656C00 /* clwkernels_cl.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = clwkernels_cl.h; path = kernelcache/clwkernels_cl.h; sourceTree = "<group>"; };
+		1DDA00CCB46261005A9308508285B4005189631409940800 /* ParameterHolder.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = ParameterHolder.cpp; sourceTree = "<group>"; };
+		21E2E706223E000023F0E4A24864300038FF0E95AF6B2600 /* CLWKernel.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CLWKernel.h; sourceTree = "<group>"; };
+		28E4D3066F1B3E00E2FBC3EA89E7B000949C23F18DB84000 /* CLWParallelPrimitives.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = CLWParallelPrimitives.cpp; sourceTree = "<group>"; };
+		327F68091D6F8200F0033D4765E068008143B1B0AA7F3800 /* CLWProgram.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CLWProgram.h; sourceTree = "<group>"; };
+		3D039845A6CFC0004919D79D8C90A408582BF6152A84800 /* ParameterHolder.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ParameterHolder.h; sourceTree = "<group>"; };
+		5408F0172379A8005616EDB3499FD8006B2517A6B0A6D000 /* CLWBuffer.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CLWBuffer.h; sourceTree = "<group>"; };
+		62A211FC20146400E554B0E8E3802800716149D02223CC00 /* CLWPlatform.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = CLWPlatform.cpp; sourceTree = "<group>"; };
+		6F41D42E4066D0034C23B350C41260017F16F01F3DCB300 /* CLWDevice.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = CLWDevice.cpp; sourceTree = "<group>"; };
+		7066E2502834B800B45BB38278485000B95FD488FAC68000 /* CLW.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CLW.h; sourceTree = "<group>"; };
+		73F5353A3887B8004DC298575A536800B98DF2FC97089000 /* CLWContext.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = CLWContext.cpp; sourceTree = "<group>"; };
+		76C08515944A7C0034445A53DCBB5E00C584CEBD215A3000 /* CLWEvent.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = CLWEvent.cpp; sourceTree = "<group>"; };
+		7D09134AEC4B2C0056D676680E16DC00C2A1D10D4ACC0000 /* CLWProgram.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = CLWProgram.cpp; sourceTree = "<group>"; };
+		81373996CDFD680016A1327F664A5200DEDB379A94915000 /* CLWParallelPrimitives.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CLWParallelPrimitives.h; sourceTree = "<group>"; };
+		9492872E8DCEC8006C8EB1FFBC7520003D7ECBC515B67800 /* CLW.cl */ = {isa = PBXFileReference; lastKnownFileType = text; name = CLW.cl; path = CL/CLW.cl; sourceTree = "<group>"; };
+		9C7FF9E9FADDB0009E8DF7862103E000B39C2179880AD800 /* CLWExcept.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CLWExcept.h; sourceTree = "<group>"; };
+		A45478660C584000A6627602327E7000BB709FF599856800 /* CLWDevice.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CLWDevice.h; sourceTree = "<group>"; };
+		A99BE785A8F47800BFB54E3FC0071800C3F57EB6B0231000 /* CLWEvent.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CLWEvent.h; sourceTree = "<group>"; };
+		B33BA949C84CD8007132480F6B3B0000EA43F8A5FA60E000 /* libCLW64D.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libCLW64D.a; sourceTree = BUILT_PRODUCTS_DIR; };
+		B3D2AFC2D0296000E1A0CDB4F8641800C4D00181DFFFA800 /* CLWKernel.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = CLWKernel.cpp; sourceTree = "<group>"; };
+		B42B9DD503055800974FC0DD987C18001910FA8B07186D00 /* ReferenceCounter.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ReferenceCounter.h; sourceTree = "<group>"; };
+		B6D90344D069C800745CD88318DAB00059D4CEC5D798180 /* CLWImage2D.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CLWImage2D.h; sourceTree = "<group>"; };
+		B91D25B543E918008361D6528301C00962E3726AC1D4800 /* ReferenceCounter.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = ReferenceCounter.cpp; sourceTree = "<group>"; };
+		CDF2013ED25BE800FBC01F30FA96A000DEEF52FDE2323000 /* CLWPlatform.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CLWPlatform.h; sourceTree = "<group>"; };
+		D3E42A699639D000109D31ED645D21007938CB0EB6B7340 /* CLWCommandQueue.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = CLWCommandQueue.cpp; sourceTree = "<group>"; };
+		E50444D12BB86000BED1A7EE4D8410002A9D02938A393A00 /* CLWImage2D.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = CLWImage2D.cpp; sourceTree = "<group>"; };
+		F0486182D99E8000ADCC36C1220F68003F0CAB2A66AE3600 /* CLWContext.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CLWContext.h; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		BDF719BA44941800A57ADCF6E8E6B000E21D4A59FB1EF800 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		1A4AA340C2503B001C58A0DCE8766B003166CAD04F7D6200 /* kernelcache */ = {
+			isa = PBXGroup;
+			children = (
+				14F11704414AA7008E26BA3E537480007A8C4A7087656C00 /* clwkernels_cl.h */,
+			);
+			name = kernelcache;
+			sourceTree = "<group>";
+		};
+		A07347C2559728015022F27308A22001BA741AD8A2CA100 /* CLW */ = {
+			isa = PBXGroup;
+			children = (
+				D437160313907000841A8DDF0806E800B01F3A4F56DA8800 /* CL */,
+				7066E2502834B800B45BB38278485000B95FD488FAC68000 /* CLW.h */,
+				5408F0172379A8005616EDB3499FD8006B2517A6B0A6D000 /* CLWBuffer.h */,
+				D3E42A699639D000109D31ED645D21007938CB0EB6B7340 /* CLWCommandQueue.cpp */,
+				1136A7ED09E57700D8C4AD213BDEC00059B5CF08B5BDFC00 /* CLWCommandQueue.h */,
+				73F5353A3887B8004DC298575A536800B98DF2FC97089000 /* CLWContext.cpp */,
+				F0486182D99E8000ADCC36C1220F68003F0CAB2A66AE3600 /* CLWContext.h */,
+				6F41D42E4066D0034C23B350C41260017F16F01F3DCB300 /* CLWDevice.cpp */,
+				A45478660C584000A6627602327E7000BB709FF599856800 /* CLWDevice.h */,
+				76C08515944A7C0034445A53DCBB5E00C584CEBD215A3000 /* CLWEvent.cpp */,
+				A99BE785A8F47800BFB54E3FC0071800C3F57EB6B0231000 /* CLWEvent.h */,
+				9C7FF9E9FADDB0009E8DF7862103E000B39C2179880AD800 /* CLWExcept.h */,
+				E50444D12BB86000BED1A7EE4D8410002A9D02938A393A00 /* CLWImage2D.cpp */,
+				B6D90344D069C800745CD88318DAB00059D4CEC5D798180 /* CLWImage2D.h */,
+				B3D2AFC2D0296000E1A0CDB4F8641800C4D00181DFFFA800 /* CLWKernel.cpp */,
+				21E2E706223E000023F0E4A24864300038FF0E95AF6B2600 /* CLWKernel.h */,
+				28E4D3066F1B3E00E2FBC3EA89E7B000949C23F18DB84000 /* CLWParallelPrimitives.cpp */,
+				81373996CDFD680016A1327F664A5200DEDB379A94915000 /* CLWParallelPrimitives.h */,
+				62A211FC20146400E554B0E8E3802800716149D02223CC00 /* CLWPlatform.cpp */,
+				CDF2013ED25BE800FBC01F30FA96A000DEEF52FDE2323000 /* CLWPlatform.h */,
+				7D09134AEC4B2C0056D676680E16DC00C2A1D10D4ACC0000 /* CLWProgram.cpp */,
+				327F68091D6F8200F0033D4765E068008143B1B0AA7F3800 /* CLWProgram.h */,
+				1DDA00CCB46261005A9308508285B4005189631409940800 /* ParameterHolder.cpp */,
+				3D039845A6CFC0004919D79D8C90A408582BF6152A84800 /* ParameterHolder.h */,
+				B91D25B543E918008361D6528301C00962E3726AC1D4800 /* ReferenceCounter.cpp */,
+				B42B9DD503055800974FC0DD987C18001910FA8B07186D00 /* ReferenceCounter.h */,
+				1A4AA340C2503B001C58A0DCE8766B003166CAD04F7D6200 /* kernelcache */,
+				DE2FD571A6C938008E134D4D9B3FB000BA17F9BDEA135000 /* Products */,
+			);
+			name = CLW;
+			sourceTree = "<group>";
+		};
+		D437160313907000841A8DDF0806E800B01F3A4F56DA8800 /* CL */ = {
+			isa = PBXGroup;
+			children = (
+				9492872E8DCEC8006C8EB1FFBC7520003D7ECBC515B67800 /* CLW.cl */,
+			);
+			name = CL;
+			sourceTree = "<group>";
+		};
+		DE2FD571A6C938008E134D4D9B3FB000BA17F9BDEA135000 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				B33BA949C84CD8007132480F6B3B0000EA43F8A5FA60E000 /* libCLW64D.a */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		1CB4CEA6B2D9B000E466F27E2464C800B1C492FED365F000 /* CLW */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = BDF719B932CF6000A57ADCF5D721F800E21D4A58E95A4000 /* Build configuration list for PBXNativeTarget "CLW" */;
+			buildPhases = (
+				BDF719BDB47B9800A57ADCFA58CE3000E21D4A5D6B067800 /* Resources */,
+				BDF719BE1E28B000A57ADCFAC27B4800E21D4A5DD4B39800 /* Sources */,
+				BDF719BA44941800A57ADCF6E8E6B000E21D4A59FB1EF800 /* Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = CLW;
+			productName = CLW;
+			productReference = B33BA949C84CD8007132480F6B3B0000EA43F8A5FA60E000 /* libCLW64D.a */;
+			productType = "com.apple.product-type.library.static";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		08FB7793FE84155DC02AAC07 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+			};
+			buildConfigurationList = 1DEB928908733DD80010E9CD /* Build configuration list for PBXProject "CLW" */;
+			compatibilityVersion = "Xcode 3.2";
+			developmentRegion = English;
+			hasScannedForEncodings = 1;
+			knownRegions = (
+				en,
+			);
+			mainGroup = A07347C2559728015022F27308A22001BA741AD8A2CA100 /* CLW */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				1CB4CEA6B2D9B000E466F27E2464C800B1C492FED365F000 /* CLW */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		BDF719BDB47B9800A57ADCFA58CE3000E21D4A5D6B067800 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		BDF719BE1E28B000A57ADCFAC27B4800E21D4A5DD4B39800 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				9218D31CF9BF6000D4C1E9189BA90000A43C919992D01000 /* CLWCommandQueue.cpp in Sources */,
+				EA0240D38690880031AAC4EECADF3000EB93344A0D066800 /* CLWContext.cpp in Sources */,
+				277468A2D483BE00E0C3145D45A660007FD87333FB6D0C00 /* CLWDevice.cpp in Sources */,
+				BB1DE1DD2DB76000EFB5947227792000E419FA5261782000 /* CLWEvent.cpp in Sources */,
+				7AD83EDA43C47C00C280C2F5881320007C693250CA3A5800 /* CLWImage2D.cpp in Sources */,
+				99F018A42DA60800533EC45E9EC8A400F2542335548F5000 /* CLWKernel.cpp in Sources */,
+				D31514B51BD88800F918208D75D9A000985B27163D209800 /* CLWParallelPrimitives.cpp in Sources */,
+				A6203DCDFB9D500DE3BFBDA7247A000B3FDAF0EDB204000 /* CLWPlatform.cpp in Sources */,
+				217FA39467E0AC00692827AFAC2F50002310970AEE568A00 /* CLWProgram.cpp in Sources */,
+				7D002E0842D3C400BFA94403E4BD60008F23EC84DBE47000 /* ParameterHolder.cpp in Sources */,
+				85EBCC656ABCE00017324FD12D7D3F00AFF91C6C8AB22000 /* ReferenceCounter.cpp in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		2E653DAE80920C005C335BA0A8CCC4003F628F6D90685200 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CONFIGURATION_BUILD_DIR = ../Bin/Debug/x64;
+				GCC_C_LANGUAGE_STANDARD = "compiler-default";
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"PRORAY_UNITTEST=1",
+					"USE_OPENCL=1",
+					_DEBUG,
+					RR_EMBED_KERNELS,
+				);
+				HEADER_SEARCH_PATHS = ..;
+				INSTALL_PATH = /usr/local/lib;
+				PRODUCT_NAME = CLW64D;
+			};
+			name = Debug;
+		};
+		7F609342340A2400592DF65F55D5D400C4F95104928AF800 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CONFIGURATION_BUILD_DIR = ../Bin/Release/x64;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				GCC_C_LANGUAGE_STANDARD = "compiler-default";
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"PRORAY_UNITTEST=1",
+					"USE_OPENCL=1",
+					NDEBUG,
+					RR_EMBED_KERNELS,
+				);
+				HEADER_SEARCH_PATHS = ..;
+				INSTALL_PATH = /usr/local/lib;
+				PRODUCT_NAME = CLW64;
+			};
+			name = Release;
+		};
+		98A67A9A6354C000DC9B4BCCB3685000E19F6CD335E68000 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CONFIGURATION_BUILD_DIR = "$(SYMROOT)";
+				CONFIGURATION_TEMP_DIR = "$(OBJROOT)";
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_OPTIMIZATION_LEVEL = 3;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"PRORAY_UNITTEST=1",
+					"USE_OPENCL=1",
+					NDEBUG,
+				);
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				OBJROOT = obj/x64/Release;
+				ONLY_ACTIVE_ARCH = NO;
+				OTHER_LDFLAGS = (
+					"-framework",
+					OpenCL,
+				);
+				SYMROOT = ../Bin/Release/x64;
+				USER_HEADER_SEARCH_PATHS = ".. ../3rdParty/include .";
+			};
+			name = Release;
+		};
+		EABF6FB8C2BF18004D12A4CE6F21DC00B7D9BAB2DAA5000 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CONFIGURATION_BUILD_DIR = "$(SYMROOT)";
+				CONFIGURATION_TEMP_DIR = "$(OBJROOT)";
+				COPY_PHASE_STRIP = NO;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_ENABLE_FIX_AND_CONTINUE = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"PRORAY_UNITTEST=1",
+					"USE_OPENCL=1",
+					_DEBUG,
+				);
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				OBJROOT = obj/x64/Debug;
+				ONLY_ACTIVE_ARCH = YES;
+				OTHER_LDFLAGS = (
+					"-framework",
+					OpenCL,
+				);
+				SYMROOT = ../Bin/Debug/x64;
+				USER_HEADER_SEARCH_PATHS = ".. ../3rdParty/include .";
+			};
+			name = Debug;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		1DEB928908733DD80010E9CD /* Build configuration list for PBXProject "CLW" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				EABF6FB8C2BF18004D12A4CE6F21DC00B7D9BAB2DAA5000 /* Debug */,
+				98A67A9A6354C000DC9B4BCCB3685000E19F6CD335E68000 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		BDF719B932CF6000A57ADCF5D721F800E21D4A58E95A4000 /* Build configuration list for PBXNativeTarget "CLW" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				2E653DAE80920C005C335BA0A8CCC4003F628F6D90685200 /* Debug */,
+				7F609342340A2400592DF65F55D5D400C4F95104928AF800 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 08FB7793FE84155DC02AAC07 /* Project object */;
+}

@@ -360,7 +360,7 @@ __kernel void ShadeSurface(
         DifferentialGeometry diffgeo;
         FillDifferentialGeometry(&scene, &isect, &diffgeo);
 
-		if (bounce == 0) { output_normals[pixelidx] += (float4)(diffgeo.n.x, diffgeo.n.y, diffgeo.n.z, 0.0f); }
+		if (bounce == 0) { output_normals[pixelidx] += (float4)(diffgeo.n.x, diffgeo.n.y, diffgeo.n.z, 1.0f); }
 
         // Check if we are hitting from the inside
         float ndotwi = dot(diffgeo.n, wi);

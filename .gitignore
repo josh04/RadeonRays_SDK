@@ -1,4 +1,10 @@
 *.vcxproj
+*.swp
+Bin/
+CLW/obj
+Calc/obj
+RadeonRays/obj
+App/obj
 App/App.vcxproj.user
 *.filters
 *.obj
@@ -19,3 +25,4 @@ Bin/Release/x64/App64.exe
 *.opendb
 *.db
 *.sln
+*.DS_Store

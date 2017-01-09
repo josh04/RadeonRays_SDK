@@ -1,0 +1,231 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 46;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		86459EFA89E14800BADD518F83A30800AF41B76FBDA20800 /* gtest-all.cc in Sources */ = {isa = PBXBuildFile; fileRef = BF4DBB5DDD16C0007CD1909C2587A400E1205056A267500 /* gtest-all.cc */; };
+		A23AA8AC6342C8005B895466D4656C00FA9EB33D8A2C1800 /* gtest_main.cc in Sources */ = {isa = PBXBuildFile; fileRef = AF96A558B3B11000DD64C34ADBEBC800C093F717C3875800 /* gtest_main.cc */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		65055871D84A78007B1EBF2BEF5D14007F5EEFA2DF791000 /* libGtest64D.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; name = libGtest64D.a; path = libGtest64D.a; sourceTree = BUILT_PRODUCTS_DIR; };
+		AF96A558B3B11000DD64C34ADBEBC800C093F717C3875800 /* gtest_main.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = gtest_main.cc; path = src/gtest_main.cc; sourceTree = "<group>"; };
+		BF4DBB5DDD16C0007CD1909C2587A400E1205056A267500 /* gtest-all.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = "gtest-all.cc"; path = "src/gtest-all.cc"; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		1F45C86FBF5DFC00F6C74D66C2CED000E5BA9FD7443B7000 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		A8A64ACA82EE38005E4A9C651D0AAC00A27E69E86945F800 /* Gtest */ = {
+			isa = PBXGroup;
+			children = (
+				BF4DBB5DDD16C0007CD1909C2587A400E1205056A267500 /* gtest-all.cc */,
+				AF96A558B3B11000DD64C34ADBEBC800C093F717C3875800 /* gtest_main.cc */,
+				DE2FD571A6C938008E134D4D9B3FB000BA17F9BDEA135000 /* Products */,
+			);
+			name = Gtest;
+			sourceTree = "<group>";
+		};
+		DE2FD571A6C938008E134D4D9B3FB000BA17F9BDEA135000 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				65055871D84A78007B1EBF2BEF5D14007F5EEFA2DF791000 /* libGtest64D.a */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		3104090A3D1DB807FDAB80AA484D8001B227B731866AA00 /* Gtest */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 1F45C86EAD994400F6C74D65B10A1800E5BA9FD63276B800 /* Build configuration list for PBXNativeTarget "Gtest" */;
+			buildPhases = (
+				1F45C8732F457C00F6C74D6A32B65000E5BA9FDAB422F000 /* Resources */,
+				1F45C87398F29600F6C74D6A9C636800E5BA9FDB1DD00800 /* Sources */,
+				1F45C86FBF5DFC00F6C74D66C2CED000E5BA9FD7443B7000 /* Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = Gtest;
+			productName = Gtest;
+			productReference = 65055871D84A78007B1EBF2BEF5D14007F5EEFA2DF791000 /* libGtest64D.a */;
+			productType = "com.apple.product-type.library.static";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		08FB7793FE84155DC02AAC07 /* Project object */ = {
+			isa = PBXProject;
+			buildConfigurationList = 1DEB928908733DD80010E9CD /* Build configuration list for PBXProject "Gtest" */;
+			compatibilityVersion = "Xcode 3.2";
+			hasScannedForEncodings = 1;
+			mainGroup = A8A64ACA82EE38005E4A9C651D0AAC00A27E69E86945F800 /* Gtest */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				3104090A3D1DB807FDAB80AA484D8001B227B731866AA00 /* libGtest64D.a */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		1F45C8732F457C00F6C74D6A32B65000E5BA9FDAB422F000 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		1F45C87398F29600F6C74D6A9C636800E5BA9FDB1DD00800 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				86459EFA89E14800BADD518F83A30800AF41B76FBDA20800 /* gtest-all.cc in Sources */,
+				A23AA8AC6342C8005B895466D4656C00FA9EB33D8A2C1800 /* gtest_main.cc in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXVariantGroup section */
+/* End PBXVariantGroup section */
+
+/* Begin XCBuildConfiguration section */
+		40CB0B0820DA60005538F20EC425E800ABC96EBFDEF6B800 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CONFIGURATION_BUILD_DIR = "$(SYMROOT)";
+				CONFIGURATION_TEMP_DIR = "$(OBJROOT)";
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_OPTIMIZATION_LEVEL = 3;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"PRORAY_UNITTEST=1",
+					"USE_OPENCL=1",
+					NDEBUG,
+					"GTEST_HAS_PTHREAD=0",
+				);
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				OBJROOT = obj/x64/Release;
+				ONLY_ACTIVE_ARCH = NO;
+				OTHER_CFLAGS = (
+					"-g",
+					"-Wall",
+				);
+				OTHER_LDFLAGS = (
+					"-framework OpenCL",
+				);
+				SYMROOT = ../Bin/Release/x64;
+				USER_HEADER_SEARCH_PATHS = (
+					..,
+					../3rdParty/include,
+					.,
+					include,
+				);
+			};
+			name = Release;
+		};
+		521D56A9598FDC002BEAB9C67B5B8A0097B6146BB810B000 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CONFIGURATION_BUILD_DIR = ../Bin/Debug/x64;
+				GCC_DYNAMIC_NO_PIC = NO;
+				INSTALL_PATH = /usr/local/lib;
+				PRODUCT_NAME = Gtest64D;
+			};
+			name = Debug;
+		};
+		7182D65743BF2C00F4357544072AF00080420E2B45CE9000 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CONFIGURATION_BUILD_DIR = ../Bin/Release/x64;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				GCC_DYNAMIC_NO_PIC = NO;
+				INSTALL_PATH = /usr/local/lib;
+				PRODUCT_NAME = Gtest64;
+			};
+			name = Release;
+		};
+		B6F32FE9C1FAF000FAE8011C120E8000FFEC2222948CB800 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CONFIGURATION_BUILD_DIR = "$(SYMROOT)";
+				CONFIGURATION_TEMP_DIR = "$(OBJROOT)";
+				COPY_PHASE_STRIP = NO;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_ENABLE_FIX_AND_CONTINUE = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"PRORAY_UNITTEST=1",
+					"USE_OPENCL=1",
+					_DEBUG,
+					"GTEST_HAS_PTHREAD=0",
+				);
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				OBJROOT = obj/x64/Debug;
+				ONLY_ACTIVE_ARCH = YES;
+				OTHER_CFLAGS = (
+					"-g",
+					"-Wall",
+				);
+				OTHER_LDFLAGS = (
+					"-framework OpenCL",
+				);
+				SYMROOT = ../Bin/Debug/x64;
+				USER_HEADER_SEARCH_PATHS = (
+					..,
+					../3rdParty/include,
+					.,
+					include,
+				);
+			};
+			name = Debug;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		1DEB928908733DD80010E9CD /* Build configuration list for PBXProject "Gtest" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				B6F32FE9C1FAF000FAE8011C120E8000FFEC2222948CB800 /* Debug */,
+				40CB0B0820DA60005538F20EC425E800ABC96EBFDEF6B800 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		1F45C86EAD994400F6C74D65B10A1800E5BA9FD63276B800 /* Build configuration list for PBXNativeTarget "libGtest64D.a" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				521D56A9598FDC002BEAB9C67B5B8A0097B6146BB810B000 /* Debug */,
+				7182D65743BF2C00F4357544072AF00080420E2B45CE9000 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+/* End XCConfigurationList section */
+};
+rootObject = 08FB7793FE84155DC02AAC07 /* Project object */;
+}

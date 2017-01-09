@@ -27,13 +27,14 @@
 #include <map>
 #include <fstream>
 #include <sstream>
-
+/*
 #ifdef __APPLE__
 #import <Foundation/Foundation.h>
 #endif
-
+*/
 #include "tiny_obj_loader.h"
 
+/*
 std::string _get_resource_path2(const char * filename) {
     std::string path = "RadeonResources/Resources/" + std::string(filename);
 #ifdef RAD_FRAMEWORK
@@ -46,7 +47,7 @@ std::string _get_resource_path2(const char * filename) {
 #endif
 	return path;
 }
-
+*/
 
 namespace tinyobj {
 
@@ -504,7 +505,7 @@ std::string MaterialFileReader::operator() (
     filepath = matId;
   }
 
-  std::ifstream matIStream(_get_resource_path2(filepath.c_str()));
+  std::ifstream matIStream(filepath.c_str());
   return LoadMtl(matMap, materials, matIStream);
 }
 
@@ -520,7 +521,7 @@ LoadObj(
 
   std::stringstream err;
 
-  std::ifstream ifs(_get_resource_path2(filename));
+  std::ifstream ifs(filename);
   if (!ifs) {
     err << "Cannot open file [" << filename << "]" << std::endl;
     return err.str();

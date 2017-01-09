@@ -55,6 +55,10 @@ class radeonEventHandler : public azure::Eventable {
                     case azure::Key::End:
                         _end_pressed = true;
                         break;
+                    case azure::Key::LShift:
+                    case azure::Key::RShift:
+                        _shift_pressed = true;
+                        break;
                 }
             } else if (event->isType("keyUp")) {
                 switch (event->getAttribute<azure::Key>("key")) {
@@ -81,6 +85,10 @@ class radeonEventHandler : public azure::Eventable {
 					case azure::Key::x:
                     case azure::Key::End:
                         _end_pressed = false;
+                        break;
+                    case azure::Key::LShift:
+                    case azure::Key::RShift:
+                        _shift_pressed = false;
                         break;
                 }
             } else if (event->isType("mouseMove")) {
@@ -141,7 +149,15 @@ class radeonEventHandler : public azure::Eventable {
             prevtime = time;
             
             bool update = false;
-            const float kMouseSensitivity = 0.001125f;
+            float kMouseSensitivity = 0.001125f;
+            
+            float kMovementSpeed = 50.25f;
+            
+            if (_shift_pressed) {
+                kMovementSpeed = kMovementSpeed / 20.0f;
+                kMouseSensitivity = kMouseSensitivity / 20.0f;
+            }
+            
             float delta_x = _mouse_delta_x * kMouseSensitivity;
             float delta_y = _mouse_delta_y * kMouseSensitivity;
             
@@ -167,7 +183,8 @@ class radeonEventHandler : public azure::Eventable {
             }
             
             //float g_cspeed = 100.25f;
-            const float kMovementSpeed = 50.25f;;
+            
+            
             if (_up_pressed)
             {
                 g_scene->camera_->MoveForward((float)dt.count() * kMovementSpeed);
@@ -215,7 +232,9 @@ class radeonEventHandler : public azure::Eventable {
         
     private:
         bool _up_pressed = false, _down_pressed = false, _left_pressed = false, _right_pressed = false, _home_pressed = false, _end_pressed = false;
-        
+    
+    bool _shift_pressed = false;
+    
 		float _mouse_delta_x = 0.0f, _mouse_delta_y = 0.0f;
         
         bool _tracking_mouse = false;

@@ -1,0 +1,654 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 46;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		29CE5A8956A6F600FDA85286E934C000D36A05BB520D6000 /* mesh.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1CD587A59E42CB009F88269261AE90002B94BF79A0523200 /* mesh.cpp */; };
+		4BBBB78CB9EB8400FC9E50A7B2B64800B2D7619E3D2AA800 /* libCLW64D.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 1121AA06BA7508002886580DEDF44800BB781A1B05EE2800 /* libCLW64D.a */; };
+		4D243D60F56A68004A194AC869C4AC002FC5ABAFE7A83600 /* split_bvh.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C2F377D7F40D80003C291B1206375A00288EAB443A284400 /* split_bvh.cpp */; };
+		555696AB7BABB000F7CE856C8B90D8005434364D78046400 /* radeon_rays.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D7CD755E551BC009025ED51873B58005FA095D27E626800 /* radeon_rays.cpp */; };
+		56C5AD46EDF6D4002A9FA54480849C00615878E95D40CC /* bvh.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 46314F04A51D6400C8E3EDF16889280054F086D8A72CC800 /* bvh.cpp */; };
+		60FE1844251AA000A8A69C5F69694800628F0BBAAB908000 /* world.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 464224E851C6CC0DE31856BA6E8180049FCE010E39D4400 /* world.cpp */; };
+		71E5F88E0FC7900011D0030A672D02008AE79983193B2000 /* hlbvh.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 69470F714B53740030D514A57D4CBE00B1C6368CF72BF800 /* hlbvh.cpp */; };
+		8D8931D3D1340800F317E1C4853020004CE125B566E26000 /* calc_intersection_device.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 49ED6699CF5F6C008523583769B958006A7B51C7A5F1B800 /* calc_intersection_device.cpp */; };
+		9425844EF6140000E33E7BFEDA5B0800713695C05E483400 /* options.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F75A87EA526BA800D061046F834FA000DE00BA3E9667D800 /* options.cpp */; };
+		9AD8EB3ED14CB000366FA594D0EF9400D1A8236C0B444800 /* bvhstrategy.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9F3F67EBBDCC18003F29726815318800B84108E0C73FA800 /* bvhstrategy.cpp */; };
+		9EC0F7E11DAB8FCC00DBE0A8 /* resource.mm in Sources */ = {isa = PBXBuildFile; fileRef = 9EC0F7E01DAB8FCC00DBE0A8 /* resource.mm */; };
+		B7B312B323AAE000452150531112700082620A4FAE0C6000 /* radeon_rays_impl.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 387DF80EDD958A0029F3BEF1EA203E00130F8BF065050900 /* radeon_rays_impl.cpp */; };
+		BA843EAEF8AF6000D9BAC69753FAB000D269B33A422C9000 /* plain_bvh_translator.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D2C0ED7AF9F84009307A360C156C0009208C3F936C4B000 /* plain_bvh_translator.cpp */; };
+		BBA25F29D9E9380021310F1A8DE554007AFA530B6F979000 /* fatnode_bvh_translator.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A3D3B80BA0D70000DF09A9A93B30F000C461A33977695000 /* fatnode_bvh_translator.cpp */; };
+		BE31EA9412F77000DE608DD8B0D87000EAF5FAA68856B800 /* hlbvh_strategy.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 313BDCA401BCA600C282600FC47D08005B492CAB21B1E400 /* hlbvh_strategy.cpp */; };
+		D976E4A8A4D148004D643064FB4ABC0076255927F472FC00 /* libCalc64D.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 3E291E3A99F78600C1716ADCAA446800D7DBE48FA8313800 /* libCalc64D.a */; };
+		DA77571A3E1C00007CEF45DB4E012C00D954F6BC3A74B800 /* bvh2lstrategy.cpp in Sources */ = {isa = PBXBuildFile; fileRef = DB0BD9E57F36E8001DB4EFE121208000ED2F986218479000 /* bvh2lstrategy.cpp */; };
+		E50466AA7DB3780053309EF1B94758011C876BCF312BB00 /* fatbvhstrategy.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F76AA6E4CFF6A00A0BD2DDA0FBFC8003983FA756CF4A800 /* fatbvhstrategy.cpp */; };
+		F0F8DD47136E9800394687994D394E00F22C87490294A000 /* calc_intersection_device_cl.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 522E4F66C54334005835D45A89F88C0066C2555B3E673400 /* calc_intersection_device_cl.cpp */; };
+		F7C198DFEC73F800400F4332263EB000F8F542E1DB9A0000 /* calc_intersection_device_vk.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 633BBB5A8B7104006943404E50265C0077CFC14F04950400 /* calc_intersection_device_vk.cpp */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		3CA784E420217E0015EDC2E119877F00A23402360D22E000 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 7C9EFC76C5AE18005E895DAC5BD72C00BB67E0F71D3D8800 /* CLW.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = B33BA949C84CD8007132480F6B3B0000EA43F8A5FA60E000;
+			remoteInfo = libCLW64D.a;
+		};
+		3F19C61A725BF000186004176BC1F200A4A6436C5F5D5000 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 7C9EFC76C5AE18005E895DAC5BD72C00BB67E0F71D3D8800 /* CLW.xcodeproj */;
+			proxyType = 1;
+			remoteGlobalIDString = 1CB4CEA6B2D9B000E466F27E2464C800B1C492FED365F000;
+			remoteInfo = libCLW64D.a;
+		};
+		690E8BAAF17B5C006B1C894717A18C00802AB33A7EA88000 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = D83EE9C4EEBBA8009F370D314A1BD0007F53AE488C5F7000 /* Calc.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = B4FEB10E7B4A380031C928887BFD3400CD10EBF0EFDF0800;
+			remoteInfo = libCalc64D.a;
+		};
+		6B80CCE143B5D0006D8ECA7D69DC0000829CF470D0E2F800 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = D83EE9C4EEBBA8009F370D314A1BD0007F53AE488C5F7000 /* Calc.xcodeproj */;
+			proxyType = 1;
+			remoteGlobalIDString = CF2F14B46AB2D0008D25B37A0DA0F80063764109CC6D800;
+			remoteInfo = libCalc64D.a;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXFileReference section */
+		15270513DC1E2D0506B68012208EC00DE6381C2A5F61800 /* radeon_rays_cl.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = radeon_rays_cl.h; path = include/radeon_rays_cl.h; sourceTree = "<group>"; };
+		17A27738FF9CD8005D7E0BC2115418005C7F2C5A86C20800 /* fatnode_bvh_translator.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = fatnode_bvh_translator.h; path = src/translator/fatnode_bvh_translator.h; sourceTree = "<group>"; };
+		1CD587A59E42CB009F88269261AE90002B94BF79A0523200 /* mesh.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = mesh.cpp; path = src/primitive/mesh.cpp; sourceTree = "<group>"; };
+		1D1AF8C06C23C1004AE916B2945E78002E184A7F7BFA0800 /* mesh.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = mesh.h; path = src/primitive/mesh.h; sourceTree = "<group>"; };
+		23AF5416C849DE00C3995E931FAF50003CB0F50BD1BD6C00 /* bvh2lstrategy.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = bvh2lstrategy.h; path = src/strategy/bvh2lstrategy.h; sourceTree = "<group>"; };
+		27361B83168F200484EF64143203000475016D9B88E2000 /* calc_intersection_device.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = calc_intersection_device.h; path = src/device/calc_intersection_device.h; sourceTree = "<group>"; };
+		2C3E0BF91A2B7200F3CC112D4C24B80074BD3314C603F800 /* instance.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = instance.h; path = src/primitive/instance.h; sourceTree = "<group>"; };
+		303B30B49156F6009E39ADBBE7E460005788AF4DC05D7400 /* bbox.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = bbox.h; path = include/math/bbox.h; sourceTree = "<group>"; };
+		313BDCA401BCA600C282600FC47D08005B492CAB21B1E400 /* hlbvh_strategy.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = hlbvh_strategy.cpp; path = src/strategy/hlbvh_strategy.cpp; sourceTree = "<group>"; };
+		37AF83291C5744006C4735BE1619000060AB9B9E50180400 /* bvh.comp */ = {isa = PBXFileReference; lastKnownFileType = text; name = bvh.comp; path = src/kernels/GLSL/bvh.comp; sourceTree = "<group>"; };
+		387DF80EDD958A0029F3BEF1EA203E00130F8BF065050900 /* radeon_rays_impl.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = radeon_rays_impl.cpp; path = src/intersection/radeon_rays_impl.cpp; sourceTree = "<group>"; };
+		38EE2E1F6502CE006D85E0B45EC48C0061EA469498C38C00 /* fatbvh.cl */ = {isa = PBXFileReference; lastKnownFileType = text; name = fatbvh.cl; path = src/kernels/CL/fatbvh.cl; sourceTree = "<group>"; };
+		42109FA39E58B00022896F1136D0A000BDC60DA162B79000 /* calc_intersection_device_vk.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = calc_intersection_device_vk.h; path = src/device/calc_intersection_device_vk.h; sourceTree = "<group>"; };
+		46314F04A51D6400C8E3EDF16889280054F086D8A72CC800 /* bvh.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = bvh.cpp; path = src/accelerator/bvh.cpp; sourceTree = "<group>"; };
+		464224E851C6CC0DE31856BA6E8180049FCE010E39D4400 /* world.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = world.cpp; path = src/world/world.cpp; sourceTree = "<group>"; };
+		483FC426524984005BB98AE7AD8AD80040F03A3480E52400 /* qbvh.cl */ = {isa = PBXFileReference; lastKnownFileType = text; name = qbvh.cl; path = src/kernels/CL/qbvh.cl; sourceTree = "<group>"; };
+		4911DBEAD27C10008BA876DA990A0800A8FF8E48070C3000 /* fatbvhstrategy.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = fatbvhstrategy.h; path = src/strategy/fatbvhstrategy.h; sourceTree = "<group>"; };
+		49ED6699CF5F6C008523583769B958006A7B51C7A5F1B800 /* calc_intersection_device.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = calc_intersection_device.cpp; path = src/device/calc_intersection_device.cpp; sourceTree = "<group>"; };
+		4D2C0ED7AF9F84009307A360C156C0009208C3F936C4B000 /* plain_bvh_translator.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = plain_bvh_translator.cpp; path = src/translator/plain_bvh_translator.cpp; sourceTree = "<group>"; };
+		4D7CD755E551BC009025ED51873B58005FA095D27E626800 /* radeon_rays.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = radeon_rays.cpp; path = src/intersection/radeon_rays.cpp; sourceTree = "<group>"; };
+		4E498CAA88BB3400DF9010164B7B90007856DCB1A8B07000 /* hlbvh_build.comp */ = {isa = PBXFileReference; lastKnownFileType = text; name = hlbvh_build.comp; path = src/kernels/GLSL/hlbvh_build.comp; sourceTree = "<group>"; };
+		522E4F66C54334005835D45A89F88C0066C2555B3E673400 /* calc_intersection_device_cl.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = calc_intersection_device_cl.cpp; path = src/device/calc_intersection_device_cl.cpp; sourceTree = "<group>"; };
+		55EB961C4A1ED80069655CDDA5602C004E9C0C2A78BA7800 /* float2.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = float2.h; path = include/math/float2.h; sourceTree = "<group>"; };
+		57B7A399878A40002B919B971A180A001534ECB82F0AF10 /* bvhstrategy.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = bvhstrategy.h; path = src/strategy/bvhstrategy.h; sourceTree = "<group>"; };
+		58EADDBCB5D820008D829051AF99D80081E6F631E998E000 /* strategy.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = strategy.h; path = src/strategy/strategy.h; sourceTree = "<group>"; };
+		5D092B21C834B400360FA7A6F918AE0043AF5D760C30E400 /* hlbvh.cl */ = {isa = PBXFileReference; lastKnownFileType = text; name = hlbvh.cl; path = src/kernels/CL/hlbvh.cl; sourceTree = "<group>"; };
+		5DE5665D83EA3400FDCF70D9DB4FA80076E707528D5DC400 /* hlbvh_build.cl */ = {isa = PBXFileReference; lastKnownFileType = text; name = hlbvh_build.cl; path = src/kernels/CL/hlbvh_build.cl; sourceTree = "<group>"; };
+		633BBB5A8B7104006943404E50265C0077CFC14F04950400 /* calc_intersection_device_vk.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = calc_intersection_device_vk.cpp; path = src/device/calc_intersection_device_vk.cpp; sourceTree = "<group>"; };
+		67A02162E0598000B6B91912C4A0880044B132D4488DB400 /* kernels_cl.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = kernels_cl.h; path = src/kernelcache/kernels_cl.h; sourceTree = "<group>"; };
+		69470F714B53740030D514A57D4CBE00B1C6368CF72BF800 /* hlbvh.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = hlbvh.cpp; path = src/accelerator/hlbvh.cpp; sourceTree = "<group>"; };
+		717A52BB71501C0EA3BC8344C8BC0006BFD01E1BB281800 /* thread_pool.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = thread_pool.h; path = src/async/thread_pool.h; sourceTree = "<group>"; };
+		71E4D5AFA5E65C00B98D59CAEA3500007375C9262C5C3C00 /* bvh2l.comp */ = {isa = PBXFileReference; lastKnownFileType = text; name = bvh2l.comp; path = src/kernels/GLSL/bvh2l.comp; sourceTree = "<group>"; };
+		72D93CA8E7BBC000B56FD798AE49B800D2C6EF061C4BE000 /* hlbvh_strategy.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = hlbvh_strategy.h; path = src/strategy/hlbvh_strategy.h; sourceTree = "<group>"; };
+		7C9EFC76C5AE18005E895DAC5BD72C00BB67E0F71D3D8800 /* CLW.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = CLW.xcodeproj; path = ../CLW/CLW.xcodeproj; sourceTree = SOURCE_ROOT; };
+		84B50FCBC4793800B94CC260BE3AF800ADB12840F839F800 /* common.cl */ = {isa = PBXFileReference; lastKnownFileType = text; name = common.cl; path = src/kernels/CL/common.cl; sourceTree = "<group>"; };
+		8B23A27008BFC0009991A785FCBF08009BD9E04481AA2000 /* radeon_rays_impl.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = radeon_rays_impl.h; path = src/intersection/radeon_rays_impl.h; sourceTree = "<group>"; };
+		8D9370E5B99F000075254D1CE930D000BE3AFA86C43E1000 /* except.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = except.h; path = src/except/except.h; sourceTree = "<group>"; };
+		914B2107A6A338009FB9261D9AA28000A2015EDC1F8D9000 /* intersection_device.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = intersection_device.h; path = src/device/intersection_device.h; sourceTree = "<group>"; };
+		976D49F8BE92500F108B0D6BB7AF8003A1E5E4096883400 /* bvh.cl */ = {isa = PBXFileReference; lastKnownFileType = text; name = bvh.cl; path = src/kernels/CL/bvh.cl; sourceTree = "<group>"; };
+		99EA3B63655DE800E903331349A4F00076FB4CD4CD921C00 /* kernels_vk.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = kernels_vk.h; path = src/kernelcache/kernels_vk.h; sourceTree = "<group>"; };
+		9C4AE223A2C20000DEE17D13694FF800FC389480D7522000 /* progressreporter.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = progressreporter.h; path = src/util/progressreporter.h; sourceTree = "<group>"; };
+		9EC0F7E01DAB8FCC00DBE0A8 /* resource.mm */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.objcpp; fileEncoding = 4; name = resource.mm; path = src/resource.mm; sourceTree = "<group>"; };
+		9F3F67EBBDCC18003F29726815318800B84108E0C73FA800 /* bvhstrategy.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = bvhstrategy.cpp; path = src/strategy/bvhstrategy.cpp; sourceTree = "<group>"; };
+		A0FBE4B0CB2070005E7FB9EF13915000EFC02E5858302000 /* world.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = world.h; path = src/world/world.h; sourceTree = "<group>"; };
+		A1F7A17C0335100024AA4068C6A0D200B0B6D95005447800 /* hlbvh.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = hlbvh.h; path = src/accelerator/hlbvh.h; sourceTree = "<group>"; };
+		A3D3B80BA0D70000DF09A9A93B30F000C461A33977695000 /* fatnode_bvh_translator.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = fatnode_bvh_translator.cpp; path = src/translator/fatnode_bvh_translator.cpp; sourceTree = "<group>"; };
+		B293557E8C9CC800FA3BD999D0EB7000B42448F51312A800 /* calc_holder.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = calc_holder.h; path = src/device/calc_holder.h; sourceTree = "<group>"; };
+		B5734FB6DD7C8800FD1BD3D221CB2800B704432D63F26000 /* quaternion.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = quaternion.h; path = include/math/quaternion.h; sourceTree = "<group>"; };
+		B66C4569C002D00096E514D7587AC0003221B3678461AE00 /* calc_intersection_device_cl.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = calc_intersection_device_cl.h; path = src/device/calc_intersection_device_cl.h; sourceTree = "<group>"; };
+		BAC2E864ED33800028C1656C43C0EA00E21066FE1C3A0000 /* int2.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = int2.h; path = include/math/int2.h; sourceTree = "<group>"; };
+		BB6C1D91FC77E000CEE5E45357B93000B41C93A02B137800 /* float3.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = float3.h; path = include/math/float3.h; sourceTree = "<group>"; };
+		BCE9A1ABA700800049225C6EB4F22C0BE7A95222D765800 /* hlbvh.comp */ = {isa = PBXFileReference; lastKnownFileType = text; name = hlbvh.comp; path = src/kernels/GLSL/hlbvh.comp; sourceTree = "<group>"; };
+		BD7319A11CC8B800140CAC207B4E170B81433224F9AA800 /* ray.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = ray.h; path = include/math/ray.h; sourceTree = "<group>"; };
+		C1BBA688DDC028009642AA4220ED100C34C99FF64360800 /* alignedalloc.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = alignedalloc.h; path = src/util/alignedalloc.h; sourceTree = "<group>"; };
+		C2F377D7F40D80003C291B1206375A00288EAB443A284400 /* split_bvh.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = split_bvh.cpp; path = src/accelerator/split_bvh.cpp; sourceTree = "<group>"; };
+		C9707550D2B11800B10251880242E800FA17FEF1DD502800 /* options.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = options.h; path = src/util/options.h; sourceTree = "<group>"; };
+		CA1187D17CCB48009DEB7FCF0F59100073AD33037831B800 /* fatbvh.comp */ = {isa = PBXFileReference; lastKnownFileType = text; name = fatbvh.comp; path = src/kernels/GLSL/fatbvh.comp; sourceTree = "<group>"; };
+		CE6ACA68993D600C6355860FAB67800654AB737B07D2400 /* mathutils.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = mathutils.h; path = include/math/mathutils.h; sourceTree = "<group>"; };
+		D2EB9A5404E29800E66561156023E800CB9C1062337E3000 /* libRadeonRays64D.dylib */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.dylib"; includeInIndex = 0; path = libRadeonRays64D.dylib; sourceTree = BUILT_PRODUCTS_DIR; };
+		D83EE9C4EEBBA8009F370D314A1BD0007F53AE488C5F7000 /* Calc.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = Calc.xcodeproj; path = ../Calc/Calc.xcodeproj; sourceTree = SOURCE_ROOT; };
+		D9BE1BC531FDA000ED37E2868D3EF000D26E91D360994000 /* grid.cl */ = {isa = PBXFileReference; lastKnownFileType = text; name = grid.cl; path = src/kernels/CL/grid.cl; sourceTree = "<group>"; };
+		DB0BD9E57F36E8001DB4EFE121208000ED2F986218479000 /* bvh2lstrategy.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = bvh2lstrategy.cpp; path = src/strategy/bvh2lstrategy.cpp; sourceTree = "<group>"; };
+		E514CC7D5F238800C838EF85F49A480049FA29336336A000 /* shapeimpl.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = shapeimpl.h; path = src/primitive/shapeimpl.h; sourceTree = "<group>"; };
+		E7D6F6176A973000DDA01EFC4984700AD1D08788BDF4000 /* plain_bvh_translator.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = plain_bvh_translator.h; path = src/translator/plain_bvh_translator.h; sourceTree = "<group>"; };
+		EB3BB0EFB2E998001909CEE1DB245200FC3902AEC2BFE000 /* bvh.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = bvh.h; path = src/accelerator/bvh.h; sourceTree = "<group>"; };
+		EF9E43A71B0028003180A6876417BA0E84EB9B5499BC800 /* matrix.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = matrix.h; path = include/math/matrix.h; sourceTree = "<group>"; };
+		F431A74A656FD80030EAAECE33932A0027E10991BAA17C00 /* split_bvh.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = split_bvh.h; path = src/accelerator/split_bvh.h; sourceTree = "<group>"; };
+		F73A5C4BA0842000465353FB84CB2800D44B6DBD08B85800 /* radeon_rays_vk.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = radeon_rays_vk.h; path = include/radeon_rays_vk.h; sourceTree = "<group>"; };
+		F75A87EA526BA800D061046F834FA000DE00BA3E9667D800 /* options.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = options.cpp; path = src/util/options.cpp; sourceTree = "<group>"; };
+		F76AA6E4CFF6A00A0BD2DDA0FBFC8003983FA756CF4A800 /* fatbvhstrategy.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = fatbvhstrategy.cpp; path = src/strategy/fatbvhstrategy.cpp; sourceTree = "<group>"; };
+		FA7A3163C6B9400D735A84A6E64E0005826CA31E8441C00 /* radeon_rays.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = radeon_rays.h; path = include/radeon_rays.h; sourceTree = "<group>"; };
+		FD431FCC1B537800D6499C514C377000E3E952205F4FA800 /* bvh2l.cl */ = {isa = PBXFileReference; lastKnownFileType = text; name = bvh2l.cl; path = src/kernels/CL/bvh2l.cl; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		EAE22E5AE7F4780058E0AB623E81E000122FACF416FAF400 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				D976E4A8A4D148004D643064FB4ABC0076255927F472FC00 /* libCalc64D.a in Frameworks */,
+				4BBBB78CB9EB8400FC9E50A7B2B64800B2D7619E3D2AA800 /* libCLW64D.a in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		32CDF22F31DE4A00F051C76D7A4F300081923BD6BEEE0000 /* translator */ = {
+			isa = PBXGroup;
+			children = (
+				A3D3B80BA0D70000DF09A9A93B30F000C461A33977695000 /* fatnode_bvh_translator.cpp */,
+				17A27738FF9CD8005D7E0BC2115418005C7F2C5A86C20800 /* fatnode_bvh_translator.h */,
+				4D2C0ED7AF9F84009307A360C156C0009208C3F936C4B000 /* plain_bvh_translator.cpp */,
+				E7D6F6176A973000DDA01EFC4984700AD1D08788BDF4000 /* plain_bvh_translator.h */,
+			);
+			name = translator;
+			sourceTree = "<group>";
+		};
+		52FBA05238063C0067698758DB51C400BDFA0409F6229000 /* util */ = {
+			isa = PBXGroup;
+			children = (
+				C1BBA688DDC028009642AA4220ED100C34C99FF64360800 /* alignedalloc.h */,
+				F75A87EA526BA800D061046F834FA000DE00BA3E9667D800 /* options.cpp */,
+				C9707550D2B11800B10251880242E800FA17FEF1DD502800 /* options.h */,
+				9C4AE223A2C20000DEE17D13694FF800FC389480D7522000 /* progressreporter.h */,
+			);
+			name = util;
+			sourceTree = "<group>";
+		};
+		56335D97DD5168001429FC5D803F90008D3BACF40F657000 /* kernels */ = {
+			isa = PBXGroup;
+			children = (
+				C35DE0D9C17548009ADF65D0C4E6200089D2B8414652C000 /* CL */,
+				F10408FADC3C880071D6FB4F34F2480B5DA02BE36B1F80 /* GLSL */,
+			);
+			name = kernels;
+			sourceTree = "<group>";
+		};
+		5951583BB749BC005B5F55D7DD6FEC00706D7FCB4476E000 /* primitive */ = {
+			isa = PBXGroup;
+			children = (
+				2C3E0BF91A2B7200F3CC112D4C24B80074BD3314C603F800 /* instance.h */,
+				1CD587A59E42CB009F88269261AE90002B94BF79A0523200 /* mesh.cpp */,
+				1D1AF8C06C23C1004AE916B2945E78002E184A7F7BFA0800 /* mesh.h */,
+				E514CC7D5F238800C838EF85F49A480049FA29336336A000 /* shapeimpl.h */,
+			);
+			name = primitive;
+			sourceTree = "<group>";
+		};
+		613D026D9804C00048C0C5AA3C575C008563330D4E8FA800 /* async */ = {
+			isa = PBXGroup;
+			children = (
+				717A52BB71501C0EA3BC8344C8BC0006BFD01E1BB281800 /* thread_pool.h */,
+			);
+			name = async;
+			sourceTree = "<group>";
+		};
+		6492700A959038003C13F50199010A002B0747721A6DAE00 /* device */ = {
+			isa = PBXGroup;
+			children = (
+				B293557E8C9CC800FA3BD999D0EB7000B42448F51312A800 /* calc_holder.h */,
+				49ED6699CF5F6C008523583769B958006A7B51C7A5F1B800 /* calc_intersection_device.cpp */,
+				27361B83168F200484EF64143203000475016D9B88E2000 /* calc_intersection_device.h */,
+				522E4F66C54334005835D45A89F88C0066C2555B3E673400 /* calc_intersection_device_cl.cpp */,
+				B66C4569C002D00096E514D7587AC0003221B3678461AE00 /* calc_intersection_device_cl.h */,
+				633BBB5A8B7104006943404E50265C0077CFC14F04950400 /* calc_intersection_device_vk.cpp */,
+				42109FA39E58B00022896F1136D0A000BDC60DA162B79000 /* calc_intersection_device_vk.h */,
+				914B2107A6A338009FB9261D9AA28000A2015EDC1F8D9000 /* intersection_device.h */,
+			);
+			name = device;
+			sourceTree = "<group>";
+		};
+		70F90510E1E8A00DE911548118F6000CD8467B892FC0000 /* math */ = {
+			isa = PBXGroup;
+			children = (
+				303B30B49156F6009E39ADBBE7E460005788AF4DC05D7400 /* bbox.h */,
+				55EB961C4A1ED80069655CDDA5602C004E9C0C2A78BA7800 /* float2.h */,
+				BB6C1D91FC77E000CEE5E45357B93000B41C93A02B137800 /* float3.h */,
+				BAC2E864ED33800028C1656C43C0EA00E21066FE1C3A0000 /* int2.h */,
+				CE6ACA68993D600C6355860FAB67800654AB737B07D2400 /* mathutils.h */,
+				EF9E43A71B0028003180A6876417BA0E84EB9B5499BC800 /* matrix.h */,
+				B5734FB6DD7C8800FD1BD3D221CB2800B704432D63F26000 /* quaternion.h */,
+				BD7319A11CC8B800140CAC207B4E170B81433224F9AA800 /* ray.h */,
+			);
+			name = math;
+			sourceTree = "<group>";
+		};
+		7806C7175E8C74005F8A8A5402DF10009C2CF7B715175800 /* include */ = {
+			isa = PBXGroup;
+			children = (
+				70F90510E1E8A00DE911548118F6000CD8467B892FC0000 /* math */,
+				FA7A3163C6B9400D735A84A6E64E0005826CA31E8441C00 /* radeon_rays.h */,
+				15270513DC1E2D0506B68012208EC00DE6381C2A5F61800 /* radeon_rays_cl.h */,
+				F73A5C4BA0842000465353FB84CB2800D44B6DBD08B85800 /* radeon_rays_vk.h */,
+			);
+			name = include;
+			sourceTree = "<group>";
+		};
+		8C4C1B1E9B66100066197E3BBD31C000D1E4D8E0F9E6E800 /* intersection */ = {
+			isa = PBXGroup;
+			children = (
+				4D7CD755E551BC009025ED51873B58005FA095D27E626800 /* radeon_rays.cpp */,
+				387DF80EDD958A0029F3BEF1EA203E00130F8BF065050900 /* radeon_rays_impl.cpp */,
+				8B23A27008BFC0009991A785FCBF08009BD9E04481AA2000 /* radeon_rays_impl.h */,
+			);
+			name = intersection;
+			sourceTree = "<group>";
+		};
+		8E1F9F995775D800C4C07E444366E0004A20803959E7A40 /* src */ = {
+			isa = PBXGroup;
+			children = (
+				DDEB2D49CCE8B800BB94B3BF5237480EEE87F08DCBF0000 /* accelerator */,
+				613D026D9804C00048C0C5AA3C575C008563330D4E8FA800 /* async */,
+				6492700A959038003C13F50199010A002B0747721A6DAE00 /* device */,
+				9AB81638401E100072399B2F438EE400612CED9FC4FB8800 /* except */,
+				8C4C1B1E9B66100066197E3BBD31C000D1E4D8E0F9E6E800 /* intersection */,
+				D81B963C995248005E9B42EC18D0280E918E7FBA9289000 /* kernelcache */,
+				56335D97DD5168001429FC5D803F90008D3BACF40F657000 /* kernels */,
+				5951583BB749BC005B5F55D7DD6FEC00706D7FCB4476E000 /* primitive */,
+				D03834F21EBCC000E6519BAC35CF6000EA91CC2325EB5800 /* strategy */,
+				32CDF22F31DE4A00F051C76D7A4F300081923BD6BEEE0000 /* translator */,
+				52FBA05238063C0067698758DB51C400BDFA0409F6229000 /* util */,
+				FE3C51165828D000E5C01452FC7B7000226281B60EB3B800 /* world */,
+				9EC0F7E01DAB8FCC00DBE0A8 /* resource.mm */,
+			);
+			name = src;
+			sourceTree = "<group>";
+		};
+		8FF77481F63DB000C698532CE22EB800679DCEC34665280 /* RadeonRays */ = {
+			isa = PBXGroup;
+			children = (
+				7806C7175E8C74005F8A8A5402DF10009C2CF7B715175800 /* include */,
+				8E1F9F995775D800C4C07E444366E0004A20803959E7A40 /* src */,
+				DE2FD571A6C938008E134D4D9B3FB000BA17F9BDEA135000 /* Products */,
+				DE2FDC7F9D9690008E13545B920D0800BA1800CBE0E0A800 /* Projects */,
+			);
+			name = RadeonRays;
+			sourceTree = "<group>";
+		};
+		9AB81638401E100072399B2F438EE400612CED9FC4FB8800 /* except */ = {
+			isa = PBXGroup;
+			children = (
+				8D9370E5B99F000075254D1CE930D000BE3AFA86C43E1000 /* except.h */,
+			);
+			name = except;
+			sourceTree = "<group>";
+		};
+		C35DE0D9C17548009ADF65D0C4E6200089D2B8414652C000 /* CL */ = {
+			isa = PBXGroup;
+			children = (
+				976D49F8BE92500F108B0D6BB7AF8003A1E5E4096883400 /* bvh.cl */,
+				FD431FCC1B537800D6499C514C377000E3E952205F4FA800 /* bvh2l.cl */,
+				84B50FCBC4793800B94CC260BE3AF800ADB12840F839F800 /* common.cl */,
+				38EE2E1F6502CE006D85E0B45EC48C0061EA469498C38C00 /* fatbvh.cl */,
+				D9BE1BC531FDA000ED37E2868D3EF000D26E91D360994000 /* grid.cl */,
+				5D092B21C834B400360FA7A6F918AE0043AF5D760C30E400 /* hlbvh.cl */,
+				5DE5665D83EA3400FDCF70D9DB4FA80076E707528D5DC400 /* hlbvh_build.cl */,
+				483FC426524984005BB98AE7AD8AD80040F03A3480E52400 /* qbvh.cl */,
+			);
+			name = CL;
+			sourceTree = "<group>";
+		};
+		D03834F21EBCC000E6519BAC35CF6000EA91CC2325EB5800 /* strategy */ = {
+			isa = PBXGroup;
+			children = (
+				DB0BD9E57F36E8001DB4EFE121208000ED2F986218479000 /* bvh2lstrategy.cpp */,
+				23AF5416C849DE00C3995E931FAF50003CB0F50BD1BD6C00 /* bvh2lstrategy.h */,
+				9F3F67EBBDCC18003F29726815318800B84108E0C73FA800 /* bvhstrategy.cpp */,
+				57B7A399878A40002B919B971A180A001534ECB82F0AF10 /* bvhstrategy.h */,
+				F76AA6E4CFF6A00A0BD2DDA0FBFC8003983FA756CF4A800 /* fatbvhstrategy.cpp */,
+				4911DBEAD27C10008BA876DA990A0800A8FF8E48070C3000 /* fatbvhstrategy.h */,
+				313BDCA401BCA600C282600FC47D08005B492CAB21B1E400 /* hlbvh_strategy.cpp */,
+				72D93CA8E7BBC000B56FD798AE49B800D2C6EF061C4BE000 /* hlbvh_strategy.h */,
+				58EADDBCB5D820008D829051AF99D80081E6F631E998E000 /* strategy.h */,
+			);
+			name = strategy;
+			sourceTree = "<group>";
+		};
+		D81B963C995248005E9B42EC18D0280E918E7FBA9289000 /* kernelcache */ = {
+			isa = PBXGroup;
+			children = (
+				67A02162E0598000B6B91912C4A0880044B132D4488DB400 /* kernels_cl.h */,
+				99EA3B63655DE800E903331349A4F00076FB4CD4CD921C00 /* kernels_vk.h */,
+			);
+			name = kernelcache;
+			sourceTree = "<group>";
+		};
+		DDEB2D49CCE8B800BB94B3BF5237480EEE87F08DCBF0000 /* accelerator */ = {
+			isa = PBXGroup;
+			children = (
+				46314F04A51D6400C8E3EDF16889280054F086D8A72CC800 /* bvh.cpp */,
+				EB3BB0EFB2E998001909CEE1DB245200FC3902AEC2BFE000 /* bvh.h */,
+				69470F714B53740030D514A57D4CBE00B1C6368CF72BF800 /* hlbvh.cpp */,
+				A1F7A17C0335100024AA4068C6A0D200B0B6D95005447800 /* hlbvh.h */,
+				C2F377D7F40D80003C291B1206375A00288EAB443A284400 /* split_bvh.cpp */,
+				F431A74A656FD80030EAAECE33932A0027E10991BAA17C00 /* split_bvh.h */,
+			);
+			name = accelerator;
+			sourceTree = "<group>";
+		};
+		DE2FD571A6C938008E134D4D9B3FB000BA17F9BDEA135000 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				D2EB9A5404E29800E66561156023E800CB9C1062337E3000 /* libRadeonRays64D.dylib */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		DE2FDC7F9D9690008E13545B920D0800BA1800CBE0E0A800 /* Projects */ = {
+			isa = PBXGroup;
+			children = (
+				D83EE9C4EEBBA8009F370D314A1BD0007F53AE488C5F7000 /* Calc.xcodeproj */,
+				7C9EFC76C5AE18005E895DAC5BD72C00BB67E0F71D3D8800 /* CLW.xcodeproj */,
+			);
+			name = Projects;
+			sourceTree = "<group>";
+		};
+		EBE92B0279363000C52F68FF729C38005175A85466379000 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				3E291E3A99F78600C1716ADCAA446800D7DBE48FA8313800 /* libCalc64D.a */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		F10408FADC3C880071D6FB4F34F2480B5DA02BE36B1F80 /* GLSL */ = {
+			isa = PBXGroup;
+			children = (
+				37AF83291C5744006C4735BE1619000060AB9B9E50180400 /* bvh.comp */,
+				71E4D5AFA5E65C00B98D59CAEA3500007375C9262C5C3C00 /* bvh2l.comp */,
+				CA1187D17CCB48009DEB7FCF0F59100073AD33037831B800 /* fatbvh.comp */,
+				BCE9A1ABA700800049225C6EB4F22C0BE7A95222D765800 /* hlbvh.comp */,
+				4E498CAA88BB3400DF9010164B7B90007856DCB1A8B07000 /* hlbvh_build.comp */,
+			);
+			name = GLSL;
+			sourceTree = "<group>";
+		};
+		FA1497690E04F000102DFE2325178900146E2E9A15338400 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				1121AA06BA7508002886580DEDF44800BB781A1B05EE2800 /* libCLW64D.a */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		FE3C51165828D000E5C01452FC7B7000226281B60EB3B800 /* world */ = {
+			isa = PBXGroup;
+			children = (
+				464224E851C6CC0DE31856BA6E8180049FCE010E39D4400 /* world.cpp */,
+				A0FBE4B0CB2070005E7FB9EF13915000EFC02E5858302000 /* world.h */,
+			);
+			name = world;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		B10F78DD4FD678008ADCDBFA71A22800F6A8369FAE575000 /* RadeonRays */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = EAE22E59D62FC00058E0AB612CBD2800122FACF305363D00 /* Build configuration list for PBXNativeTarget "RadeonRays" */;
+			buildPhases = (
+				EAE22E5E57DBF80058E0AB65AE696000122FACF786E27500 /* Resources */,
+				EAE22E5EC189100058E0AB6618167C00122FACF7F08F8E00 /* Sources */,
+				EAE22E5AE7F4780058E0AB623E81E000122FACF416FAF400 /* Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				EBFC253966EE7000C5426336605470005188A28B53EFD000 /* PBXTargetDependency */,
+				FA27919FFBBD28001040F85A12CFC600148128D102EBC100 /* PBXTargetDependency */,
+			);
+			name = RadeonRays;
+			productName = RadeonRays;
+			productReference = D2EB9A5404E29800E66561156023E800CB9C1062337E3000 /* libRadeonRays64D.dylib */;
+			productType = "com.apple.product-type.library.dynamic";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		08FB7793FE84155DC02AAC07 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+			};
+			buildConfigurationList = 1DEB928908733DD80010E9CD /* Build configuration list for PBXProject "RadeonRays" */;
+			compatibilityVersion = "Xcode 3.2";
+			developmentRegion = English;
+			hasScannedForEncodings = 1;
+			knownRegions = (
+				en,
+			);
+			mainGroup = 8FF77481F63DB000C698532CE22EB800679DCEC34665280 /* RadeonRays */;
+			projectDirPath = "";
+			projectReferences = (
+				{
+					ProductGroup = EBE92B0279363000C52F68FF729C38005175A85466379000 /* Products */;
+					ProjectRef = D83EE9C4EEBBA8009F370D314A1BD0007F53AE488C5F7000 /* Calc.xcodeproj */;
+				},
+				{
+					ProductGroup = FA1497690E04F000102DFE2325178900146E2E9A15338400 /* Products */;
+					ProjectRef = 7C9EFC76C5AE18005E895DAC5BD72C00BB67E0F71D3D8800 /* CLW.xcodeproj */;
+				},
+			);
+			projectRoot = "";
+			targets = (
+				B10F78DD4FD678008ADCDBFA71A22800F6A8369FAE575000 /* RadeonRays */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXReferenceProxy section */
+		1121AA06BA7508002886580DEDF44800BB781A1B05EE2800 /* libCLW64D.a */ = {
+			isa = PBXReferenceProxy;
+			fileType = archive.ar;
+			path = libCLW64D.a;
+			remoteRef = 3CA784E420217E0015EDC2E119877F00A23402360D22E000 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		3E291E3A99F78600C1716ADCAA446800D7DBE48FA8313800 /* libCalc64D.a */ = {
+			isa = PBXReferenceProxy;
+			fileType = archive.ar;
+			path = libCalc64D.a;
+			remoteRef = 690E8BAAF17B5C006B1C894717A18C00802AB33A7EA88000 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+/* End PBXReferenceProxy section */
+
+/* Begin PBXResourcesBuildPhase section */
+		EAE22E5E57DBF80058E0AB65AE696000122FACF786E27500 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		EAE22E5EC189100058E0AB6618167C00122FACF7F08F8E00 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				56C5AD46EDF6D4002A9FA54480849C00615878E95D40CC /* bvh.cpp in Sources */,
+				71E5F88E0FC7900011D0030A672D02008AE79983193B2000 /* hlbvh.cpp in Sources */,
+				4D243D60F56A68004A194AC869C4AC002FC5ABAFE7A83600 /* split_bvh.cpp in Sources */,
+				8D8931D3D1340800F317E1C4853020004CE125B566E26000 /* calc_intersection_device.cpp in Sources */,
+				F0F8DD47136E9800394687994D394E00F22C87490294A000 /* calc_intersection_device_cl.cpp in Sources */,
+				F7C198DFEC73F800400F4332263EB000F8F542E1DB9A0000 /* calc_intersection_device_vk.cpp in Sources */,
+				555696AB7BABB000F7CE856C8B90D8005434364D78046400 /* radeon_rays.cpp in Sources */,
+				9EC0F7E11DAB8FCC00DBE0A8 /* resource.mm in Sources */,
+				B7B312B323AAE000452150531112700082620A4FAE0C6000 /* radeon_rays_impl.cpp in Sources */,
+				29CE5A8956A6F600FDA85286E934C000D36A05BB520D6000 /* mesh.cpp in Sources */,
+				DA77571A3E1C00007CEF45DB4E012C00D954F6BC3A74B800 /* bvh2lstrategy.cpp in Sources */,
+				9AD8EB3ED14CB000366FA594D0EF9400D1A8236C0B444800 /* bvhstrategy.cpp in Sources */,
+				E50466AA7DB3780053309EF1B94758011C876BCF312BB00 /* fatbvhstrategy.cpp in Sources */,
+				BE31EA9412F77000DE608DD8B0D87000EAF5FAA68856B800 /* hlbvh_strategy.cpp in Sources */,
+				BBA25F29D9E9380021310F1A8DE554007AFA530B6F979000 /* fatnode_bvh_translator.cpp in Sources */,
+				BA843EAEF8AF6000D9BAC69753FAB000D269B33A422C9000 /* plain_bvh_translator.cpp in Sources */,
+				9425844EF6140000E33E7BFEDA5B0800713695C05E483400 /* options.cpp in Sources */,
+				60FE1844251AA000A8A69C5F69694800628F0BBAAB908000 /* world.cpp in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		EBFC253966EE7000C5426336605470005188A28B53EFD000 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = libCalc64D.a;
+			targetProxy = 6B80CCE143B5D0006D8ECA7D69DC0000829CF470D0E2F800 /* PBXContainerItemProxy */;
+		};
+		FA27919FFBBD28001040F85A12CFC600148128D102EBC100 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = libCLW64D.a;
+			targetProxy = 3F19C61A725BF000186004176BC1F200A4A6436C5F5D5000 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin XCBuildConfiguration section */
+		493AAE9EF5F7BC001D14A69C88858600F2D659D0F15E2800 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CONFIGURATION_BUILD_DIR = ../Bin/Release/x64;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				EXECUTABLE_PREFIX = lib;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"PRORAY_UNITTEST=1",
+					"USE_OPENCL=1",
+					NDEBUG,
+					CALC_STATIC_LIBRARY,
+					EXPORT_API,
+					RR_EMBED_KERNELS,
+				);
+				HEADER_SEARCH_PATHS = ../;
+				INSTALL_PATH = /usr/local/lib;
+				PRODUCT_NAME = RadeonRays64;
+			};
+			name = Release;
+		};
+		5C195BE77F1E8000341586B8ADC4D400505A07E07062E40 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CONFIGURATION_BUILD_DIR = "$(SYMROOT)";
+				CONFIGURATION_TEMP_DIR = "$(OBJROOT)";
+				COPY_PHASE_STRIP = NO;
+				GCC_ENABLE_FIX_AND_CONTINUE = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"PRORAY_UNITTEST=1",
+					"USE_OPENCL=1",
+					_DEBUG,
+					CALC_STATIC_LIBRARY,
+					EXPORT_API,
+				);
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				OBJROOT = obj/x64/Debug;
+				ONLY_ACTIVE_ARCH = YES;
+				OTHER_LDFLAGS = (
+					"-framework",
+					OpenCL,
+					"-Wl,-install_name",
+					"-Wl,@loader_path/libRadeonRays64D.dylib",
+				);
+				SYMROOT = ../Bin/Debug/x64;
+				USER_HEADER_SEARCH_PATHS = ".. ../3rdParty/include include ../Calc/inc";
+			};
+			name = Debug;
+		};
+		BF2761704AAE40006CFE58B8EFCE340C0B854E6D1241800 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CONFIGURATION_BUILD_DIR = ../Bin/Debug/x64;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				EXECUTABLE_PREFIX = lib;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"PRORAY_UNITTEST=1",
+					"USE_OPENCL=1",
+					_DEBUG,
+					CALC_STATIC_LIBRARY,
+					EXPORT_API,
+					RR_EMBED_KERNELS,
+				);
+				HEADER_SEARCH_PATHS = ../;
+				INSTALL_PATH = /usr/local/lib;
+				PRODUCT_NAME = RadeonRays64D;
+			};
+			name = Debug;
+		};
+		C82C2D69B525F0008FDE514126B108005D3BF1C1D5B23000 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CONFIGURATION_BUILD_DIR = "$(SYMROOT)";
+				CONFIGURATION_TEMP_DIR = "$(OBJROOT)";
+				GCC_OPTIMIZATION_LEVEL = 3;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"PRORAY_UNITTEST=1",
+					"USE_OPENCL=1",
+					NDEBUG,
+					CALC_STATIC_LIBRARY,
+					EXPORT_API,
+				);
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				OBJROOT = obj/x64/Release;
+				ONLY_ACTIVE_ARCH = NO;
+				OTHER_LDFLAGS = (
+					"-framework",
+					OpenCL,
+					"-Wl,-install_name",
+					"-Wl,@loader_path/libRadeonRays64.dylib",
+				);
+				SYMROOT = ../Bin/Release/x64;
+				USER_HEADER_SEARCH_PATHS = ".. ../3rdParty/include include ../Calc/inc";
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		1DEB928908733DD80010E9CD /* Build configuration list for PBXProject "RadeonRays" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				5C195BE77F1E8000341586B8ADC4D400505A07E07062E40 /* Debug */,
+				C82C2D69B525F0008FDE514126B108005D3BF1C1D5B23000 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		EAE22E59D62FC00058E0AB612CBD2800122FACF305363D00 /* Build configuration list for PBXNativeTarget "RadeonRays" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				BF2761704AAE40006CFE58B8EFCE340C0B854E6D1241800 /* Debug */,
+				493AAE9EF5F7BC001D14A69C88858600F2D659D0F15E2800 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 08FB7793FE84155DC02AAC07 /* Project object */;
+}

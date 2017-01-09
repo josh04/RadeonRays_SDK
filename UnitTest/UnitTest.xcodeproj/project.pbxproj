@@ -1,0 +1,461 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 46;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		4BBBB78CB9EB8400FC9E50A7B2B64800B2D7619E3D2AA800 /* libCLW64D.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 1121AA06BA7508002886580DEDF44800BB781A1B05EE2800 /* libCLW64D.a */; };
+		B62CBE278A7DA0009DBE9A5EBA0F7000E6D447C8951CB000 /* utils.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2E824BABBCACA400EC78EA715F9AC800658A9B07EEC0A800 /* utils.cpp */; };
+		C685A08175DC68007FD44C3BE6FF08001EE9AB129CC5B400 /* test_main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C2B569FB6C46D800F08387ED94819000D3B2BBBA7C1D1800 /* test_main.cpp */; };
+		C97F95F1DB28C800EDEEC21DB5D010004B9D27839A110C00 /* libGtest64D.a in Frameworks */ = {isa = PBXBuildFile; fileRef = F1090023B9A788006796FD8B10BD3000C286AFF53D05C800 /* libGtest64D.a */; };
+		D976E4A8A4D148004D643064FB4ABC0076255927F472FC00 /* libCalc64D.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 3E291E3A99F78600C1716ADCAA446800D7DBE48FA8313800 /* libCalc64D.a */; };
+		DFD7A0893A6D98002280B684DC573400F1FB5F05D37E4800 /* tiny_obj_loader.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4075AB878E3EF8007D2EB30B5C624C0074250DCEE3709C00 /* tiny_obj_loader.cpp */; };
+		EE6D53F141D19000D5C51B28B4D5F000BC0EAF1B1948E800 /* libRadeonRays64D.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = BB7627C8F3C3B800602761808274EC0097EBE05FDDFF0800 /* libRadeonRays64D.dylib */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		3B5B56B7805AB2001528B9D4A2265E0080F41479DEDB8800 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = DFA51645FBD16800DC8FFCD31D6DA0005F6D534315E43C00 /* ../RadeonRays/RadeonRays.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = D2EB9A5404E29800E66561156023E800CB9C1062337E3000;
+			remoteInfo = libRadeonRays64D.dylib;
+		};
+		3CA784E420217E0015EDC2E119877F00A23402360D22E000 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 7C9EFC76C5AE18005E895DAC5BD72C00BB67E0F71D3D8800 /* ../CLW/CLW.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = B33BA949C84CD8007132480F6B3B0000EA43F8A5FA60E000;
+			remoteInfo = libCLW64D.a;
+		};
+		3DCD97EDD2952400179AFB0AF460D100836655B03115F800 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = DFA51645FBD16800DC8FFCD31D6DA0005F6D534315E43C00 /* ../RadeonRays/RadeonRays.xcodeproj */;
+			proxyType = 1;
+			remoteGlobalIDString = B10F78DD4FD678008ADCDBFA71A22800F6A8369FAE575000;
+			remoteInfo = libRadeonRays64D.dylib;
+		};
+		3F19C61A725BF000186004176BC1F200A4A6436C5F5D5000 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 7C9EFC76C5AE18005E895DAC5BD72C00BB67E0F71D3D8800 /* ../CLW/CLW.xcodeproj */;
+			proxyType = 1;
+			remoteGlobalIDString = 1CB4CEA6B2D9B000E466F27E2464C800B1C492FED365F000;
+			remoteInfo = libCLW64D.a;
+		};
+		690E8BAAF17B5C006B1C894717A18C00802AB33A7EA88000 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = D83EE9C4EEBBA8009F370D314A1BD0007F53AE488C5F7000 /* ../Calc/Calc.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = B4FEB10E7B4A380031C928887BFD3400CD10EBF0EFDF0800;
+			remoteInfo = libCalc64D.a;
+		};
+		6B80CCE143B5D0006D8ECA7D69DC0000829CF470D0E2F800 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = D83EE9C4EEBBA8009F370D314A1BD0007F53AE488C5F7000 /* ../Calc/Calc.xcodeproj */;
+			proxyType = 1;
+			remoteGlobalIDString = CF2F14B46AB2D0008D25B37A0DA0F80063764109CC6D800;
+			remoteInfo = libCalc64D.a;
+		};
+		B586B1D3DA76E000F95462F4C5630800B027CB550D48D000 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = ECA826AD7E40380040CD4B4B1BF750096FE96C1C9B95000 /* ../Gtest/Gtest.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 65055871D84A78007B1EBF2BEF5D14007F5EEFA2DF791000;
+			remoteInfo = libGtest64D.a;
+		};
+		B7F8F30A2CB15000FBC6A42B179D7800B29A0C8B5F834000 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = ECA826AD7E40380040CD4B4B1BF750096FE96C1C9B95000 /* ../Gtest/Gtest.xcodeproj */;
+			proxyType = 1;
+			remoteGlobalIDString = 3104090A3D1DB807FDAB80AA484D8001B227B731866AA00;
+			remoteInfo = libGtest64D.a;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXFileReference section */
+		127AE46AC23D98009FE9220AAFA52800DD29DC074C9F2000 /* radeon_rays_performance_test_cl.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = radeon_rays_performance_test_cl.h; path = radeon_rays_performance_test_cl.h; sourceTree = "<group>"; };
+		19C80B579E423D00A73648F78BA9D000E47702F428A3C000 /* radeon_rays_conformance_test_cl.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = radeon_rays_conformance_test_cl.h; path = radeon_rays_conformance_test_cl.h; sourceTree = "<group>"; };
+		2E824BABBCACA400EC78EA715F9AC800658A9B07EEC0A800 /* utils.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = utils.cpp; path = utils.cpp; sourceTree = "<group>"; };
+		3345F273E9C0C600C0B43013D7285800FDF4EA1074225000 /* radeon_rays_performance_test_vk.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = radeon_rays_performance_test_vk.h; path = radeon_rays_performance_test_vk.h; sourceTree = "<group>"; };
+		3A931960C5C56C00C8015700B32D000054210FD5026F240 /* radeon_rays_conformance_test_vk.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = radeon_rays_conformance_test_vk.h; path = radeon_rays_conformance_test_vk.h; sourceTree = "<group>"; };
+		4075AB878E3EF8007D2EB30B5C624C0074250DCEE3709C00 /* tiny_obj_loader.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = tiny_obj_loader.cpp; path = tiny_obj_loader.cpp; sourceTree = "<group>"; };
+		4F116586C040540028DEC8A3E20C020094AA23491EC12800 /* calc_test_vk.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = calc_test_vk.h; path = calc_test_vk.h; sourceTree = "<group>"; };
+		5673854E3F97E800F8EB740F4F7D1800555124F03BF0A000 /* radeon_rays_apitest_embree.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = radeon_rays_apitest_embree.h; path = radeon_rays_apitest_embree.h; sourceTree = "<group>"; };
+		6BE9E91CE62DE000E51F8C56F857B800D1851C892C48A800 /* radeon_rays_test_cl.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = radeon_rays_test_cl.h; path = radeon_rays_test_cl.h; sourceTree = "<group>"; };
+		703891296DC0A00CDFBAC7EF23C3000AE184D96347FD000 /* radeon_rays_conformance_test_embree.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = radeon_rays_conformance_test_embree.h; path = radeon_rays_conformance_test_embree.h; sourceTree = "<group>"; };
+		7658416CCD35CC00344EE0327023F200AD6090C8FF49D000 /* UnitTest64D */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; name = UnitTest64D; path = UnitTest64D; sourceTree = BUILT_PRODUCTS_DIR; };
+		7C9EFC76C5AE18005E895DAC5BD72C00BB67E0F71D3D8800 /* libCLW64D.a */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = "CLW.xcodeproj"; path = ../CLW/CLW.xcodeproj; sourceTree = SOURCE_ROOT; };
+		89EAB271B8243000716E75AE5C76D000AE10E3116EAF1800 /* utils.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = utils.h; path = utils.h; sourceTree = "<group>"; };
+		9A78D5263D1490006206DA5A6F0DDC00E2F7FC41E8ED1800 /* tiny_obj_loader.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = tiny_obj_loader.h; path = tiny_obj_loader.h; sourceTree = "<group>"; };
+		C2B569FB6C46D800F08387ED94819000D3B2BBBA7C1D1800 /* test_main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = test_main.cpp; path = test_main.cpp; sourceTree = "<group>"; };
+		D087697B0DCCC00E6D5D9B4D2A8780052A1345A0F5DA400 /* calc_test_cl.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = calc_test_cl.h; path = calc_test_cl.h; sourceTree = "<group>"; };
+		D1A0676CB4BE5000696C3CDC93DB6C00283BF57C6FE4CA00 /* radeon_rays_apitest_vk.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = radeon_rays_apitest_vk.h; path = radeon_rays_apitest_vk.h; sourceTree = "<group>"; };
+		D83EE9C4EEBBA8009F370D314A1BD0007F53AE488C5F7000 /* libCalc64D.a */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = "Calc.xcodeproj"; path = ../Calc/Calc.xcodeproj; sourceTree = SOURCE_ROOT; };
+		DBB87B7251FC1000738450E231193000325409820D228A00 /* radeon_rays_apitest_cl.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = radeon_rays_apitest_cl.h; path = radeon_rays_apitest_cl.h; sourceTree = "<group>"; };
+		DFA51645FBD16800DC8FFCD31D6DA0005F6D534315E43C00 /* libRadeonRays64D.dylib */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = "RadeonRays.xcodeproj"; path = ../RadeonRays/RadeonRays.xcodeproj; sourceTree = SOURCE_ROOT; };
+		ECA826AD7E40380040CD4B4B1BF750096FE96C1C9B95000 /* libGtest64D.a */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = "Gtest.xcodeproj"; path = ../Gtest/Gtest.xcodeproj; sourceTree = SOURCE_ROOT; };
+		F6297BC8FCE32800C42E28313F5C200108312FA0411BD00 /* clw_test.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = clw_test.h; path = clw_test.h; sourceTree = "<group>"; };
+		F6B8C338D06CA8002486E12AF8A764007B614F7E042F180 /* clw_test_cl.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = clw_test_cl.h; path = clw_test_cl.h; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		59DE5A0941807C0041621D45E5D31C007E048AA8F80B6400 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				C97F95F1DB28C800EDEEC21DB5D010004B9D27839A110C00 /* libGtest64D.a in Frameworks */,
+				EE6D53F141D19000D5C51B28B4D5F000BC0EAF1B1948E800 /* libRadeonRays64D.dylib in Frameworks */,
+				D976E4A8A4D148004D643064FB4ABC0076255927F472FC00 /* libCalc64D.a in Frameworks */,
+				4BBBB78CB9EB8400FC9E50A7B2B64800B2D7619E3D2AA800 /* libCLW64D.a in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		2C49E6590BE87C002E57E3F5320EAC0043660DE89915A400 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				F1090023B9A788006796FD8B10BD3000C286AFF53D05C800 /* libGtest64D.a */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		AC7721A5C35C00009408FDDCF2EDD000DD1EAB46CDFB1000 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				BB7627C8F3C3B800602761808274EC0097EBE05FDDFF0800 /* libRadeonRays64D.dylib */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		DE2FD571A6C938008E134D4D9B3FB000BA17F9BDEA135000 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				7658416CCD35CC00344EE0327023F200AD6090C8FF49D000 /* UnitTest64D */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		DE2FDC7F9D9690008E13545B920D0800BA1800CBE0E0A800 /* Projects */ = {
+			isa = PBXGroup;
+			children = (
+				ECA826AD7E40380040CD4B4B1BF750096FE96C1C9B95000 /* Gtest.xcodeproj */,
+				DFA51645FBD16800DC8FFCD31D6DA0005F6D534315E43C00 /* RadeonRays.xcodeproj */,
+				D83EE9C4EEBBA8009F370D314A1BD0007F53AE488C5F7000 /* Calc.xcodeproj */,
+				7C9EFC76C5AE18005E895DAC5BD72C00BB67E0F71D3D8800 /* CLW.xcodeproj */,
+			);
+			name = Projects;
+			sourceTree = "<group>";
+		};
+		E19AF667D8D3D800917E6E43CD4A5000BD831AB41C1DF000 /* UnitTest */ = {
+			isa = PBXGroup;
+			children = (
+				D087697B0DCCC00E6D5D9B4D2A8780052A1345A0F5DA400 /* calc_test_cl.h */,
+				4F116586C040540028DEC8A3E20C020094AA23491EC12800 /* calc_test_vk.h */,
+				F6297BC8FCE32800C42E28313F5C200108312FA0411BD00 /* clw_test.h */,
+				F6B8C338D06CA8002486E12AF8A764007B614F7E042F180 /* clw_test_cl.h */,
+				DBB87B7251FC1000738450E231193000325409820D228A00 /* radeon_rays_apitest_cl.h */,
+				5673854E3F97E800F8EB740F4F7D1800555124F03BF0A000 /* radeon_rays_apitest_embree.h */,
+				D1A0676CB4BE5000696C3CDC93DB6C00283BF57C6FE4CA00 /* radeon_rays_apitest_vk.h */,
+				19C80B579E423D00A73648F78BA9D000E47702F428A3C000 /* radeon_rays_conformance_test_cl.h */,
+				703891296DC0A00CDFBAC7EF23C3000AE184D96347FD000 /* radeon_rays_conformance_test_embree.h */,
+				3A931960C5C56C00C8015700B32D000054210FD5026F240 /* radeon_rays_conformance_test_vk.h */,
+				127AE46AC23D98009FE9220AAFA52800DD29DC074C9F2000 /* radeon_rays_performance_test_cl.h */,
+				3345F273E9C0C600C0B43013D7285800FDF4EA1074225000 /* radeon_rays_performance_test_vk.h */,
+				6BE9E91CE62DE000E51F8C56F857B800D1851C892C48A800 /* radeon_rays_test_cl.h */,
+				C2B569FB6C46D800F08387ED94819000D3B2BBBA7C1D1800 /* test_main.cpp */,
+				4075AB878E3EF8007D2EB30B5C624C0074250DCEE3709C00 /* tiny_obj_loader.cpp */,
+				9A78D5263D1490006206DA5A6F0DDC00E2F7FC41E8ED1800 /* tiny_obj_loader.h */,
+				2E824BABBCACA400EC78EA715F9AC800658A9B07EEC0A800 /* utils.cpp */,
+				89EAB271B8243000716E75AE5C76D000AE10E3116EAF1800 /* utils.h */,
+				DE2FD571A6C938008E134D4D9B3FB000BA17F9BDEA135000 /* Products */,
+				DE2FDC7F9D9690008E13545B920D0800BA1800CBE0E0A800 /* Projects */,
+			);
+			name = UnitTest;
+			sourceTree = "<group>";
+		};
+		EBE92B0279363000C52F68FF729C38005175A85466379000 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				3E291E3A99F78600C1716ADCAA446800D7DBE48FA8313800 /* libCalc64D.a */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		FA1497690E04F000102DFE2325178900146E2E9A15338400 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				1121AA06BA7508002886580DEDF44800BB781A1B05EE2800 /* libCLW64D.a */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		A67F5EE5D20788006E3182BD4392A0003B8F233DF293C600 /* UnitTest */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 59DE5A082FBBC80041621D44D40E64007E048AA7E646AC00 /* Build configuration list for PBXNativeTarget "UnitTest" */;
+			buildPhases = (
+				59DE5A0CB168000041621D4955BA9C007E048AAC67F2E400 /* Resources */,
+				59DE5A0D1B15180041621D49BF67B4007E048AACD19FFC00 /* Sources */,
+				59DE5A0941807C0041621D45E5D31C007E048AA8F80B6400 /* Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				2C5CE08FF9A0BA002E6ADE2C1FC6EA004379081F86CDE000 /* PBXTargetDependency */,
+				AC8A1BDCB1144000941BF813E0A60800DD31A57DBBB34800 /* PBXTargetDependency */,
+				EBFC253966EE7000C5426336605470005188A28B53EFD000 /* PBXTargetDependency */,
+				FA27919FFBBD28001040F85A12CFC600148128D102EBC100 /* PBXTargetDependency */,
+			);
+			name = UnitTest;
+			productInstallPath = "$(HOME)/bin";
+			productName = UnitTest;
+			productReference = 7658416CCD35CC00344EE0327023F200AD6090C8FF49D000 /* UnitTest64D */;
+			productType = "com.apple.product-type.tool";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		08FB7793FE84155DC02AAC07 /* Project object */ = {
+			isa = PBXProject;
+			buildConfigurationList = 1DEB928908733DD80010E9CD /* Build configuration list for PBXProject "UnitTest" */;
+			compatibilityVersion = "Xcode 3.2";
+			hasScannedForEncodings = 1;
+			mainGroup = E19AF667D8D3D800917E6E43CD4A5000BD831AB41C1DF000 /* UnitTest */;
+			projectDirPath = "";
+			projectReferences = (
+				{
+					ProductGroup = 2C49E6590BE87C002E57E3F5320EAC0043660DE89915A400 /* Products */;
+					ProjectRef = ECA826AD7E40380040CD4B4B1BF750096FE96C1C9B95000 /* Gtest.xcodeproj */;
+				},
+				{
+					ProductGroup = AC7721A5C35C00009408FDDCF2EDD000DD1EAB46CDFB1000 /* Products */;
+					ProjectRef = DFA51645FBD16800DC8FFCD31D6DA0005F6D534315E43C00 /* RadeonRays.xcodeproj */;
+				},
+				{
+					ProductGroup = EBE92B0279363000C52F68FF729C38005175A85466379000 /* Products */;
+					ProjectRef = D83EE9C4EEBBA8009F370D314A1BD0007F53AE488C5F7000 /* Calc.xcodeproj */;
+				},
+				{
+					ProductGroup = FA1497690E04F000102DFE2325178900146E2E9A15338400 /* Products */;
+					ProjectRef = 7C9EFC76C5AE18005E895DAC5BD72C00BB67E0F71D3D8800 /* CLW.xcodeproj */;
+				},
+			);
+			projectRoot = "";
+			targets = (
+				A67F5EE5D20788006E3182BD4392A0003B8F233DF293C600 /* UnitTest64D */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXReferenceProxy section */
+		1121AA06BA7508002886580DEDF44800BB781A1B05EE2800 /* libCLW64D.a */ = {
+			isa = PBXReferenceProxy;
+			fileType = archive.ar;
+			path = libCLW64D.a;
+			remoteRef = 3CA784E420217E0015EDC2E119877F00A23402360D22E000 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		3E291E3A99F78600C1716ADCAA446800D7DBE48FA8313800 /* libCalc64D.a */ = {
+			isa = PBXReferenceProxy;
+			fileType = archive.ar;
+			path = libCalc64D.a;
+			remoteRef = 690E8BAAF17B5C006B1C894717A18C00802AB33A7EA88000 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		BB7627C8F3C3B800602761808274EC0097EBE05FDDFF0800 /* libRadeonRays64D.dylib */ = {
+			isa = PBXReferenceProxy;
+			fileType = "compiled.mach-o.dylib";
+			path = libRadeonRays64D.dylib;
+			remoteRef = 3B5B56B7805AB2001528B9D4A2265E0080F41479DEDB8800 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		F1090023B9A788006796FD8B10BD3000C286AFF53D05C800 /* libGtest64D.a */ = {
+			isa = PBXReferenceProxy;
+			fileType = archive.ar;
+			path = libGtest64D.a;
+			remoteRef = B586B1D3DA76E000F95462F4C5630800B027CB550D48D000 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+/* End PBXReferenceProxy section */
+
+/* Begin PBXResourcesBuildPhase section */
+		59DE5A0CB168000041621D4955BA9C007E048AAC67F2E400 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		59DE5A0D1B15180041621D49BF67B4007E048AACD19FFC00 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				C685A08175DC68007FD44C3BE6FF08001EE9AB129CC5B400 /* test_main.cpp in Sources */,
+				DFD7A0893A6D98002280B684DC573400F1FB5F05D37E4800 /* tiny_obj_loader.cpp in Sources */,
+				B62CBE278A7DA0009DBE9A5EBA0F7000E6D447C8951CB000 /* utils.cpp in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		2C5CE08FF9A0BA002E6ADE2C1FC6EA004379081F86CDE000 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = libGtest64D.a;
+			targetProxy = B7F8F30A2CB15000FBC6A42B179D7800B29A0C8B5F834000 /* PBXContainerItemProxy */;
+		};
+		AC8A1BDCB1144000941BF813E0A60800DD31A57DBBB34800 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = libRadeonRays64D.dylib;
+			targetProxy = 3DCD97EDD2952400179AFB0AF460D100836655B03115F800 /* PBXContainerItemProxy */;
+		};
+		EBFC253966EE7000C5426336605470005188A28B53EFD000 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = libCalc64D.a;
+			targetProxy = 6B80CCE143B5D0006D8ECA7D69DC0000829CF470D0E2F800 /* PBXContainerItemProxy */;
+		};
+		FA27919FFBBD28001040F85A12CFC600148128D102EBC100 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = libCLW64D.a;
+			targetProxy = 3F19C61A725BF000186004176BC1F200A4A6436C5F5D5000 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin PBXVariantGroup section */
+/* End PBXVariantGroup section */
+
+/* Begin XCBuildConfiguration section */
+		65680A6045931400933628526DCDD00076655C1F55695C00 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CONFIGURATION_BUILD_DIR = ../Bin/Debug/x64;
+				GCC_DYNAMIC_NO_PIC = NO;
+				INSTALL_PATH = /usr/local/bin;
+				PRODUCT_NAME = UnitTest64D;
+			};
+			name = Debug;
+		};
+		824953793D6A50005C16B6965F360000C7E2113B9BEB2800 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CONFIGURATION_BUILD_DIR = ../Bin/Release/x64;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				GCC_DYNAMIC_NO_PIC = NO;
+				INSTALL_PATH = /usr/local/bin;
+				PRODUCT_NAME = UnitTest64;
+			};
+			name = Release;
+		};
+		97D269560546500039FD31311202FE00629D440586ED6C00 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CONFIGURATION_BUILD_DIR = "$(SYMROOT)";
+				CONFIGURATION_TEMP_DIR = "$(OBJROOT)";
+				COPY_PHASE_STRIP = NO;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_ENABLE_FIX_AND_CONTINUE = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"PRORAY_UNITTEST=1",
+					"USE_OPENCL=1",
+					_DEBUG,
+					CALC_STATIC_LIBRARY,
+				);
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				OBJROOT = obj/x64/Debug;
+				ONLY_ACTIVE_ARCH = YES;
+				OTHER_CFLAGS = (
+					"-std=c++11 -stdlib=libc++",
+				);
+				OTHER_LDFLAGS = (
+					"-framework OpenCL",
+				);
+				SYMROOT = ../Bin/Debug/x64;
+				USER_HEADER_SEARCH_PATHS = (
+					..,
+					../3rdParty/include,
+					../RadeonRays/include,
+					../Gtest/include,
+					../Calc/inc,
+					.,
+					../CLW,
+				);
+			};
+			name = Debug;
+		};
+		D65E5092647D1800AE5A7B63932370007F4A9528EC64C800 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CONFIGURATION_BUILD_DIR = "$(SYMROOT)";
+				CONFIGURATION_TEMP_DIR = "$(OBJROOT)";
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_OPTIMIZATION_LEVEL = 3;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"PRORAY_UNITTEST=1",
+					"USE_OPENCL=1",
+					NDEBUG,
+					CALC_STATIC_LIBRARY,
+				);
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				OBJROOT = obj/x64/Release;
+				ONLY_ACTIVE_ARCH = NO;
+				OTHER_CFLAGS = (
+					"-std=c++11 -stdlib=libc++",
+				);
+				OTHER_LDFLAGS = (
+					"-framework OpenCL",
+				);
+				SYMROOT = ../Bin/Release/x64;
+				USER_HEADER_SEARCH_PATHS = (
+					..,
+					../3rdParty/include,
+					../RadeonRays/include,
+					../Gtest/include,
+					../Calc/inc,
+					.,
+					../CLW,
+				);
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		1DEB928908733DD80010E9CD /* Build configuration list for PBXProject "UnitTest" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				97D269560546500039FD31311202FE00629D440586ED6C00 /* Debug */,
+				D65E5092647D1800AE5A7B63932370007F4A9528EC64C800 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		59DE5A082FBBC80041621D44D40E64007E048AA7E646AC00 /* Build configuration list for PBXNativeTarget "UnitTest64D" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				65680A6045931400933628526DCDD00076655C1F55695C00 /* Debug */,
+				824953793D6A50005C16B6965F360000C7E2113B9BEB2800 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+/* End XCConfigurationList section */
+};
+rootObject = 08FB7793FE84155DC02AAC07 /* Project object */;
+}

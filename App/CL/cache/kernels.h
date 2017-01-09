@@ -18460,6 +18460,25 @@ static const char g_integrator_ao_opencl[]= \
 "    } \n"\
 "} \n"\
 " \n"\
+"// Copy data to interop texture if supported \n"\
+"__kernel void CopyDepth( \n"\
+"	__global float const* data, \n"\
+"	int imgwidth, \n"\
+"	int imgheight, \n"\
+"	write_only image2d_t img \n"\
+") \n"\
+"{ \n"\
+"	int gid = get_global_id(0); \n"\
+" \n"\
+"	int gidx = gid % imgwidth; \n"\
+"	int gidy = gid / imgwidth; \n"\
+" \n"\
+"	if (gidx < imgwidth && gidy < imgheight) \n"\
+"	{ \n"\
+"		float v = data[gid]; \n"\
+"		write_imagef(img, make_int2(gidx, gidy), (float4)(v, v, v, 1.0f)); \n"\
+"	} \n"\
+"} \n"\
 " \n"\
 "// Copy data to interop texture if supported \n"\
 "__kernel void ApplyGammaAndCopyData( \n"\
@@ -32783,7 +32802,7 @@ static const char g_integrator_pt_opencl[]= \
 "        DifferentialGeometry diffgeo; \n"\
 "        FillDifferentialGeometry(&scene, &isect, &diffgeo); \n"\
 " \n"\
-"		if (bounce == 0) { output_normals[pixelidx] += (float4)(diffgeo.n.x, diffgeo.n.y, diffgeo.n.z, 0.0f); } \n"\
+"		if (bounce == 0) { output_normals[pixelidx] += (float4)(diffgeo.n.x, diffgeo.n.y, diffgeo.n.z, 1.0f); } \n"\
 " \n"\
 "        // Check if we are hitting from the inside \n"\
 "        float ndotwi = dot(diffgeo.n, wi); \n"\
@@ -33263,7 +33282,30 @@ static const char g_integrator_pt_opencl[]= \
 "        write_imagef(img, make_int2(gidx, gidy), (float4)(v, v, v, 1.0f)); \n"\
 "    } \n"\
 "} \n"\
+"/* \n"\
+"// Copy env from interop texture if supported \n"\
+"__kernel void CopyEnvironment ( \n"\
+"	__global float4 * data, \n"\
+"	int imgwidth, \n"\
+"	int imgheight, \n"\
+"	// Textures \n"\
+"	TEXTURE_ARG_LIST, \n"\
+"	read_only image2d_t img \n"\
+") \n"\
+"{ \n"\
+"	int gid = get_global_id(0); \n"\
 " \n"\
+"	int gidx = gid % imgwidth; \n"\
+"	int gidy = gid / imgwidth; \n"\
+" \n"\
+"	if (gidx < imgwidth && gidy < imgheight) \n"\
+"	{ \n"\
+"		const sampler_t sampl = CLK_FILTER_NEAREST | CLK_NORMALIZED_COORDS_FALSE | CLK_ADDRESS_CLAMP_TO_EDGE; \n"\
+"		float4 inp = read_imagef(img, sampl, make_int2(gidx, gidy)); \n"\
+"		data[gid] = inp; \n"\
+"	} \n"\
+"} \n"\
+"*/ \n"\
 "// Copy data to interop texture if supported \n"\
 "__kernel void ApplyGammaAndCopyData( \n"\
 "    __global float4 const* data, \n"\
