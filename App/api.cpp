@@ -461,7 +461,7 @@ void launch_threads() {
 }
 
 update_return_type update(bool share_opencl, bool update, cl_mem load_image, cl_mem depth_image, cl_mem normals_image) {
-    
+    try {
     if (update)
     {
         g_scene->set_dirty(Baikal::Scene::kCamera);
@@ -594,7 +594,13 @@ update_return_type update(bool share_opencl, bool update, cl_mem load_image, cl_
         */
     }
     return { (float *)g_outputs[g_primary].fdata.data(), g_outputs[g_primary].depth_data.data(),  (float *)g_outputs[g_primary].normals_data.data()  };
-    
+    } catch (CLWException& c) {
+        std::stringstream strm;
+        strm << "RadeonRays Exception: " << c.errcode_ << " " << c.what();
+        //putLog(strm.str());
+        
+        throw std::runtime_error(strm.str());
+    }
 }
 
 void close_down() {
@@ -608,14 +614,15 @@ void close_down() {
 }
 
 
-void update_environment(bool share_opencl, unsigned char * environment_image_host) {
+void update_environment(bool share_opencl, unsigned char * environment_image_host, bool set_dirty) {
 	auto& env_tex = g_scene->textures_[g_scene->envidx_];
 
 	auto env_ptr = g_scene->texturedata_[env_tex.dataoffset].get();
 	memcpy(env_ptr, environment_image_host, env_tex.size);
 
-	g_scene->set_dirty(Baikal::Scene::DirtyFlags::kEnvironmentLight);
-
+    if (set_dirty) {
+        g_scene->set_dirty(Baikal::Scene::DirtyFlags::kEnvironmentLight);
+    }
 	/*
 	if (share_opencl) {
 		CLWKernel envcopykernel = ((Baikal::PtRenderer *)g_cfgs[g_primary].renderer)->GetEnvironmentCopyKernel();

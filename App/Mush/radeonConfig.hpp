@@ -58,6 +58,8 @@ namespace mush {
 			camera = camera_type::perspective;
 
 			model_scale = 1.0f;
+            
+            environment_map_fish_eye = false;
         }
          
         
@@ -95,6 +97,8 @@ namespace mush {
         
 		camera_type camera;
 		float model_scale;
+        
+        bool environment_map_fish_eye;
     };
 }
 

@@ -16,7 +16,7 @@ class radeonEventHandler;
 
 class radeonProcess : public mush::imageProcess {
 public:
-    radeonProcess(std::shared_ptr<radeonEventHandler> rad_event, unsigned int width, unsigned int height, bool share_opencl);
+    radeonProcess(std::shared_ptr<radeonEventHandler> rad_event, unsigned int width, unsigned int height, bool share_opencl, bool environment_map_set_dirty);
     ~radeonProcess();
     
     void init(std::shared_ptr<mush::opencl> context, const std::initializer_list<std::shared_ptr<mush::ringBuffer>>& buffers) override;
@@ -56,6 +56,7 @@ private:
 	unsigned char * env_down_buffer = nullptr;
 
 	bool _change_environment = false;
+    bool _environment_map_set_dirty;
 };
 
 #endif /* radeonProcess_hpp */

@@ -12,7 +12,7 @@
 
 #include "api.hpp"
 
-radeonProcess::radeonProcess(std::shared_ptr<radeonEventHandler> rad_event, unsigned int width, unsigned int height, bool share_opencl) : mush::imageProcess(), _share_opencl(share_opencl), _rad_event(rad_event) {
+radeonProcess::radeonProcess(std::shared_ptr<radeonEventHandler> rad_event, unsigned int width, unsigned int height, bool share_opencl, bool environment_map_set_dirty) : mush::imageProcess(), _share_opencl(share_opencl), _rad_event(rad_event), _environment_map_set_dirty(environment_map_set_dirty) {
     _width = width;
     _height = height;
 }
@@ -80,7 +80,7 @@ void radeonProcess::process() {
 				queue->enqueueReadImage(*ptr, CL_TRUE, origin, region, 0, 0, env_down_buffer, NULL, &event);
 				event.wait();
 
-				update_environment(true, env_down_buffer);
+				update_environment(true, env_down_buffer, _environment_map_set_dirty);
 			} else {
 				_environment_map->outUnlock();
 				release();
@@ -95,7 +95,14 @@ void radeonProcess::process() {
     
     inLock();
     
-    auto update_return = update(_share_opencl, up, (*_getImageMem(0))(), (*depth_image)(), (*normals_image)());
+    update_return_type update_return;
+    try {
+        update_return = update(_share_opencl, up, (*_getImageMem(0))(), (*depth_image)(), (*normals_image)());
+    } catch (std::runtime_error& e) {
+        putLog(e.what());
+        release();
+        return;
+    }
     auto ptr = update_return.image;
     auto depth_ptr = update_return.depth;
     auto normals_ptr = update_return.normals;

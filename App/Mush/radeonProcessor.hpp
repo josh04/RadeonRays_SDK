@@ -52,7 +52,8 @@ private:
     std::shared_ptr<radeonDepthProcess> _depth = nullptr;
     std::shared_ptr<radeonDepthProcess> _normals = nullptr;
     std::shared_ptr<mush::imageProcess> _copy = nullptr;
-	std::shared_ptr<mush::imageProcess> _output_copy = nullptr;
+    std::shared_ptr<mush::imageProcess> _output_copy = nullptr;
+    std::shared_ptr<mush::imageProcess> _fish_eye = nullptr;
     
     
     std::shared_ptr<mush::quitEventHandler> _quit = nullptr;

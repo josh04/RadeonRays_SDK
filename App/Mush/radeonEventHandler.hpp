@@ -25,7 +25,7 @@ extern std::unique_ptr<Baikal::Scene> g_scene;
 
 class radeonEventHandler : public azure::Eventable {
     public:
-        radeonEventHandler() {}
+    radeonEventHandler(bool disable_mouse) : azure::Eventable(), _disable_mouse(disable_mouse) {}
         ~radeonEventHandler() {}
         
         bool event(std::shared_ptr<azure::Event> event) {
@@ -92,21 +92,22 @@ class radeonEventHandler : public azure::Eventable {
                         break;
                 }
             } else if (event->isType("mouseMove")) {
-                
-                int m_x = event->getAttribute<int>("x");
-                int m_y = event->getAttribute<int>("y");
-                if (_tracking_mouse == true) {
-                    int diff_x = m_x - _m_x;
-                    int diff_y = m_y - _m_y;
-                    /*
-                    float f_diff_x = diff_x * 0.1125f;
-                    float f_diff_y = diff_y * 0.1125f;
-                    */
-                    _mouse_delta_x += diff_x;
-                    _mouse_delta_y += diff_y;
+                if (!_disable_mouse) {
+                    int m_x = event->getAttribute<int>("x");
+                    int m_y = event->getAttribute<int>("y");
+                    if (_tracking_mouse == true) {
+                        int diff_x = m_x - _m_x;
+                        int diff_y = m_y - _m_y;
+                        /*
+                         float f_diff_x = diff_x * 0.1125f;
+                         float f_diff_y = diff_y * 0.1125f;
+                         */
+                        _mouse_delta_x += diff_x;
+                        _mouse_delta_y += diff_y;
+                    }
+                    _m_x = m_x;
+                    _m_y = m_y;
                 }
-                _m_x = m_x;
-                _m_y = m_y;
                 
             }
             else if (event->isType("mouseDown")) {
@@ -244,6 +245,8 @@ class radeonEventHandler : public azure::Eventable {
 		std::atomic_bool _oculus_changed;
 		RadeonRays::matrix _oculus_matrix;
 		RadeonRays::float3 _oculus_position;
+    
+    bool _disable_mouse;
     };
 
 #endif /* radeonEventHandler_h */

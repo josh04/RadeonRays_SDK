@@ -27,7 +27,7 @@ struct update_return_type {
 update_return_type update(bool share_opencl, bool update, cl_mem load_image, cl_mem depth_image, cl_mem normals_image);
 void close_down();
 
-void update_environment(bool share_opencl, unsigned char * environment_image_host);
+void update_environment(bool share_opencl, unsigned char * environment_image_host, bool set_dirty);
 
 //const char * _get_resource_path(const char * filename);
 

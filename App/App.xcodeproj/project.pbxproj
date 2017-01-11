@@ -38,8 +38,6 @@
 		9EC0F7BF1DAAB63700DBE0A8 /* libRadeonRays64D.dylib in Copy Frameworks */ = {isa = PBXBuildFile; fileRef = BB7627C8F3C3B800602761808274EC0097EBE05FDDFF0800 /* libRadeonRays64D.dylib */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
 		9EC0F7DD1DAB8CD500DBE0A8 /* CL in CopyFiles */ = {isa = PBXBuildFile; fileRef = 9EC0F7DC1DAB8CD500DBE0A8 /* CL */; };
 		9EC0F7DF1DAB8CDC00DBE0A8 /* GLSL in CopyFiles */ = {isa = PBXBuildFile; fileRef = 9EC0F7DE1DAB8CDC00DBE0A8 /* GLSL */; };
-		9EC0F7E51DABE2AB00DBE0A8 /* bmw in CopyFiles */ = {isa = PBXBuildFile; fileRef = 9EC0F7E21DABE2AB00DBE0A8 /* bmw */; };
-		9EC0F7E61DABE2AB00DBE0A8 /* CornellBox in CopyFiles */ = {isa = PBXBuildFile; fileRef = 9EC0F7E31DABE2AB00DBE0A8 /* CornellBox */; };
 		9EC0F7E71DABE2AB00DBE0A8 /* Textures in CopyFiles */ = {isa = PBXBuildFile; fileRef = 9EC0F7E41DABE2AB00DBE0A8 /* Textures */; };
 		9EE3DAB81DCA457E000AD800 /* radeonConfig.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 9EE3DAB71DC9EF8F000AD800 /* radeonConfig.hpp */; settings = {ATTRIBUTES = (Public, ); }; };
 		9EE3DABA1DCA4602000AD800 /* mush-radeon-dll.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 9EE3DAB91DCA4602000AD800 /* mush-radeon-dll.hpp */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -119,8 +117,6 @@
 			files = (
 				9EC0F7DD1DAB8CD500DBE0A8 /* CL in CopyFiles */,
 				9EC0F7DF1DAB8CDC00DBE0A8 /* GLSL in CopyFiles */,
-				9EC0F7E51DABE2AB00DBE0A8 /* bmw in CopyFiles */,
-				9EC0F7E61DABE2AB00DBE0A8 /* CornellBox in CopyFiles */,
 				9EC0F7E71DABE2AB00DBE0A8 /* Textures in CopyFiles */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
