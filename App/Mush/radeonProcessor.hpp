@@ -48,6 +48,7 @@ public:
     
     std::vector<std::shared_ptr<azure::Eventable>> getEventables() const override;
 private:
+	std::shared_ptr<mush::ringBuffer> _input = nullptr;
     std::shared_ptr<radeonProcess> _radeon = nullptr;
     std::shared_ptr<radeonDepthProcess> _depth = nullptr;
     std::shared_ptr<radeonDepthProcess> _normals = nullptr;

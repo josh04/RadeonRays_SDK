@@ -17,7 +17,6 @@
 #define NOMINMAX
 #include <Windows.h>
 #include "GL/glew.h"
-#include "GLUT/GLUT.h"
 #else
 #include <CL/cl.h>
 #include <GL/glew.h>
@@ -614,15 +613,14 @@ void close_down() {
 }
 
 
-void update_environment(bool share_opencl, unsigned char * environment_image_host, bool set_dirty) {
+void update_environment(bool share_opencl, unsigned char * environment_image_host) {
 	auto& env_tex = g_scene->textures_[g_scene->envidx_];
 
 	auto env_ptr = g_scene->texturedata_[env_tex.dataoffset].get();
 	memcpy(env_ptr, environment_image_host, env_tex.size);
 
-    if (set_dirty) {
-        g_scene->set_dirty(Baikal::Scene::DirtyFlags::kEnvironmentLight);
-    }
+    g_scene->set_dirty(Baikal::Scene::DirtyFlags::kEnvironmentLight);
+
 	/*
 	if (share_opencl) {
 		CLWKernel envcopykernel = ((Baikal::PtRenderer *)g_cfgs[g_primary].renderer)->GetEnvironmentCopyKernel();

@@ -35,23 +35,30 @@ void radeonProcessor::init(std::shared_ptr<mush::opencl> context, const std::ini
     bool is_spherical = (_config.camera == mush::camera_type::spherical_equirectangular);
     
     _rad_event = std::make_shared<radeonEventHandler>(is_spherical);
-    
-    bool env_map_set_dirty = true;
-    if (_per_frame < 1) {
-        env_map_set_dirty = false;
-    }
-    _radeon = std::make_shared<radeonProcess>(_rad_event, _config.width, _config.height, _config.share_opencl, env_map_set_dirty);
+
+    _radeon = std::make_shared<radeonProcess>(_rad_event, _config.width, _config.height, _config.share_opencl);
 	if (buffers.size() > 0) {
-        
+
+		_input = buffers.begin()[0];
+
         if (_config.environment_map_fish_eye) {
             _fish_eye = std::make_shared<mush::fisheye2EquirectangularProcess>(185.0f, 0.497f, 0.52f);
         
             _fish_eye->init(context, {buffers.begin()[0]});
+			
             _fish_eye->setTagInGuiName("Fish Eye Projection");
             _radeon->init(context, {_fish_eye});
+
+			if (_per_frame == -1) {
+				_fish_eye->removeRepeat();
+			}
         } else {
             _radeon->init(context, {buffers.begin()[0]});
         }
+
+		if (_per_frame == -1) {
+			buffers.begin()[0]->removeRepeat();
+		}
 	} else {
 		_radeon->init(context, {});
 	}
@@ -93,8 +100,17 @@ void radeonProcessor::init(std::shared_ptr<mush::opencl> context, const std::ini
 void radeonProcessor::process() {
 	if (_tick == 0) {
 		_radeon->set_change_environment();
+
         if (_config.environment_map_fish_eye) {
+			if (_per_frame == -1) {
+				_input->addRepeat();
+			}
+
             _fish_eye->process();
+
+			if (_per_frame == -1) {
+				_input->removeRepeat();
+			}
         }
 	}
 

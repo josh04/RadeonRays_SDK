@@ -12,7 +12,7 @@
 
 #include "api.hpp"
 
-radeonProcess::radeonProcess(std::shared_ptr<radeonEventHandler> rad_event, unsigned int width, unsigned int height, bool share_opencl, bool environment_map_set_dirty) : mush::imageProcess(), _share_opencl(share_opencl), _rad_event(rad_event), _environment_map_set_dirty(environment_map_set_dirty) {
+radeonProcess::radeonProcess(std::shared_ptr<radeonEventHandler> rad_event, unsigned int width, unsigned int height, bool share_opencl) : mush::imageProcess(), _share_opencl(share_opencl), _rad_event(rad_event) {
     _width = width;
     _height = height;
 }
@@ -64,7 +64,8 @@ void radeonProcess::process() {
         call_once = true;
     }
 
-	up = up || _change_environment;
+	up = up;
+	_change_environment = _change_environment && up;
 
 	if (_change_environment) {
 		_change_environment = false;
@@ -80,7 +81,7 @@ void radeonProcess::process() {
 				queue->enqueueReadImage(*ptr, CL_TRUE, origin, region, 0, 0, env_down_buffer, NULL, &event);
 				event.wait();
 
-				update_environment(true, env_down_buffer, _environment_map_set_dirty);
+				update_environment(true, env_down_buffer);
 			} else {
 				_environment_map->outUnlock();
 				release();
