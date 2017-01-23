@@ -131,6 +131,9 @@ Scene* Scene::LoadFromObj(std::string const& filename, std::string const& basepa
     std::vector<material_t> objmaterials;
 
 	material_t default_material;
+    
+    default_material.name = "glass";
+    
 	default_material.diffuse[0] = 0.5f;
 	default_material.diffuse[1] = 0.5f;
 	default_material.diffuse[2] = 0.5f;
