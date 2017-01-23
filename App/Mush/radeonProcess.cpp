@@ -91,6 +91,11 @@ void radeonProcess::process() {
 			_environment_map->outUnlock();
 
 		}
+	} else {
+		if (_environment_map.get() != nullptr) {
+			auto ptr = _environment_map->imageOutLock();
+			_environment_map->outUnlock();
+		}
 	}
     
     

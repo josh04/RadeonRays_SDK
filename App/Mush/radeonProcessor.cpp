@@ -49,9 +49,9 @@ void radeonProcessor::init(std::shared_ptr<mush::opencl> context, const std::ini
             _fish_eye->setTagInGuiName("Fish Eye Projection");
             _radeon->init(context, {_fish_eye});
 
-			if (_per_frame == -1) {
-				_fish_eye->removeRepeat();
-			}
+			//if (_per_frame == -1) {
+			//	_fish_eye->removeRepeat();
+			//}
         } else {
             _radeon->init(context, {buffers.begin()[0]});
         }
@@ -101,17 +101,18 @@ void radeonProcessor::process() {
 	if (_tick == 0) {
 		_radeon->set_change_environment();
 
-        if (_config.environment_map_fish_eye) {
-			if (_per_frame == -1) {
-				_input->addRepeat();
-			}
+	}
 
-            _fish_eye->process();
+	if (_config.environment_map_fish_eye) {
+		//if (_per_frame == -1) {
+		//	_input->addRepeat();
+		//}
 
-			if (_per_frame == -1) {
-				_input->removeRepeat();
-			}
-        }
+		_fish_eye->process();
+
+		//if (_per_frame == -1) {
+		//	_input->removeRepeat();
+		//}
 	}
 
 	if (_tick == _per_frame) {

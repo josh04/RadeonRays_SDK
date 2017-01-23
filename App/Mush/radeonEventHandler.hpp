@@ -135,6 +135,7 @@ class radeonEventHandler : public azure::Eventable {
 				//_camera->set_additional_displacement(loc);
 				//_camera->set_fov(fov);
 				//_camera->set_additional_shift_matrix(mat);
+
 				_oculus_changed = true;
 			}
             return false;
@@ -246,7 +247,7 @@ class radeonEventHandler : public azure::Eventable {
 		RadeonRays::matrix _oculus_matrix;
 		RadeonRays::float3 _oculus_position;
     
-    bool _disable_mouse;
+		bool _disable_mouse;
     };
 
 #endif /* radeonEventHandler_h */
