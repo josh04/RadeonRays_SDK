@@ -25,6 +25,10 @@ namespace mush {
 	class imageProcess;
     class timerWrapper;
     class imageProcessor;
+	namespace camera {
+		class base;
+		class camera_event_handler;
+	}
 }
 
 class RADEONEXPORTS_API radeonProcessor : public mush::imageProcessor {
@@ -54,6 +58,7 @@ private:
     std::shared_ptr<radeonDepthProcess> _normals = nullptr;
     std::shared_ptr<mush::imageProcess> _copy = nullptr;
     std::shared_ptr<mush::imageProcess> _output_copy = nullptr;
+	std::shared_ptr<mush::imageProcess> _depth_copy = nullptr;
     std::shared_ptr<mush::imageProcess> _fish_eye = nullptr;
     
     
@@ -66,6 +71,13 @@ private:
 
 	int _tick = 0;
 	int _per_frame = 20;
+
+	std::shared_ptr<mush::camera::base> _mush_camera = nullptr;
+	std::shared_ptr<mush::camera::camera_event_handler> _mush_camera_event = nullptr;
+	bool auto_cam = false;
+
+	float prev_theta = 0.0f;
+	float prev_phi = 0.0f;
 };
 
 #endif /* radeonProcessor_hpp */

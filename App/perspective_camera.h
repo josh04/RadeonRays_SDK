@@ -87,6 +87,10 @@ public:
 	void ApplyOculusTransform(RadeonRays::matrix mat, RadeonRays::float3 loc);
 	void RemoveOculusTransform();
 	void MoveWorldUp(float distance);
+	void SetPosition(RadeonRays::float3 location);
+	RadeonRays::float3 GetPosition() const {
+		return m_p;
+	}
 
 private:
     // Rotate camera around world Z axis

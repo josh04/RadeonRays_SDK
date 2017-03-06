@@ -60,6 +60,14 @@ namespace mush {
 			model_scale = 1.0f;
             
             environment_map_fish_eye = false;
+
+
+			stereo_displacement = false;
+			stereo_distance = 0.63f;
+			automatic_camera_path = "";
+			write_camera_path = "";
+
+			quit_on_camera_path = false;
         }
          
         
@@ -99,6 +107,14 @@ namespace mush {
 		float model_scale;
         
         bool environment_map_fish_eye;
+
+		bool stereo_displacement;
+		float stereo_distance;
+
+
+		const char * automatic_camera_path;
+		const char * write_camera_path;
+		bool quit_on_camera_path;
     };
 }
 

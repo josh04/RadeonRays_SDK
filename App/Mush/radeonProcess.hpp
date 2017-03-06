@@ -25,6 +25,10 @@ public:
 		_change_environment = true;
 	}
 
+	void set_camera_change() {
+		_external_camera_change = true;
+	}
+
     void process() override;
     
     void release() override;
@@ -56,6 +60,7 @@ private:
 	unsigned char * env_down_buffer = nullptr;
 
 	bool _change_environment = false;
+	bool _external_camera_change = false;
 };
 
 #endif /* radeonProcess_hpp */

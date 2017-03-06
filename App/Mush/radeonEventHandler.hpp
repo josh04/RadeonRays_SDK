@@ -15,6 +15,8 @@
 #include <azure/Eventkey.hpp>
 #include <azure/glm/glm.hpp>
 
+#include <Mush Core/camera_path_io.hpp>
+
 #include "../Scene/scene.h"
 
 namespace Baikal {
@@ -59,6 +61,9 @@ class radeonEventHandler : public azure::Eventable {
                     case azure::Key::RShift:
                         _shift_pressed = true;
                         break;
+					case azure::Key::Space:
+						save_position();
+						break;
                 }
             } else if (event->isType("keyUp")) {
                 switch (event->getAttribute<azure::Key>("key")) {
@@ -142,7 +147,7 @@ class radeonEventHandler : public azure::Eventable {
         }
         
         bool update() {
-            
+			_tick++;
 			g_scene->camera_->RemoveOculusTransform();
             static auto prevtime = std::chrono::high_resolution_clock::now();
             
@@ -172,14 +177,15 @@ class radeonEventHandler : public azure::Eventable {
             if (std::abs(camroty) > 0.001f)
             {
                 g_scene->camera_->Tilt(camroty);
+				theta += camroty;
                 //gg_scene->camera_->ArcballRotateVertically(float3(0, 0, 0), camroty);
                 update = true;
             }
             
             if (std::abs(camrotx) > 0.001f)
             {
-                
                 g_scene->camera_->Rotate(camrotx);
+				phi += camrotx;
                 //gg_scene->camera_->ArcballRotateHorizontally(float3(0, 0, 0), camrotx);
                 update = true;
             }
@@ -231,11 +237,24 @@ class radeonEventHandler : public azure::Eventable {
             return update;
 
         }
+
+		void write_camera_path(const std::string camera_path) const {
+
+			if (_saved_camera_positions.size() > 1) {
+				write_camera_path_json(camera_path.c_str(), _saved_camera_positions);
+			}
+
+		}
+
+		void save_position() {
+			auto pos = g_scene->camera_->GetPosition();
+			_saved_camera_positions.push_back({ _tick, {{pos.x, pos.y, pos.z} , theta, phi, 0.0f, 0.0f } });
+		}
         
     private:
         bool _up_pressed = false, _down_pressed = false, _left_pressed = false, _right_pressed = false, _home_pressed = false, _end_pressed = false;
     
-    bool _shift_pressed = false;
+		bool _shift_pressed = false;
     
 		float _mouse_delta_x = 0.0f, _mouse_delta_y = 0.0f;
         
@@ -248,6 +267,12 @@ class radeonEventHandler : public azure::Eventable {
 		RadeonRays::float3 _oculus_position;
     
 		bool _disable_mouse;
+		std::vector<mush::camera::camera_path_node> _saved_camera_positions;
+
+		float theta = 0.0f;
+		float phi = 0.0f;
+
+		int _tick = 0;
     };
 
 #endif /* radeonEventHandler_h */

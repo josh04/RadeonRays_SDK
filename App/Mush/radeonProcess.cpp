@@ -26,7 +26,7 @@ void radeonProcess::init(std::shared_ptr<mush::opencl> context, const std::initi
     
 	unsigned int env_depth = 0;
 
-	if (buffers.size() > 0) {
+	if (buffers.size() > 0 && buffers.begin()[0] != nullptr) {
 		_environment_map = castToImage(buffers.begin()[0]);
 		_environment_map->getParams(env_width, env_height, env_depth);
 
@@ -35,7 +35,9 @@ void radeonProcess::init(std::shared_ptr<mush::opencl> context, const std::initi
 	}
 
     bool success = ::init(_width, _height, _share_opencl, context->get_cl_context(), context->get_cl_device(), (*context->getQueue())(), env_width, env_height);
-    
+	
+	g_scene->AddPointLight(RadeonRays::float3(0.0f, 16.0f, 6.0f), RadeonRays::float3(1.f, 0.9f, 0.6f) * 80.0f);
+
 	if (!success) {
 		kill();
 		throw std::runtime_error("Exception thrown in RadeonRays.");
@@ -56,8 +58,8 @@ void radeonProcess::init(std::shared_ptr<mush::opencl> context, const std::initi
 }
 
 void radeonProcess::process() {
-    bool up = _rad_event->update();
-    
+    bool up = _rad_event->update() || _external_camera_change;
+	_external_camera_change = false;
     if (!call_once) {
         launch_threads();
         //up = true;

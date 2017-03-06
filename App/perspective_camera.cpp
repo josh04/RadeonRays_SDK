@@ -187,3 +187,8 @@ void PerspectiveCamera::MoveWorldUp(float distance)
 {
 	m_p += distance * float3(0, 1, 0);
 }
+
+void PerspectiveCamera::SetPosition(RadeonRays::float3 location)
+{
+	m_p = location;
+}
