@@ -50,6 +50,10 @@ typedef struct _Camera
         float aspect;
         float focus_distance;
         float aperture;
+
+		//camera polar coords
+		float theta;
+		float phi;
     } Camera;
 
 
@@ -321,20 +325,20 @@ __kernel void SphericalCamera_GeneratePaths(
 		float2 csample = hsample * camera->dim;
 
 
-		float phi = (2.0 * M_PI) * (imgsample.x);
-		float theta = (M_PI) * (imgsample.y);
+		float theta = (2.0 * M_PI) * (imgsample.x) + camera->theta;
+		float phi = (M_PI) * (imgsample.y);
 
 		float4 m1, m2, m3, m4;
 		float4 n1, n2, n3, n4;
 
-		m1 = (float4) { cos(phi), 0.0, -sin(phi), 0.0 };
+		m1 = (float4) { cos(theta), 0.0, -sin(theta), 0.0 };
 		m2 = (float4) { 0.0, 1.0, 0.0, 0.0 };
-		m3 = (float4) { sin(phi), 0.0, cos(phi), 0.0 };
+		m3 = (float4) { sin(theta), 0.0, cos(theta), 0.0 };
 		m4 = (float4) { 0.0, 0.0, 0.0, 1.0 };
 
 
-		n1 = (float4) { cos(theta), sin(theta), 0.0, 0.0 };
-		n2 = (float4) { -sin(theta), cos(theta), 0.0, 0.0 };
+		n1 = (float4) { cos(phi), sin(phi), 0.0, 0.0 };
+		n2 = (float4) { -sin(phi), cos(phi), 0.0, 0.0 };
 		n3 = (float4) { 0.0, 0.0, 1.0, 0.0 };
 		n4 = (float4) { 0.0, 0.0, 0.0, 1.0 };
 

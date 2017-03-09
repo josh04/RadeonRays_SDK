@@ -25,6 +25,7 @@ namespace mush {
 	class imageProcess;
     class timerWrapper;
     class imageProcessor;
+	class sphereMapProcess;
 	namespace camera {
 		class base;
 		class camera_event_handler;
@@ -60,6 +61,7 @@ private:
     std::shared_ptr<mush::imageProcess> _output_copy = nullptr;
 	std::shared_ptr<mush::imageProcess> _depth_copy = nullptr;
     std::shared_ptr<mush::imageProcess> _fish_eye = nullptr;
+	std::shared_ptr<mush::sphereMapProcess> _sphere = nullptr;
     
     
     std::shared_ptr<mush::quitEventHandler> _quit = nullptr;
@@ -78,6 +80,8 @@ private:
 
 	float prev_theta = 0.0f;
 	float prev_phi = 0.0f;
+
+	int _frames = 0;
 };
 
 #endif /* radeonProcessor_hpp */

@@ -13,6 +13,7 @@
 #include <Mush Core/fisheye2EquirectangularProcess.hpp>
 #include <Mush Core/camera_base.hpp>
 #include <Mush Core/camera_event_handler.hpp>
+#include <Mush Core/sphereMapProcess.hpp>
 
 #include <Mush Core/timerWrapper.hpp>
 
@@ -39,6 +40,12 @@ void radeonProcessor::init(std::shared_ptr<mush::opencl> context, const std::ini
 	if (std::string(_config.automatic_camera_path).length() > 0) {
 		_mush_camera_event->load_camera_path(_config.automatic_camera_path, 1.0f);
 		auto_cam = true;
+
+		if (_config.auto_camera_frame_offset > 0) {
+			for (int i = 0; i < _config.auto_camera_frame_offset; ++i) {
+				_mush_camera_event->frame_tick();
+			}
+		}
 	}
 
 
@@ -89,6 +96,22 @@ void radeonProcessor::init(std::shared_ptr<mush::opencl> context, const std::ini
 	_depth_copy = std::make_shared<mush::fixedExposureProcess>(0.0f);
 	_depth_copy->init(context, _depth);
 
+	if (_config.camera == mush::camera_type::spherical_equirectangular) {
+		if (std::string(_config.automatic_camera_path).length() > 0) {
+			_sphere = std::make_shared<mush::sphereMapProcess>(1920, 1080, true, _config.automatic_camera_path, 1.0f);
+
+			if (_config.auto_camera_frame_offset > 0) {
+				for (int i = 0; i < _config.auto_camera_frame_offset; ++i) {
+					_sphere->frame_tick();
+				}
+			}
+		} else {
+			_sphere = std::make_shared<mush::sphereMapProcess>(1920, 1080);
+		}
+		_sphere->init(context, { _copy });
+		_sphere->setTagInGuiName("Sphere");
+	}
+
     if (_per_frame != -1) {
         _copy->removeRepeat();
 		_depth->removeRepeat();
@@ -98,7 +121,7 @@ void radeonProcessor::init(std::shared_ptr<mush::opencl> context, const std::ini
     _depth->setTagInGuiName("Renderer Depth Output");
     _normals->setTagInGuiName("Renderer Normals Output");
     _copy->setTagInGuiName("Copy");
-	_copy->setTagInGuiName("Depth Copy");
+	_depth_copy->setTagInGuiName("Depth Copy");
     
     _timer = std::unique_ptr<mush::timerWrapper>(new mush::timerWrapper("RR: "));
     /*
@@ -118,42 +141,58 @@ void radeonProcessor::init(std::shared_ptr<mush::opencl> context, const std::ini
 void radeonProcessor::process() {
 	if (_tick == 0) {
 		if (auto_cam) {
-			if (_mush_camera_event->camera_path_finished()) {
-				_quit->event(std::make_shared<azure::QuitEvent>());
-			}
-			_mush_camera_event->frame_tick();
-
-
-			glm::vec4 cam_loc = glm::vec4(_mush_camera->get_location(), 1.0f);
-
-			//cam_loc = glm::rotate((float)(-M_PI / 2.0f), glm::vec3(0.0f, 1.0f, 0.0f)) * cam_loc;
-			
-			if (_config.stereo_displacement) {
-				if (_config.camera == mush::camera_type::spherical_equirectangular) {
-					cam_loc.z += _config.stereo_distance;
+			if (!_mush_camera_event->camera_path_finished()) {
+				_mush_camera_event->frame_tick();
+				if (_sphere != nullptr) {
+					_sphere->frame_tick();
 				}
-			}
-			g_scene->camera_->SetPosition({ cam_loc.x, cam_loc.y, cam_loc.z });
-			if (_config.stereo_displacement) {
-				if (_config.camera == mush::camera_type::perspective) {
+
+
+				glm::vec4 cam_loc = glm::vec4(_mush_camera->get_location(), 1.0f);
+
+				//cam_loc = glm::rotate((float)(-M_PI / 2.0f), glm::vec3(0.0f, 1.0f, 0.0f)) * cam_loc;
+
+				/*if (_config.stereo_displacement) {
+					if (_config.camera == mush::camera_type::spherical_equirectangular) {
+						cam_loc.z += _config.stereo_distance;
+					}
+				}*/
+				g_scene->camera_->SetPosition({ cam_loc.x, cam_loc.y, cam_loc.z });
+				
+
+				float new_theta = _mush_camera->get_theta();
+				//if (_config.camera != mush::camera_type::spherical_equirectangular) {
+					//new_theta = -new_theta;
+					new_theta += M_PI_2;
+				//} else {
+				//	new_theta -= M_PI_2;
+				//}
+				float new_phi = _mush_camera->get_phi();
+
+				g_scene->camera_->Rotate(new_theta - prev_theta);
+				if (_config.camera != mush::camera_type::spherical_equirectangular) {
+					g_scene->camera_->Tilt(new_phi - prev_phi);
+				}	
+
+				if (_config.stereo_displacement) {
+					//if (_config.camera == mush::camera_type::perspective) {
 					g_scene->camera_->MoveRight(_config.stereo_distance);
+					//}
 				}
+
+				prev_theta = new_theta;
+				prev_phi = new_phi;
+
+				//g_scene->camera_->MoveWorldUp(16.0f);
+				//g_scene->camera_->MoveRight(6.0f);
+				g_scene->camera_->ApplyOculusTransform(RadeonRays::matrix(), RadeonRays::float3());
+
+				_radeon->set_camera_change();
+			} else if (_config.quit_on_camera_path) {
+				_quit->event(std::make_shared<azure::QuitEvent>());
+			} else {
+				auto_cam = false;
 			}
-
-			float new_theta = _mush_camera->get_theta() + M_PI;
-			float new_phi = _mush_camera->get_phi() - M_PI/2.0f;
-
-			g_scene->camera_->Rotate(new_theta - prev_theta);
-			g_scene->camera_->Tilt(new_phi - prev_phi);
-
-			prev_theta = new_theta;
-			prev_phi = new_phi;
-
-			//g_scene->camera_->MoveWorldUp(16.0f);
-			//g_scene->camera_->MoveRight(6.0f);
-			g_scene->camera_->ApplyOculusTransform(RadeonRays::matrix(), RadeonRays::float3());
-
-			_radeon->set_camera_change();
 		}
 		_radeon->set_change_environment();
 
@@ -171,7 +210,7 @@ void radeonProcessor::process() {
 		//}
 	}
 
-	if (_tick == _per_frame) {
+	if (_tick == _per_frame - 1) {
 		_copy->addRepeat();
 		_depth->addRepeat();
 	}
@@ -183,12 +222,13 @@ void radeonProcessor::process() {
     
     _timer->print_metered_report();
 
-	if (_tick == _per_frame) {
+	if (_tick == _per_frame - 1) {
 		_output_copy->process();
 		_depth_copy->process();
 		_copy->removeRepeat();
 		_depth->removeRepeat();
 		_tick = -1;
+		_frames++;
 	}
     
     if (_per_frame == -1) {
@@ -200,12 +240,31 @@ void radeonProcessor::process() {
 }
 
 void radeonProcessor::go() {
+
+	std::atomic_bool closing;
+	closing = false;
+
+	std::thread sphere_thread;
+	if (_config.camera == mush::camera_type::spherical_equirectangular) {
+		sphere_thread = std::thread([&]() { while (!closing) { _sphere->process(); }
+
+
+			_sphere->release_local_gl_assets();
+			_sphere->release();
+		});
+	}
+
     while (!_quit->getQuit() && _radeon->good()) {
         process();
+		if (_config.max_frames > 0 && _frames >= _config.max_frames) {
+			break;
+		}
     }
 
 	_rad_event->write_camera_path(_config.write_camera_path);
     
+	closing = true;
+
     _timer->print_final_report();
     _radeon->release();
     _depth->release();
@@ -216,17 +275,29 @@ void radeonProcessor::go() {
     if (_config.environment_map_fish_eye) {
         _fish_eye->release();
     }
+
+	if (sphere_thread.joinable()) {
+		sphere_thread.join();
+	}
 }
 
 std::vector<std::shared_ptr<mush::guiAccessible>> radeonProcessor::getGuiBuffers() {
-    return {/*_radeon, */_copy, _depth, _normals, _output_copy, _depth_copy, _fish_eye};
+    return {/*_radeon, */_copy, _depth, _normals, _output_copy, _depth_copy, _fish_eye, _sphere};
 }
 
 const std::vector<std::shared_ptr<mush::ringBuffer>> radeonProcessor::getBuffers() const {
-    return {_output_copy, _depth_copy};
+	/*if (_sphere != nullptr) {
+		return{ _output_copy, _depth_copy, _sphere };
+	} else {*/
+		return{ _output_copy, _depth_copy };
+	//}
 }
 
 std::vector<std::shared_ptr<azure::Eventable>> radeonProcessor::getEventables() const {
-    return {_quit, _rad_event};
+	if (_sphere != nullptr) {
+		return{ _quit, _rad_event, _sphere->get_eventable() };
+	} else {
+		return{ _quit, _rad_event };
+	}
 	//return{ _quit };
 }

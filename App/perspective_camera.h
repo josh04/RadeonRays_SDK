@@ -113,6 +113,10 @@ private:
     float  m_focus_distance;
     float  m_aperture;
 
+	// Polar coords
+	float theta;
+	float phi;
+
     friend std::ostream& operator << (std::ostream& o, PerspectiveCamera const& p);
 
 	// Camera coordinate frame

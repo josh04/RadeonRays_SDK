@@ -31,12 +31,14 @@ THE SOFTWARE.
 
 using namespace RadeonRays;
 
-PerspectiveCamera::PerspectiveCamera(float3 const& eye, float3 const& at, float3 const& up) 
-                       : m_p(eye)
-                       , m_aperture(0.f)
-                       , m_focus_distance(0.f)
-                       , m_focal_length(0.f)
-                       , m_zcap(0.f, 0.f)
+PerspectiveCamera::PerspectiveCamera(float3 const& eye, float3 const& at, float3 const& up)
+	: m_p(eye)
+	, m_aperture(0.f)
+	, m_focus_distance(0.f)
+	, m_focal_length(0.f)
+	, m_zcap(0.f, 0.f),
+	theta(0.0f),
+	phi(0.0f)
 {
     // Construct camera frame
     m_forward = normalize(at - eye);
@@ -52,6 +54,7 @@ PerspectiveCamera::PerspectiveCamera(float3 const& eye, float3 const& at, float3
 // Rotate camera around world Z axis, use for FPS camera
 void PerspectiveCamera::Rotate(float angle)
 {
+	theta += angle;
     Rotate(float3(0.f, 1.f, 0.f), angle);
 }
 
@@ -84,6 +87,7 @@ void PerspectiveCamera::Rotate(float3 v, float angle)
 // Tilt camera
 void PerspectiveCamera::Tilt(float angle)
 {
+	phi += angle;
     Rotate(m_right, angle);
 }
 

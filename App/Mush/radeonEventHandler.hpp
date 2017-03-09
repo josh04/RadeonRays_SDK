@@ -177,7 +177,7 @@ class radeonEventHandler : public azure::Eventable {
             if (std::abs(camroty) > 0.001f)
             {
                 g_scene->camera_->Tilt(camroty);
-				theta += camroty;
+				phi += camroty;
                 //gg_scene->camera_->ArcballRotateVertically(float3(0, 0, 0), camroty);
                 update = true;
             }
@@ -185,7 +185,7 @@ class radeonEventHandler : public azure::Eventable {
             if (std::abs(camrotx) > 0.001f)
             {
                 g_scene->camera_->Rotate(camrotx);
-				phi += camrotx;
+				theta += camrotx;
                 //gg_scene->camera_->ArcballRotateHorizontally(float3(0, 0, 0), camrotx);
                 update = true;
             }

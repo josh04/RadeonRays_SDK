@@ -61,13 +61,16 @@ namespace mush {
             
             environment_map_fish_eye = false;
 
-
 			stereo_displacement = false;
 			stereo_distance = 0.63f;
 			automatic_camera_path = "";
 			write_camera_path = "";
 
 			quit_on_camera_path = false;
+
+			max_frames = -1;
+
+			auto_camera_frame_offset = 0;
         }
          
         
@@ -115,6 +118,10 @@ namespace mush {
 		const char * automatic_camera_path;
 		const char * write_camera_path;
 		bool quit_on_camera_path;
+
+		int max_frames;
+
+		int auto_camera_frame_offset;
     };
 }
 
