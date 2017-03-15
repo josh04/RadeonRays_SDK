@@ -102,7 +102,7 @@ void radeonProcessor::init(std::shared_ptr<mush::opencl> context, const std::ini
 
 			if (_config.auto_camera_frame_offset > 0) {
 				for (int i = 0; i < _config.auto_camera_frame_offset; ++i) {
-					_sphere->frame_tick();
+					//_sphere->frame_tick();
 				}
 			}
 		} else {
@@ -144,7 +144,7 @@ void radeonProcessor::process() {
 			if (!_mush_camera_event->camera_path_finished()) {
 				_mush_camera_event->frame_tick();
 				if (_sphere != nullptr) {
-					_sphere->frame_tick();
+//					_sphere->frame_tick();
 				}
 
 
