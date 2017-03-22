@@ -294,10 +294,8 @@ const std::vector<std::shared_ptr<mush::ringBuffer>> radeonProcessor::getBuffers
 }
 
 std::vector<std::shared_ptr<azure::Eventable>> radeonProcessor::getEventables() const {
-	if (_sphere != nullptr) {
-		return{ _quit, _rad_event, _sphere->get_eventable() };
-	} else {
-		return{ _quit, _rad_event };
-	}
+	
+    return{ _quit, _rad_event };
+    
 	//return{ _quit };
 }

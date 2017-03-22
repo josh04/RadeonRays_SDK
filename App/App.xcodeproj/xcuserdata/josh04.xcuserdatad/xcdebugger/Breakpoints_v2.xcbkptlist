@@ -42,27 +42,27 @@
                   moduleName = "RadeonLibrary"
                   usesParentBreakpointCondition = "Yes"
                   urlString = "file:///Users/josh04/Development/RadeonRays_SDK/CLW/CLWProgram.cpp"
-                  timestampString = "511120013.796714"
+                  timestampString = "511837840.665434"
                   startingColumnNumber = "9223372036854775807"
                   endingColumnNumber = "9223372036854775807"
                   startingLineNumber = "57"
                   endingLineNumber = "57"
-                  offsetFromSymbolStart = "250">
+                  offsetFromSymbolStart = "1075">
                </Location>
                <Location
                   shouldBeEnabled = "Yes"
                   ignoreCount = "0"
                   continueAfterRunningActions = "No"
                   symbolName = "load_file_contents(std::__1::basic_string&lt;char, std::__1::char_traits&lt;char&gt;, std::__1::allocator&lt;char&gt; &gt; const&amp;, std::__1::vector&lt;char, std::__1::allocator&lt;char&gt; &gt;&amp;, bool)"
-                  moduleName = "libRadeonRays64.dylib"
+                  moduleName = "libRadeonRays64D.dylib"
                   usesParentBreakpointCondition = "Yes"
                   urlString = "file:///Users/josh04/Development/RadeonRays_SDK/CLW/CLWProgram.cpp"
-                  timestampString = "511120013.799899"
+                  timestampString = "511837840.671918"
                   startingColumnNumber = "9223372036854775807"
                   endingColumnNumber = "9223372036854775807"
                   startingLineNumber = "57"
                   endingLineNumber = "57"
-                  offsetFromSymbolStart = "250">
+                  offsetFromSymbolStart = "1075">
                </Location>
             </Locations>
          </BreakpointContent>
