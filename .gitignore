@@ -26,3 +26,13 @@ Bin/Release/x64/App64.exe
 *.db
 *.sln
 *.DS_Store
+*.d
+*.o
+*.a
+*.so
+App/Makefile
+Bin/Release/x64/
+CLW/Makefile
+Calc/Makefile
+Gtest/Makefile
+Makefile
