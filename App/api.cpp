@@ -51,9 +51,10 @@
 #include "math/mathutils.h"
 
 #include "tiny_obj_loader.h"
-#include "perspective_camera.h"
+#include "Scene/camera.h"
 #include "shader_manager.h"
-#include "Scene/scene.h"
+#include "Scene/scene1.h"
+#include "Scene/IO/scene_io.h"
 #include "PT/ptrenderer.h"
 #include "AO/aorenderer.h"
 #include "CLW/clwoutput.h"
@@ -94,7 +95,6 @@ float g_camera_focal_length = 0.035f; // 35mm lens
 float g_camera_focus_distance = 0.f;
 float g_camera_aperture = 0.f;
 
-
 bool g_recording_enabled = false;
 int g_frame_count = 0;
 bool g_benchmark = false;
@@ -132,7 +132,8 @@ std::vector<std::thread> g_renderthreads;
 int g_primary = -1;
 
 
-std::unique_ptr<Baikal::Scene> g_scene;
+std::unique_ptr<Baikal::Scene1> g_scene;
+std::unique_ptr<Baikal::PerspectiveCamera> g_camera;
 
 mush::camera_type g_camera_type;
 
@@ -313,46 +314,52 @@ void InitData()
     std::string basepath = g_path;
     basepath += "/";
     std::string filename = basepath + g_modelname;
-    
-    g_scene.reset(Baikal::Scene::LoadFromObj(filename, basepath, g_scale));
-    
-    g_scene->camera_.reset(new PerspectiveCamera(
-                                                 g_camera_pos
-                                                 , g_camera_at
-                                                 , g_camera_up));
-    
+
+	// Load OBJ scene
+	std::unique_ptr<Baikal::SceneIo> scene_io(Baikal::SceneIo::CreateSceneIoObj());
+	g_scene.reset(scene_io->LoadScene(filename, basepath));
+
+    //g_scene.reset(Baikal::Scene::LoadFromObj(filename, basepath, g_scale));
+
+	g_camera.reset(new Baikal::PerspectiveCamera(
+		g_camera_pos
+		, g_camera_at
+		, g_camera_up));
+
+	g_scene->SetCamera(g_camera.get());
+	
     // Adjust sensor size based on current aspect ratio
     float aspect = (float)g_window_width / g_window_height;
     g_camera_sensor_size.y = g_camera_sensor_size.x / aspect;
 
 	switch (g_camera_type) {
 	case mush::camera_type::perspective:
-		g_scene->camera_type_ = (int)Baikal::CameraType::kDefault;
+		g_camera->SetCameraType((int)Baikal::CameraType::kDefault);
 			break;
 	case mush::camera_type::perspective_dof:
-		g_scene->camera_type_ = (int)Baikal::CameraType::kPhysical;
+		g_camera->SetCameraType((int)Baikal::CameraType::kPhysical);
 		break;
 	case mush::camera_type::spherical_equirectangular:
-		g_scene->camera_type_ = (int)Baikal::CameraType::kSpherical;
+		g_camera->SetCameraType((int)Baikal::CameraType::kSpherical);
 		break;
 	}
     
-    g_scene->camera_->SetSensorSize(g_camera_sensor_size);
-    g_scene->camera_->SetDepthRange(g_camera_zcap);
-    g_scene->camera_->SetFocalLength(g_camera_focal_length);
-    g_scene->camera_->SetFocusDistance(g_camera_focus_distance);
-    g_scene->camera_->SetAperture(g_camera_aperture);
+	g_camera->SetSensorSize(g_camera_sensor_size);
+	g_camera->SetDepthRange(g_camera_zcap);
+	g_camera->SetFocalLength(g_camera_focal_length);
+	g_camera->SetFocusDistance(g_camera_focus_distance);
+	g_camera->SetAperture(g_camera_aperture);
     
     std::stringstream strm;
-    strm << "AMD: Camera type: " << (g_scene->camera_->GetAperture() > 0.f ? "Physical" : "Pinhole") << "\n";
-    strm << "AMD: Lens focal length: " << g_scene->camera_->GetFocalLength() * 1000.f << "mm\n";
-    strm << "AMD: Lens focus distance: " << g_scene->camera_->GetFocusDistance() << "m\n";
-    strm << "AMD: F-Stop: " << 1.f / (g_scene->camera_->GetAperture() * 10.f) << "\n";
+    strm << "AMD: Camera type: " << (g_camera->GetAperture() > 0.f ? "Physical" : "Pinhole") << "\n";
+    strm << "AMD: Lens focal length: " << g_camera->GetFocalLength() * 1000.f << "mm\n";
+    strm << "AMD: Lens focus distance: " << g_camera->GetFocusDistance() << "m\n";
+    strm << "AMD: F-Stop: " << 1.f / (g_camera->GetAperture() * 10.f) << "\n";
     strm << "AMD: Sensor size: " << g_camera_sensor_size.x * 1000.f << "x" << g_camera_sensor_size.y * 1000.f << "mm\n";
     putLog(strm.str());
 
-	g_scene->SetEnvironment(g_environment_width, g_environment_height, 1, Baikal::Scene::RGBA32, g_envmapmul);
-    //g_scene->SetEnvironment(g_environment_map_name, g_environment_map_path, g_envmapmul);
+	//g_scene->SetEnvironment(g_environment_width, g_environment_height, 1, Baikal::Scene::RGBA32, g_envmapmul);
+	
     
 #pragma omp parallel for
     for (int i = 0; i < g_cfgs.size(); ++i)
@@ -463,7 +470,8 @@ update_return_type update(bool share_opencl, bool update, cl_mem load_image, cl_
     try {
     if (update)
     {
-        g_scene->set_dirty(Baikal::Scene::kCamera);
+		g_scene->SetDirtyFlag(Baikal::Scene1::kCamera);
+        //g_scene->set_dirty(Baikal::Scene::kCamera);
         
         if (g_num_samples > -1)
         {
@@ -614,12 +622,14 @@ void close_down() {
 
 
 void update_environment(bool share_opencl, unsigned char * environment_image_host) {
+	/*
 	auto& env_tex = g_scene->textures_[g_scene->envidx_];
 
 	auto env_ptr = g_scene->texturedata_[env_tex.dataoffset].get();
 	memcpy(env_ptr, environment_image_host, env_tex.size);
-
-    g_scene->set_dirty(Baikal::Scene::DirtyFlags::kEnvironmentLight);
+	*/
+	g_scene->SetDirtyFlag(Baikal::Scene1::kEnvironmentLight);
+    //g_scene->set_dirty(Baikal::Scene::DirtyFlags::kEnvironmentLight);
 
 	/*
 	if (share_opencl) {

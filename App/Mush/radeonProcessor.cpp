@@ -76,7 +76,9 @@ void radeonProcessor::init(std::shared_ptr<mush::opencl> context, const std::ini
         }
 
 		if (_per_frame == -1) {
-			buffers.begin()[0]->removeRepeat();
+			if (buffers.begin()[0] != nullptr) {
+				buffers.begin()[0]->removeRepeat();
+			}
 		}
 	} else {
 		_radeon->init(context, {});
@@ -135,7 +137,7 @@ void radeonProcessor::init(std::shared_ptr<mush::opencl> context, const std::ini
     _timer->register_node(_normals, "Normals");
     _timer->register_node(_copy, "Vertical Flip");
 
-	g_scene->camera_->Rotate(-M_PI/2.0f);
+	g_camera->Rotate(-M_PI/2.0f);
 }
 
 void radeonProcessor::process() {
@@ -157,7 +159,7 @@ void radeonProcessor::process() {
 						cam_loc.z += _config.stereo_distance;
 					}
 				}*/
-				g_scene->camera_->SetPosition({ cam_loc.x, cam_loc.y, cam_loc.z });
+				g_camera->SetPosition({ cam_loc.x, cam_loc.y, cam_loc.z });
 				
 
 				float new_theta = _mush_camera->get_theta();
@@ -169,14 +171,14 @@ void radeonProcessor::process() {
 				//}
 				float new_phi = _mush_camera->get_phi();
 
-				g_scene->camera_->Rotate(new_theta - prev_theta);
+				g_camera->Rotate(new_theta - prev_theta);
 				if (_config.camera != mush::camera_type::spherical_equirectangular) {
-					g_scene->camera_->Tilt(new_phi - prev_phi);
+					g_camera->Tilt(new_phi - prev_phi);
 				}	
 
 				if (_config.stereo_displacement) {
 					//if (_config.camera == mush::camera_type::perspective) {
-					g_scene->camera_->MoveRight(_config.stereo_distance);
+					g_camera->MoveRight(_config.stereo_distance);
 					//}
 				}
 
@@ -185,7 +187,7 @@ void radeonProcessor::process() {
 
 				//g_scene->camera_->MoveWorldUp(16.0f);
 				//g_scene->camera_->MoveRight(6.0f);
-				g_scene->camera_->ApplyOculusTransform(RadeonRays::matrix(), RadeonRays::float3());
+				g_camera->ApplyOculusTransform(RadeonRays::matrix(), RadeonRays::float3());
 
 				_radeon->set_camera_change();
 			} else if (_config.quit_on_camera_path) {

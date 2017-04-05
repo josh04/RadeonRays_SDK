@@ -193,4 +193,43 @@ namespace Baikal
         m_p = c - dir;
         SetDirty(true);
     }
+
+	void PerspectiveCamera::ApplyOculusTransform(RadeonRays::matrix mat, RadeonRays::float3 loc) {
+		pre_oculus_m_forward = m_forward;
+		pre_oculus_m_right = m_right;
+		pre_oculus_m_up = m_up;
+		pre_oculus_m_p = m_p;
+
+		m_forward = mat * m_forward;
+		m_right = mat * m_right;
+		m_up = mat * m_up;
+		m_p = m_p + loc;
+	}
+
+	void PerspectiveCamera::RemoveOculusTransform() {
+		m_forward = pre_oculus_m_forward;
+		m_right = pre_oculus_m_right;
+		m_up = pre_oculus_m_up;
+		m_p = pre_oculus_m_p;
+	}
+
+	// Move along camera Y direction
+	void PerspectiveCamera::MoveWorldUp(float distance)
+	{
+		m_p += distance * float3(0, 1, 0);
+	}
+
+	void PerspectiveCamera::SetPosition(RadeonRays::float3 location)
+	{
+		m_p = location;
+	}
+
+	void PerspectiveCamera::SetCameraType(int camera_type)
+	{
+		this->camera_type = camera_type;
+	}
+
+	int PerspectiveCamera::GetCameraType() const {
+		return camera_type;
+	}
 }

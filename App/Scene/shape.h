@@ -32,8 +32,10 @@
 #include "math/float2.h"
 #include <memory>
 #include <string>
+#include <vector>
 
 #include "scene_object.h"
+#include "Collector/collector.h"
 
 namespace Baikal
 {
@@ -55,6 +57,12 @@ namespace Baikal
         // Get and set material
         void SetMaterial(Material const* material);
         Material const* GetMaterial() const;
+
+		void SetMaterials(const std::vector<int>& material_indices, std::vector<const Material *>& materials);
+		
+		std::vector<uint32_t> GetMaterials(Collector& c) const;
+		std::vector<const Material *> GetMaterials() const;
+
         
         // Forbidden stuff
         Shape(Shape const&) = delete;
@@ -62,6 +70,9 @@ namespace Baikal
     
     private:
         Material const* m_material;
+
+		std::vector<int> m_material_indices;
+		std::vector<const Material *> m_materials;
     };
     
     /**
@@ -118,7 +129,7 @@ namespace Baikal
         
     }
     
-    inline Shape::Shape() : m_material(nullptr)
+	inline Shape::Shape() : m_material(nullptr)
     {
         
     }

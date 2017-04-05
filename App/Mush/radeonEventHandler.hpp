@@ -17,13 +17,15 @@
 
 #include <Mush Core/camera_path_io.hpp>
 
-#include "../Scene/scene.h"
+#include "../Scene/scene1.h"
+#include "../Scene/camera.h"
 
 namespace Baikal {
-    class Scene;
+    class Scene1;
 }
 
-extern std::unique_ptr<Baikal::Scene> g_scene;
+extern std::unique_ptr<Baikal::Scene1> g_scene;
+extern std::unique_ptr<Baikal::PerspectiveCamera> g_camera;
 
 class radeonEventHandler : public azure::Eventable {
     public:
@@ -148,7 +150,7 @@ class radeonEventHandler : public azure::Eventable {
         
         bool update() {
 			_tick++;
-			g_scene->camera_->RemoveOculusTransform();
+			g_camera->RemoveOculusTransform();
             static auto prevtime = std::chrono::high_resolution_clock::now();
             
             auto time = std::chrono::high_resolution_clock::now();
@@ -176,7 +178,7 @@ class radeonEventHandler : public azure::Eventable {
             
             if (std::abs(camroty) > 0.001f)
             {
-                g_scene->camera_->Tilt(camroty);
+				g_camera->Tilt(camroty);
 				phi += camroty;
                 //gg_scene->camera_->ArcballRotateVertically(float3(0, 0, 0), camroty);
                 update = true;
@@ -184,7 +186,7 @@ class radeonEventHandler : public azure::Eventable {
             
             if (std::abs(camrotx) > 0.001f)
             {
-                g_scene->camera_->Rotate(camrotx);
+				g_camera->Rotate(camrotx);
 				theta += camrotx;
                 //gg_scene->camera_->ArcballRotateHorizontally(float3(0, 0, 0), camrotx);
                 update = true;
@@ -195,37 +197,37 @@ class radeonEventHandler : public azure::Eventable {
             
             if (_up_pressed)
             {
-                g_scene->camera_->MoveForward((float)dt.count() * kMovementSpeed);
+				g_camera->MoveForward((float)dt.count() * kMovementSpeed);
                 update = true;
             }
             
             if (_down_pressed)
             {
-                g_scene->camera_->MoveForward(-(float)dt.count() * kMovementSpeed);
+				g_camera->MoveForward(-(float)dt.count() * kMovementSpeed);
                 update = true;
             }
             
             if (_right_pressed)
             {
-                g_scene->camera_->MoveRight((float)dt.count() * kMovementSpeed);
+				g_camera->MoveRight((float)dt.count() * kMovementSpeed);
                 update = true;
             }
             
             if (_left_pressed)
             {
-                g_scene->camera_->MoveRight(-(float)dt.count() * kMovementSpeed);
+				g_camera->MoveRight(-(float)dt.count() * kMovementSpeed);
                 update = true;
             }
             
             if (_home_pressed)
             {
-                g_scene->camera_->MoveUp((float)dt.count() * kMovementSpeed);
+				g_camera->MoveUp((float)dt.count() * kMovementSpeed);
                 update = true;
             }
             
             if (_end_pressed)
             {
-                g_scene->camera_->MoveUp(-(float)dt.count() * kMovementSpeed);
+				g_camera->MoveUp(-(float)dt.count() * kMovementSpeed);
                 update = true;
             }
 
@@ -233,7 +235,7 @@ class radeonEventHandler : public azure::Eventable {
 				update = true;
 			}
 
-			g_scene->camera_->ApplyOculusTransform(_oculus_matrix, _oculus_position);
+			g_camera->ApplyOculusTransform(_oculus_matrix, _oculus_position);
             return update;
 
         }
@@ -247,7 +249,7 @@ class radeonEventHandler : public azure::Eventable {
 		}
 
 		void save_position() {
-			auto pos = g_scene->camera_->GetPosition();
+			auto pos = g_camera->GetPosition();
 			_saved_camera_positions.push_back({ _tick, {{pos.x, pos.y, pos.z} , theta, phi, 0.0f, 0.0f } });
 		}
         

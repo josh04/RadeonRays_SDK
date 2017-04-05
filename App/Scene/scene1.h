@@ -57,7 +57,8 @@ namespace Baikal
             kLights,
             kShapes,
             kShapeTransforms,
-            kCamera
+            kCamera,
+			kEnvironmentLight
         };
         
         // Constructor

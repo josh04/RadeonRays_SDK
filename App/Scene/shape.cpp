@@ -171,4 +171,31 @@ namespace Baikal
     {
         return m_uvs.get();
     }
+
+	void Shape::SetMaterials(const std::vector<int>& material_indices, std::vector<const Material *>& materials)
+	{
+		m_material_indices = material_indices;
+		m_materials = materials;
+
+		SetDirty(true);
+	}
+
+	std::vector<uint32_t> Shape::GetMaterials(Collector& c) const {
+		std::vector<uint32_t> output_materials;
+		std::vector<uint32_t> material_map;
+
+		for (int i = 0; i < m_materials.size(); ++i) {
+			material_map.push_back(c.GetItemIndex(m_materials[i]));
+		}
+
+		output_materials.reserve(m_material_indices.size());
+		for (auto& m : m_material_indices) {
+			output_materials.push_back(material_map[m]);
+		}
+		return output_materials;
+	}
+
+	std::vector<const Material *> Shape::GetMaterials() const {
+		return m_materials;
+	}
 }

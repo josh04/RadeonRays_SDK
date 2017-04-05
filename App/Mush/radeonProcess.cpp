@@ -10,6 +10,7 @@
 #include "radeonProcess.hpp"
 #include "radeonEventHandler.hpp"
 
+#include "../Scene/light.h"
 #include "api.hpp"
 
 radeonProcess::radeonProcess(std::shared_ptr<radeonEventHandler> rad_event, unsigned int width, unsigned int height, bool share_opencl) : mush::imageProcess(), _share_opencl(share_opencl), _rad_event(rad_event) {
@@ -35,13 +36,19 @@ void radeonProcess::init(std::shared_ptr<mush::opencl> context, const std::initi
 	}
 
     bool success = ::init(_width, _height, _share_opencl, context->get_cl_context(), context->get_cl_device(), (*context->getQueue())(), env_width, env_height);
-	
-	g_scene->AddPointLight(RadeonRays::float3(0.0f, 16.0f, 6.0f), RadeonRays::float3(1.f, 0.9f, 0.6f) * 80.0f);
 
 	if (!success) {
 		kill();
 		throw std::runtime_error("Exception thrown in RadeonRays.");
 	}
+	
+	Baikal::Light * light = new Baikal::PointLight();
+	light->SetPosition(RadeonRays::float3(0.0f, 16.0f, 6.0f));
+	light->SetEmittedRadiance(RadeonRays::float3(1.f, 0.9f, 0.6f) * 80.0f);
+
+	g_scene->AttachAutoreleaseObject(light);
+	g_scene->AttachLight(light);
+	
 
     //float_image = context->floatImage(_width, _height);
     

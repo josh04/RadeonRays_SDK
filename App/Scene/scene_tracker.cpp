@@ -79,9 +79,15 @@ namespace Baikal
                                   // Get material from current shape
                                   auto shape = reinterpret_cast<Shape const*>(item);
                                   auto material = shape->GetMaterial();
+
                                   
                                   // Push to stack as an initializer
-                                  material_stack.push(material);
+								  material_stack.push(material);
+
+								  auto materials = shape->GetMaterials();
+								  for (auto& m : materials) {
+									  material_stack.push(m);
+								  }
                                   
                                   // Drain the stack
                                   while (!material_stack.empty())
@@ -309,8 +315,8 @@ namespace Baikal
             {
                 UpdateMaterials(scene, mat_collector, tex_collector, out);
             }
-
-			if (scene.dirty() & Scene::DirtyFlags::kEnvironmentLight)
+										  
+			if (scene.GetDirtyFlags() & Scene1::kEnvironmentLight)
 			{
 				UpdateEnvironmentMap(scene, out);
 			}
@@ -350,18 +356,19 @@ namespace Baikal
 
     void SceneTracker::UpdateCamera(Scene1 const& scene, Collector& mat_collector, Collector& tex_collector, ClwScene& out) const
     {
-<<<<<<< HEAD
+
+		/*
         // Update camere type
         //out.camera_type = scene.camera_->GetAperture() > 0.f ? CameraType::kPhysical : CameraType::kDefault;
 		// JOSH
 		out.camera_type = (Baikal::CameraType)scene.camera_type_;
-=======
+		*/
+
         // TODO: support different camera types here
         auto camera = static_cast<PerspectiveCamera const*>(scene.GetCamera());
         
         // TODO: remove this
         out.camera_type = camera->GetAperture() > 0.f ? CameraType::kPhysical : CameraType::kDefault;
->>>>>>> dcb879e32484cfd59c3249ca17e9c3d35e093292
 
         // Update camera data
         ClwScene::Camera* data = nullptr;
@@ -482,10 +489,14 @@ namespace Baikal
             shapes[num_shapes_written] = shape;
             ++num_shapes_written;
 
-            auto matidx = mat_collector.GetItemIndex(mesh->GetMaterial());
-            std::fill(matids + num_matids_written, matids + num_matids_written + mesh_num_indices / 3, matidx);
+            //auto matidx = mat_collector.GetItemIndex(mesh->GetMaterial());
+            //std::fill(matids + num_matids_written, matids + num_matids_written + mesh_num_indices / 3, matidx);
+			auto material_indices = mesh->GetMaterials(mat_collector);
 
-            num_matids_written += mesh_num_indices / 3;
+			std::copy(material_indices.begin(), material_indices.end(), matids + num_matids_written);
+			num_matids_written += material_indices.size();
+
+            //num_matids_written += mesh_num_indices / 3;
         }
 
         m_context.UnmapBuffer(0, out.vertices, vertices);
@@ -544,74 +555,9 @@ namespace Baikal
 
         out.isect_shapes.clear();
 
-<<<<<<< HEAD
-        m_vidmem_usage = 0;
-
 		//JOSH
-		out.camera_type = (Baikal::CameraType)scene.camera_type_;
+		//out.camera_type = (Baikal::CameraType)scene.camera_type_;
 
-        // Create static buffers
-        out.camera = m_context.CreateBuffer<PerspectiveCamera>(1, CL_MEM_READ_ONLY |  CL_MEM_COPY_HOST_PTR, scene.camera_.get());
-
-        // Vertex, normal and uv data
-        out.vertices = m_context.CreateBuffer<float3>(scene.vertices_.size(), CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, (void*)&scene.vertices_[0]);
-        m_vidmem_usage += scene.vertices_.size() * sizeof(float3);
-
-        out.normals = m_context.CreateBuffer<float3>(scene.normals_.size(), CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, (void*)&scene.normals_[0]);
-        m_vidmem_usage += scene.normals_.size() * sizeof(float3);
-
-        out.uvs = m_context.CreateBuffer<float2>(scene.uvs_.size(), CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, (void*)&scene.uvs_[0]);
-        m_vidmem_usage += scene.uvs_.size() * sizeof(float2);
-
-        // Index data
-        out.indices = m_context.CreateBuffer<int>(scene.indices_.size(), CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, (void*)&scene.indices_[0]);
-        m_vidmem_usage += scene.indices_.size() * sizeof(int);
-
-        // Shapes
-        out.shapes = m_context.CreateBuffer<Scene::Shape>(scene.shapes_.size(), CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, (void*)&scene.shapes_[0]);
-        m_vidmem_usage += scene.shapes_.size() * sizeof(Scene::Shape);
-
-        // Material IDs
-        out.materialids = m_context.CreateBuffer<int>(scene.materialids_.size(), CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, (void*)&scene.materialids_[0]);
-        m_vidmem_usage += scene.materialids_.size() * sizeof(int);
-
-        // Material descriptions
-        out.materials = m_context.CreateBuffer<Scene::Material>(scene.materials_.size(), CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, (void*)&scene.materials_[0]);
-        m_vidmem_usage += scene.materials_.size() * sizeof(Scene::Material);
-
-        // Bake textures
-        BakeTextures(scene, out);
-
-        // Emissives
-        if (scene.lights_.size() > 0)
-        {
-            out.lights = m_context.CreateBuffer<Scene::Light>(scene.lights_.size(), CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, (void*)&scene.lights_[0]);
-            out.num_lights = scene.lights_.size();
-            m_vidmem_usage += scene.lights_.size() * sizeof(Scene::Light);
-        }
-        else
-        {
-            out.lights = m_context.CreateBuffer<Scene::Light>(1, CL_MEM_READ_ONLY);
-            out.num_lights = 0;
-            m_vidmem_usage += sizeof(Scene::Light);
-        }
-
-        //Volume vol = {1, 0, 0, 0, {0.9f, 0.6f, 0.9f}, {5.1f, 1.8f, 5.1f}, {0.0f, 0.0f, 0.0f}};
-        Scene::Volume vol = { 1, 0, 0, 0,{    1.2f, 0.4f, 1.2f },{ 5.1f, 4.8f, 5.1f },{ 0.0f, 0.0f, 0.0f } };
-
-        out.volumes = m_context.CreateBuffer<Scene::Volume>(1, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, &vol);
-
-        out.envmapmul = scene.envmapmul_;
-        out.envmapidx = scene.envidx_;
-
-        std::cout << "Vidmem usage (data): " << m_vidmem_usage / (1024 * 1024) << "Mb\n";
-        std::cout << "Polygon count " << scene.indices_.size() / 3 << "\n";
-
-        std::cout << "Number of objects: " << scene.shapes_.size() << "\n";
-        std::cout << "Number of textures: " << scene.textures_.size() << "\n";
-        std::cout << "Number of lights: " << scene.lights_.size() << "\n";
-
-=======
         // Create camera buffer
         out.camera = m_context.CreateBuffer<ClwScene::Camera>(1, CL_MEM_READ_ONLY);
         
@@ -635,7 +581,6 @@ namespace Baikal
 
         std::unique_ptr<Iterator> shape_iter(scene.CreateShapeIterator());
         
->>>>>>> dcb879e32484cfd59c3249ca17e9c3d35e093292
         // Enumerate all shapes in the scene
         // and submit to RadeonRays API
         int id = 1;
@@ -1125,8 +1070,8 @@ namespace Baikal
         }
     }
 
-<<<<<<< HEAD
-	void SceneTracker::UpdateEnvironmentMap(Scene const& scene, ClwScene& out) const {
+
+	void SceneTracker::UpdateEnvironmentMap(Scene1 const& scene, ClwScene& out) const {
 
 		// Map both buffers
 		char* mappeddata = nullptr;
@@ -1137,7 +1082,7 @@ namespace Baikal
 		// Save them for unmap
 		mappeddata_orig = mappeddata;
 
-
+		/*
 		auto& env_tex = scene.textures_[scene.envidx_];
 
 		for (int i = 0; i < env_tex.dataoffset; ++i) {
@@ -1147,10 +1092,10 @@ namespace Baikal
 		//mappeddata += env_tex.dataoffset;
 
 		memcpy(mappeddata, scene.texturedata_[env_tex.dataoffset].get(), env_tex.size);
-
+		*/
 		m_context.UnmapBuffer(0, out.texturedata, mappeddata_orig).Wait();
 	}
-=======
+
     void SceneTracker::WriteTexture(Texture const* texture, std::size_t data_offset, void* data) const
     {
         auto clw_texture = reinterpret_cast<ClwScene::Texture*>(data);
@@ -1169,5 +1114,4 @@ namespace Baikal
         auto end = begin + texture->GetSizeInBytes();
         std::copy(begin, end, static_cast<char*>(data));
     }
->>>>>>> dcb879e32484cfd59c3249ca17e9c3d35e093292
 }

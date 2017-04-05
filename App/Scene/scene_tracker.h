@@ -98,7 +98,7 @@ namespace Baikal
         void WriteTextureData(Texture const* texture, void* data) const;
 		
 		// JOSH
-		void UpdateEnvironmentMap(Scene const& scene, ClwScene& out) const;
+		void UpdateEnvironmentMap(Scene1 const& scene, ClwScene& out) const;
 
     private:
         // Context

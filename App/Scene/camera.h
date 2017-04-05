@@ -30,6 +30,7 @@
 
 #include "math/float3.h"
 #include "math/float2.h"
+#include "math/matrix.h"
 
 #include "scene_object.h"
 
@@ -101,6 +102,14 @@ namespace Baikal
         //
         void ArcballRotateVertically(RadeonRays::float3 c, float angle);
         
+		// JOSH04
+		void ApplyOculusTransform(RadeonRays::matrix mat, RadeonRays::float3 loc);
+		void RemoveOculusTransform();
+		void MoveWorldUp(float distance);
+		void SetPosition(RadeonRays::float3 location);
+
+		void SetCameraType(int camera_type);
+		int GetCameraType() const;
         
     private:
         // Rotate camera around world Z axis
@@ -122,8 +131,20 @@ namespace Baikal
         float  m_aspect;
         float  m_focus_distance;
         float  m_aperture;
+
+		// Polar coords
+		float theta;
+		float phi;
+
+		int camera_type;
         
         friend std::ostream& operator << (std::ostream& o, PerspectiveCamera const& p);
+
+		// Camera coordinate frame
+		RadeonRays::float3 pre_oculus_m_forward;
+		RadeonRays::float3 pre_oculus_m_right;
+		RadeonRays::float3 pre_oculus_m_up;
+		RadeonRays::float3 pre_oculus_m_p;
     };
     
     inline void PerspectiveCamera::SetFocusDistance(float distance)

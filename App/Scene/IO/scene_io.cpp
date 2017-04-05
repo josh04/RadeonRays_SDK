@@ -219,6 +219,7 @@ namespace Baikal
             // Set material
             auto idx = objshapes[s].mesh.material_ids[0];
             mesh->SetMaterial(materials[idx]);
+			mesh->SetMaterials(objshapes[s].mesh.material_ids, materials);
             
             // Attach to the scene
             scene->AttachShape(mesh);
@@ -241,7 +242,7 @@ namespace Baikal
         }
         
         // TODO: temporary code, add IBL
-        Texture* ibl_texture = image_io->LoadImage("../Resources/Textures/studio015.hdr");
+        Texture* ibl_texture = image_io->LoadImage("RadeonResources/Resources/Textures/studio015.hdr");
         scene->AttachAutoreleaseObject(ibl_texture);
         
         ImageBasedLight* ibl = new ImageBasedLight();
