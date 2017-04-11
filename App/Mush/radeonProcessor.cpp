@@ -76,7 +76,9 @@ void radeonProcessor::init(std::shared_ptr<mush::opencl> context, const std::ini
         }
 
 		if (_per_frame == -1) {
-			buffers.begin()[0]->removeRepeat();
+			if (buffers.begin()[0] != nullptr) {
+				buffers.begin()[0]->removeRepeat();
+			}
 		}
 	} else {
 		_radeon->init(context, {});
