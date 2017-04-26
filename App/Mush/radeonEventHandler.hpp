@@ -64,6 +64,11 @@ class radeonEventHandler : public azure::Eventable {
 					case azure::Key::Space:
 						save_position();
 						break;
+					case azure::Key::Backspace:
+						if (_shift_pressed) {
+							_reset = true;
+						}
+						break;
                 }
             } else if (event->isType("keyUp")) {
                 switch (event->getAttribute<azure::Key>("key")) {
@@ -229,6 +234,12 @@ class radeonEventHandler : public azure::Eventable {
                 update = true;
             }
 
+			if (_reset) {
+				g_scene->camera_->SetPosition({ 0.0f, 0.0f, 0.0f });
+				_reset = false;
+				update = true;
+			}
+
 			if (_oculus_changed.exchange(false)) {
 				update = true;
 			}
@@ -254,6 +265,7 @@ class radeonEventHandler : public azure::Eventable {
     private:
         bool _up_pressed = false, _down_pressed = false, _left_pressed = false, _right_pressed = false, _home_pressed = false, _end_pressed = false;
     
+		bool _reset = false;
 		bool _shift_pressed = false;
     
 		float _mouse_delta_x = 0.0f, _mouse_delta_y = 0.0f;

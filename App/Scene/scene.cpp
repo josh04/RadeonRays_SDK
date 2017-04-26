@@ -148,7 +148,7 @@ Scene* Scene::LoadFromObj(std::string const& filename, std::string const& basepa
         throw std::runtime_error(res);
     }
 
-	objmaterials.push_back(default_material);
+	//objmaterials.push_back(default_material);
 
     // Allocate scene
     Scene* scene(new Scene);

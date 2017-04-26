@@ -36,7 +36,7 @@ void radeonProcess::init(std::shared_ptr<mush::opencl> context, const std::initi
 
     bool success = ::init(_width, _height, _share_opencl, context->get_cl_context(), context->get_cl_device(), (*context->getQueue())(), env_width, env_height);
 	
-	g_scene->AddPointLight(RadeonRays::float3(0.0f, 16.0f, 6.0f), RadeonRays::float3(1.f, 0.9f, 0.6f) * 80.0f);
+	//g_scene->AddPointLight(RadeonRays::float3(0.0f, 16.0f, 6.0f), RadeonRays::float3(1.f, 0.9f, 0.6f) * 80.0f);
 
 	if (!success) {
 		kill();
