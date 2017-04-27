@@ -10,6 +10,7 @@
 #define radeonEventHandler_h
 
 #include <cstdlib>
+#include <sstream>
 #include <azure/Eventable.hpp>
 #include <azure/Event.hpp>
 #include <azure/Eventkey.hpp>
@@ -69,6 +70,14 @@ class radeonEventHandler : public azure::Eventable {
 							_reset = true;
 						}
 						break;
+					case azure::Key::y:
+					{
+						std::stringstream strm;
+						auto pos = g_scene->camera_->GetPosition();
+						strm << "x: " << pos.x << " y: " << pos.y << " z: " << pos.z << " theta: " << theta << " phi: " << phi;
+						putLog(strm.str());
+					}
+					break;
                 }
             } else if (event->isType("keyUp")) {
                 switch (event->getAttribute<azure::Key>("key")) {
