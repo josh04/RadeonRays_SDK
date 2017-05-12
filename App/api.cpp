@@ -84,8 +84,8 @@ int g_environment_height = 720;
 
 float g_cspeed = 100.25f;
 
-float3 g_camera_pos = float3(0.f, 1.f, 4.f);
-float3 g_camera_at = float3(0.f, 1.f, 0.f);
+float3 g_camera_pos = float3(0.f, 0.f, 0.f);
+float3 g_camera_at = float3(1.f, 0.f, 0.f);
 float3 g_camera_up = float3(0.f, 1.f, 0.f);
 
 float2 g_camera_sensor_size = float2(0.036f, 0.024f);  // default full frame sensor 36x24 mm
@@ -162,6 +162,7 @@ void setup(const mush::radeonConfig& config) {
 
 	g_ao_radius = config.ao_radius;
 	g_camera_pos = { config.camera_position.s[0], config.camera_position.s[1], config.camera_position.s[2] };
+	g_camera_at = g_camera_pos + g_camera_at;
 	g_camera_sensor_size = { config.camera_sensor_size.s[0], config.camera_sensor_size.s[1] };
 	g_camera_zcap = { config.camera_zcap.s[0], config.camera_zcap.s[1] };
 	g_camera_focal_length = config.camera_focal_length;
@@ -614,7 +615,9 @@ void close_down() {
             continue;
         
         g_ctrl[i].stop.store(true);
+		
     }
+	g_outputs.clear();
 }
 
 

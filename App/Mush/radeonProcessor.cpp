@@ -137,7 +137,9 @@ void radeonProcessor::init(std::shared_ptr<mush::opencl> context, const std::ini
     _timer->register_node(_normals, "Normals");
     _timer->register_node(_copy, "Vertical Flip");
 
-	g_scene->camera_->Rotate(-M_PI/2.0f);
+	//g_scene->camera_->Rotate(-M_PI/2.0f);
+
+	_radeon->set_change_environment();
 }
 
 void radeonProcessor::process() {
@@ -201,8 +203,9 @@ void radeonProcessor::process() {
 			} else {
 				auto_cam = false;
 			}
+
+			_radeon->set_change_environment();
 		}
-		_radeon->set_change_environment();
 
 	}
 
