@@ -132,7 +132,7 @@ Scene* Scene::LoadFromObj(std::string const& filename, std::string const& basepa
 
 	material_t default_material;
     
-    default_material.name = "glass";
+    default_material.name = "default";
     
 	default_material.diffuse[0] = 0.5f;
 	default_material.diffuse[1] = 0.5f;
@@ -148,7 +148,7 @@ Scene* Scene::LoadFromObj(std::string const& filename, std::string const& basepa
         throw std::runtime_error(res);
     }
 
-	//objmaterials.push_back(default_material);
+	objmaterials.push_back(default_material);
 
     // Allocate scene
     Scene* scene(new Scene);
@@ -1204,7 +1204,7 @@ Scene* Scene::LoadFromObj(std::string const& filename, std::string const& basepa
         shape.angularvelocity = quaternion(0.f, 0.f, 0.f, 1.f);
         // Save last index to add to this shape indices
         // int baseidx = (int)scene->vertices_.size();
-
+		size_t prev_vertices = scene->vertices_.size();
         int pos_count = (int)objshapes[s].mesh.positions.size() / 3;
         // Enumerate and copy vertex data
         for (int i = 0; i < pos_count; ++i)
@@ -1212,10 +1212,28 @@ Scene* Scene::LoadFromObj(std::string const& filename, std::string const& basepa
             scene->vertices_.push_back(float3(objshapes[s].mesh.positions[3 * i] * scale, objshapes[s].mesh.positions[3 * i + 1] * scale, objshapes[s].mesh.positions[3 * i + 2] * scale));
         }
 
-        for (int i = 0; i < (int)objshapes[s].mesh.normals.size() / 3; ++i)
-        {
-            scene->normals_.push_back(float3(objshapes[s].mesh.normals[3 * i], objshapes[s].mesh.normals[3 * i + 1], objshapes[s].mesh.normals[3 * i + 2]));
-        }
+		if (objshapes[s].mesh.normals.size() > 0) {
+			for (int i = 0; i < (int)objshapes[s].mesh.normals.size() / 3; ++i)
+			{
+				scene->normals_.push_back(float3(objshapes[s].mesh.normals[3 * i], objshapes[s].mesh.normals[3 * i + 1], objshapes[s].mesh.normals[3 * i + 2]));
+			}
+		} else {
+
+			float3 normal;
+			for (int i = prev_vertices; i < scene->vertices_.size(); ++i) {
+				if (i % 3 == 0) {
+					float3 one = scene->vertices_[i];
+					float3 two = scene->vertices_[i+1];
+					float3 three = scene->vertices_[i+2];
+
+					normal = CalcNormal(one, two, three);
+
+				}
+
+				scene->normals_.push_back(normal);
+			}
+
+		}
 
         //check UV
         int texcoords_count = objshapes[s].mesh.texcoords.size() / 2;
@@ -1269,6 +1287,32 @@ Scene* Scene::LoadFromObj(std::string const& filename, std::string const& basepa
     scene->envidx_ = -1;
 
     return scene;
+}
+
+float3 Scene::CalcNormal(float3 v0, float3 v1, float3 v2) {
+	float3 N;
+	float3 v10;
+	v10[0] = v1[0] - v0[0];
+	v10[1] = v1[1] - v0[1];
+	v10[2] = v1[2] - v0[2];
+
+	float3 v20;
+	v20[0] = v2[0] - v0[0];
+	v20[1] = v2[1] - v0[1];
+	v20[2] = v2[2] - v0[2];
+
+	N[0] = v20[1] * v10[2] - v20[2] * v10[1];
+	N[1] = v20[2] * v10[0] - v20[0] * v10[2];
+	N[2] = v20[0] * v10[1] - v20[1] * v10[0];
+
+	float len2 = N[0] * N[0] + N[1] * N[1] + N[2] * N[2];
+	if (len2 > 0.0f) {
+		float len = sqrtf(len2);
+
+		N[0] /= len;
+		N[1] /= len;
+	}
+	return N;
 }
 
 void Scene::AddDirectionalLight(RadeonRays::float3 const& d, RadeonRays::float3 const& e)

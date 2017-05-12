@@ -34,7 +34,7 @@ namespace mush {
 
 class RADEONEXPORTS_API radeonProcessor : public mush::imageProcessor {
 public:
-    radeonProcessor(const mush::radeonConfig& config);
+    radeonProcessor(const mush::radeonConfig& config, bool catch_exceptions);
     ~radeonProcessor();
     
     void init(std::shared_ptr<mush::opencl> context, const std::initializer_list<std::shared_ptr<mush::ringBuffer>>& buffers) override;
@@ -82,6 +82,8 @@ private:
 	float prev_phi = 0.0f;
 
 	int _frames = 0;
+
+	bool _catch_exceptions;
 };
 
 #endif /* radeonProcessor_hpp */

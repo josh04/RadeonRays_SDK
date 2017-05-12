@@ -24,6 +24,7 @@ struct update_return_type {
     float * normals;
 };
 
+update_return_type update_catch(bool share_opencl, bool update, cl_mem load_image, cl_mem depth_image, cl_mem normals_image);
 update_return_type update(bool share_opencl, bool update, cl_mem load_image, cl_mem depth_image, cl_mem normals_image);
 void close_down();
 

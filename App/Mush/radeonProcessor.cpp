@@ -23,7 +23,7 @@
 #include "radeonDepthProcess.hpp"
 #include "api.hpp"
 
-radeonProcessor::radeonProcessor(const mush::radeonConfig& config) : mush::imageProcessor(), _config(config) {
+radeonProcessor::radeonProcessor(const mush::radeonConfig& config, bool catch_exceptions) : mush::imageProcessor(), _config(config), _catch_exceptions(catch_exceptions) {
 	_per_frame = config.num_samples;
 	_config.num_samples = -1;
 }
@@ -55,7 +55,7 @@ void radeonProcessor::init(std::shared_ptr<mush::opencl> context, const std::ini
     
     _rad_event = std::make_shared<radeonEventHandler>(is_spherical);
 
-    _radeon = std::make_shared<radeonProcess>(_rad_event, _config.width, _config.height, _config.share_opencl);
+    _radeon = std::make_shared<radeonProcess>(_rad_event, _config.width, _config.height, _config.share_opencl, _catch_exceptions);
 	if (buffers.size() > 0) {
 
 		_input = buffers.begin()[0];
@@ -74,12 +74,12 @@ void radeonProcessor::init(std::shared_ptr<mush::opencl> context, const std::ini
         } else {
             _radeon->init(context, {buffers.begin()[0]});
         }
-
-		if (_per_frame == -1) {
+		
+		/*if (_per_frame == -1) {
 			if (buffers.begin()[0] != nullptr) {
 				buffers.begin()[0]->removeRepeat();
 			}
-		}
+		}*/
 	} else {
 		_radeon->init(context, {});
 	}
@@ -162,19 +162,25 @@ void radeonProcessor::process() {
 				g_scene->camera_->SetPosition({ cam_loc.x, cam_loc.y, cam_loc.z });
 				
 
-				float new_theta = _mush_camera->get_theta();
+				float new_theta = _mush_camera->get_theta() * M_PI / 180.0;
 				//if (_config.camera != mush::camera_type::spherical_equirectangular) {
 					//new_theta = -new_theta;
-					new_theta += M_PI_2;
+					//new_theta += M_PI_2;
 				//} else {
 				//	new_theta -= M_PI_2;
 				//}
-				float new_phi = _mush_camera->get_phi();
+				float new_phi = _mush_camera->get_phi() * M_PI / 180.0;
 
+				/*
 				g_scene->camera_->Rotate(new_theta - prev_theta);
 				if (_config.camera != mush::camera_type::spherical_equirectangular) {
 					g_scene->camera_->Tilt(new_phi - prev_phi);
-				}	
+				}
+				*/
+				if (_config.camera != mush::camera_type::spherical_equirectangular) {
+					new_phi = 0.0;
+				}
+				g_scene->camera_->SetRotate({ 0.0, 1.0, 0.0 }, new_theta, { 0.0, 0.0, 1.0 }, new_phi);
 
 				if (_config.stereo_displacement) {
 					//if (_config.camera == mush::camera_type::perspective) {

@@ -9,6 +9,9 @@
 #ifndef radeonEventHandler_h
 #define radeonEventHandler_h
 
+#define _USE_MATH_DEFINES
+#include <math.h>
+
 #include <cstdlib>
 #include <azure/Eventable.hpp>
 #include <azure/Event.hpp>
@@ -181,7 +184,7 @@ class radeonEventHandler : public azure::Eventable {
             
             if (std::abs(camroty) > 0.001f)
             {
-                g_scene->camera_->Tilt(camroty);
+                //g_scene->camera_->Tilt(camroty);
 				phi += camroty;
                 //gg_scene->camera_->ArcballRotateVertically(float3(0, 0, 0), camroty);
                 update = true;
@@ -189,7 +192,7 @@ class radeonEventHandler : public azure::Eventable {
             
             if (std::abs(camrotx) > 0.001f)
             {
-                g_scene->camera_->Rotate(camrotx);
+                //g_scene->camera_->Rotate(camrotx);
 				theta += camrotx;
                 //gg_scene->camera_->ArcballRotateHorizontally(float3(0, 0, 0), camrotx);
                 update = true;
@@ -236,8 +239,17 @@ class radeonEventHandler : public azure::Eventable {
 
 			if (_reset) {
 				g_scene->camera_->SetPosition({ 0.0f, 0.0f, 0.0f });
+				g_scene->camera_->Tilt(-phi);
+				phi = 0.0f;
+				g_scene->camera_->Rotate(-theta);
+				theta = 0.0f;
+
 				_reset = false;
 				update = true;
+			}
+
+			if (update) {
+				g_scene->camera_->SetRotate({ 0.0, 1.0, 0.0 }, theta, { 0.0, 0.0, 1.0 }, phi);
 			}
 
 			if (_oculus_changed.exchange(false)) {
@@ -259,7 +271,7 @@ class radeonEventHandler : public azure::Eventable {
 
 		void save_position() {
 			auto pos = g_scene->camera_->GetPosition();
-			_saved_camera_positions.push_back({ _tick, {{pos.x, pos.y, pos.z} , theta, phi, 0.0f, 0.0f } });
+			_saved_camera_positions.push_back({ _tick, {{pos.x, pos.y, pos.z}, theta * 180.0f / (float)M_PI, phi * 180.0f / (float)M_PI, 0.0f, 0.0f } });
 		}
         
     private:

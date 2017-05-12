@@ -91,10 +91,12 @@ public:
 	RadeonRays::float3 GetPosition() const {
 		return m_p;
 	}
+	void SetRotate(RadeonRays::float3 v, float theta, RadeonRays::float3 u, float phi);
 
 private:
     // Rotate camera around world Z axis
     void Rotate(RadeonRays::float3, float angle);
+	//JOSH04
 
     // Camera coordinate frame
     RadeonRays::float3 m_forward;

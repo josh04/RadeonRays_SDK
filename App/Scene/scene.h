@@ -234,6 +234,8 @@ namespace Baikal
             std::uint32_t dirty() const { return dirty_; }
             void set_dirty(int dirty) const { dirty_ = dirty_ | dirty; }
 
+			static RadeonRays::float3 CalcNormal(RadeonRays::float3 v0, RadeonRays::float3 v1, RadeonRays::float3 v2);
+
             // Scene data
             // Vertices
             std::vector<RadeonRays::float3> vertices_;

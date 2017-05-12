@@ -459,9 +459,20 @@ void launch_threads() {
     StartRenderThreads();
 }
 
-update_return_type update(bool share_opencl, bool update, cl_mem load_image, cl_mem depth_image, cl_mem normals_image) {
-    try {
-    if (update)
+update_return_type update_catch(bool share_opencl, bool update_, cl_mem load_image, cl_mem depth_image, cl_mem normals_image) {
+	try {
+		update(share_opencl, update, load_image, depth_image, normals_image);
+	} catch (CLWException& c) {
+		std::stringstream strm;
+		strm << "RadeonRays Exception: " << c.errcode_ << " " << c.what();
+		//putLog(strm.str());
+
+		throw std::runtime_error(strm.str());
+	}
+}
+
+update_return_type update(bool share_opencl, bool update_, cl_mem load_image, cl_mem depth_image, cl_mem normals_image) {
+    if (update_)
     {
         g_scene->set_dirty(Baikal::Scene::kCamera);
         
@@ -593,13 +604,7 @@ update_return_type update(bool share_opencl, bool update, cl_mem load_image, cl_
         */
     }
     return { (float *)g_outputs[g_primary].fdata.data(), g_outputs[g_primary].depth_data.data(),  (float *)g_outputs[g_primary].normals_data.data()  };
-    } catch (CLWException& c) {
-        std::stringstream strm;
-        strm << "RadeonRays Exception: " << c.errcode_ << " " << c.what();
-        //putLog(strm.str());
-        
-        throw std::runtime_error(strm.str());
-    }
+
 }
 
 void close_down() {

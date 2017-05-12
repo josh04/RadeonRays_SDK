@@ -12,7 +12,7 @@
 
 #include "api.hpp"
 
-radeonProcess::radeonProcess(std::shared_ptr<radeonEventHandler> rad_event, unsigned int width, unsigned int height, bool share_opencl) : mush::imageProcess(), _share_opencl(share_opencl), _rad_event(rad_event) {
+radeonProcess::radeonProcess(std::shared_ptr<radeonEventHandler> rad_event, unsigned int width, unsigned int height, bool share_opencl, bool catch_exceptions) : mush::imageProcess(), _share_opencl(share_opencl), _rad_event(rad_event), _catch_exceptions(catch_exceptions) {
     _width = width;
     _height = height;
 }
@@ -104,13 +104,17 @@ void radeonProcess::process() {
     inLock();
     
     update_return_type update_return;
-    try {
-        update_return = update(_share_opencl, up, (*_getImageMem(0))(), (*depth_image)(), (*normals_image)());
-    } catch (std::runtime_error& e) {
-        putLog(e.what());
-        release();
-        return;
-    }
+	if (_catch_exceptions) {
+		try {
+			update_return = update_catch(_share_opencl, up, (*_getImageMem(0))(), (*depth_image)(), (*normals_image)());
+		} catch (std::runtime_error& e) {
+			putLog(e.what());
+			release();
+			return;
+		}
+	} else {
+		update_return = update(_share_opencl, up, (*_getImageMem(0))(), (*depth_image)(), (*normals_image)());
+	}
     auto ptr = update_return.image;
     auto depth_ptr = update_return.depth;
     auto normals_ptr = update_return.normals;

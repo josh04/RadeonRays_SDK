@@ -196,3 +196,34 @@ void PerspectiveCamera::SetPosition(RadeonRays::float3 location)
 {
 	m_p = location;
 }
+
+void PerspectiveCamera::SetRotate(float3 v, float theta, float3 u, float phi)
+{
+
+	m_up = float3(0.0, 1.0, 0.0);
+	m_right = float3(0.0, 0.0, 1.0);
+	m_forward = float3(1.0, 0.0, 0.0);
+	/// matrix should have basis vectors in rows
+	/// to be used for quaternion construction
+	/// would be good to add several options
+	/// to quaternion class
+	matrix cam_matrix = matrix(
+		m_up.x, m_up.y, m_up.z, 0.f,
+		m_right.x, m_right.y, m_right.z, 0.f,
+		m_forward.x, m_forward.y, m_forward.z, 0.f,
+		0.f, 0.f, 0.f, 1.f);
+
+	// Create camera orientation quaternion
+	quaternion q = normalize(quaternion(cam_matrix));
+
+	// Rotate camera frame around v
+	q = q * rotation_quaternion(u, -phi);
+	q = q * rotation_quaternion(v, -theta);
+
+	// Uncomress back to lookat
+	q.to_matrix(cam_matrix);
+
+	m_up = normalize(float3(cam_matrix.m00, cam_matrix.m01, cam_matrix.m02));
+	m_right = normalize(float3(cam_matrix.m10, cam_matrix.m11, cam_matrix.m12));
+	m_forward = normalize(float3(cam_matrix.m20, cam_matrix.m21, cam_matrix.m22));
+}
