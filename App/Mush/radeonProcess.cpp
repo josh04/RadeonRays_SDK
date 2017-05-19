@@ -72,7 +72,7 @@ void radeonProcess::process() {
 	if (_change_environment) {
 		_change_environment = false;
 		if (_environment_map.get() != nullptr) {
-			auto ptr = _environment_map->imageOutLock();
+			auto ptr = _environment_map->outLock();
 
 			if (ptr != nullptr) {
 				cl::Event event;
@@ -80,7 +80,7 @@ void radeonProcess::process() {
 				origin[0] = 0; origin[1] = 0; origin[2] = 0;
 				region[0] = env_width; region[1] = env_height; region[2] = 1;
 
-				queue->enqueueReadImage(*ptr, CL_TRUE, origin, region, 0, 0, env_down_buffer, NULL, &event);
+				queue->enqueueReadImage(cl::Image2D(ptr.get_image()), CL_TRUE, origin, region, 0, 0, env_down_buffer, NULL, &event);
 				event.wait();
 
 				update_environment(true, env_down_buffer);
@@ -95,7 +95,7 @@ void radeonProcess::process() {
 		}
 	} /*else {
 		if (_environment_map.get() != nullptr) {
-			auto ptr = _environment_map->imageOutLock();
+			auto ptr = _environment_map->outLock();
 			_environment_map->outUnlock();
 		}
 	}*/
@@ -106,14 +106,14 @@ void radeonProcess::process() {
     update_return_type update_return;
 	if (_catch_exceptions) {
 		try {
-			update_return = update_catch(_share_opencl, up, (*_getImageMem(0))(), (*depth_image)(), (*normals_image)());
+			update_return = update_catch(_share_opencl, up, _getImageMem(0), (*depth_image)(), (*normals_image)());
 		} catch (std::runtime_error& e) {
 			putLog(e.what());
 			release();
 			return;
 		}
 	} else {
-		update_return = update(_share_opencl, up, (*_getImageMem(0))(), (*depth_image)(), (*normals_image)());
+		update_return = update(_share_opencl, up, _getImageMem(0), (*depth_image)(), (*normals_image)());
 	}
     auto ptr = update_return.image;
     auto depth_ptr = update_return.depth;
@@ -125,11 +125,11 @@ void radeonProcess::process() {
         origin[0] = 0; origin[1] = 0; origin[2] = 0;
         region[0] = _width; region[1] = _height; region[2] = 1;
     
-        queue->enqueueWriteImage(*_getImageMem(0), CL_TRUE, origin, region, 0, 0, ptr, NULL, &event);
+        queue->enqueueWriteImage(cl::Image2D(_getImageMem(0)), CL_TRUE, origin, region, 0, 0, ptr, NULL, &event);
         event.wait();
         
-        _divide->setArg(0, *_getImageMem(0));
-        _divide->setArg(1, *_getImageMem(0));
+        _divide->setArg(0, _getImageMem(0));
+        _divide->setArg(1, _getImageMem(0));
         queue->enqueueNDRangeKernel(*_divide, cl::NullRange, cl::NDRange(_width, _height), cl::NullRange, NULL, &event);
         event.wait();
         

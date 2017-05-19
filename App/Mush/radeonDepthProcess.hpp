@@ -46,7 +46,7 @@ public:
         inLock();
         
         _copy->setArg(0, *_image);
-        _copy->setArg(1, *_getImageMem(0));
+        _copy->setArg(1, _getImageMem(0));
         
         cl::Event event;
         queue->enqueueNDRangeKernel(*_copy, cl::NullRange, cl::NDRange(_width, _height), cl::NullRange, NULL, &event);
