@@ -80,7 +80,7 @@ void radeonProcess::process() {
 				origin[0] = 0; origin[1] = 0; origin[2] = 0;
 				region[0] = env_width; region[1] = env_height; region[2] = 1;
 
-				queue->enqueueReadImage(cl::Image2D(ptr.get_image()), CL_TRUE, origin, region, 0, 0, env_down_buffer, NULL, &event);
+				queue->enqueueReadImage(ptr.get_image(), CL_TRUE, origin, region, 0, 0, env_down_buffer, NULL, &event);
 				event.wait();
 
 				update_environment(true, env_down_buffer);
@@ -129,7 +129,7 @@ void radeonProcess::process() {
         origin[0] = 0; origin[1] = 0; origin[2] = 0;
         region[0] = _width; region[1] = _height; region[2] = 1;
     
-        queue->enqueueWriteImage(cl::Image2D(_getImageMem(0)), CL_TRUE, origin, region, 0, 0, ptr, NULL, &event);
+        queue->enqueueWriteImage(_getImageMem(0), CL_TRUE, origin, region, 0, 0, ptr, NULL, &event);
         event.wait();
         
         _divide->setArg(0, _getImageMem(0));

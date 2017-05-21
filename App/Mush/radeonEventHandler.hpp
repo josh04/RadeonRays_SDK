@@ -284,7 +284,7 @@ class radeonEventHandler : public azure::Eventable {
 		}
 
 		cl_float3 get_theta_phi_fov() const {
-			return{ theta, phi, 0.0f };
+			return{ theta * 180.0f/(float)M_PI, phi * 180.0f / (float)M_PI, 0.0f };
 		}
         
     private:

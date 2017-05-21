@@ -463,7 +463,7 @@ void launch_threads() {
 update_return_type update_catch(bool share_opencl, bool update_, cl_mem load_image, cl_mem depth_image, cl_mem normals_image) {
 	update_return_type ret;
 	try {
-		ret = update(share_opencl, update, load_image, depth_image, normals_image);
+		ret = update(share_opencl, update_, load_image, depth_image, normals_image);
 	} catch (CLWException& c) {
 		std::stringstream strm;
 		strm << "RadeonRays Exception: " << c.errcode_ << " " << c.what();
