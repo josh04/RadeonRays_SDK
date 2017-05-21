@@ -58,13 +58,13 @@ void radeonProcess::init(std::shared_ptr<mush::opencl> context, const std::initi
 }
 
 void radeonProcess::process() {
-    bool up = _rad_event->update() || _external_camera_change;
+	bool up = _rad_event->update() || _external_camera_change;
 	_external_camera_change = false;
-    if (!call_once) {
-        launch_threads();
-        //up = true;
-        call_once = true;
-    }
+	if (!call_once) {
+		launch_threads();
+		//up = true;
+		call_once = true;
+	}
 
 	up = up;
 	_change_environment = _change_environment && up;
@@ -99,9 +99,13 @@ void radeonProcess::process() {
 			_environment_map->outUnlock();
 		}
 	}*/
-    
-    
-    inLock();
+
+
+	auto buf = inLock();
+	auto loc = g_scene->camera_->GetPosition();
+	auto tpf = _rad_event->get_theta_phi_fov();
+	tpf.s[2] = 75.0f;
+	buf.set_camera_position({ loc.x, loc.y, loc.z }, tpf);
     
     update_return_type update_return;
 	if (_catch_exceptions) {
