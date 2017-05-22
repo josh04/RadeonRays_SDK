@@ -282,6 +282,10 @@ class radeonEventHandler : public azure::Eventable {
 			auto pos = g_scene->camera_->GetPosition();
 			_saved_camera_positions.push_back({ _tick, {{pos.x, pos.y, pos.z}, theta * 180.0f / (float)M_PI, phi * 180.0f / (float)M_PI, 0.0f, 0.0f } });
 		}
+
+		cl_float3 get_theta_phi_fov() const {
+			return{ theta * 180.0f/(float)M_PI, phi * 180.0f / (float)M_PI, 0.0f };
+		}
         
     private:
         bool _up_pressed = false, _down_pressed = false, _left_pressed = false, _right_pressed = false, _home_pressed = false, _end_pressed = false;

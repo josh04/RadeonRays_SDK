@@ -58,13 +58,13 @@ void radeonProcess::init(std::shared_ptr<mush::opencl> context, const std::initi
 }
 
 void radeonProcess::process() {
-    bool up = _rad_event->update() || _external_camera_change;
+	bool up = _rad_event->update() || _external_camera_change;
 	_external_camera_change = false;
-    if (!call_once) {
-        launch_threads();
-        //up = true;
-        call_once = true;
-    }
+	if (!call_once) {
+		launch_threads();
+		//up = true;
+		call_once = true;
+	}
 
 	up = up;
 	_change_environment = _change_environment && up;
@@ -72,7 +72,7 @@ void radeonProcess::process() {
 	if (_change_environment) {
 		_change_environment = false;
 		if (_environment_map.get() != nullptr) {
-			auto ptr = _environment_map->imageOutLock();
+			auto ptr = _environment_map->outLock();
 
 			if (ptr != nullptr) {
 				cl::Event event;
@@ -80,7 +80,7 @@ void radeonProcess::process() {
 				origin[0] = 0; origin[1] = 0; origin[2] = 0;
 				region[0] = env_width; region[1] = env_height; region[2] = 1;
 
-				queue->enqueueReadImage(*ptr, CL_TRUE, origin, region, 0, 0, env_down_buffer, NULL, &event);
+				queue->enqueueReadImage(ptr.get_image(), CL_TRUE, origin, region, 0, 0, env_down_buffer, NULL, &event);
 				event.wait();
 
 				update_environment(true, env_down_buffer);
@@ -95,25 +95,29 @@ void radeonProcess::process() {
 		}
 	} /*else {
 		if (_environment_map.get() != nullptr) {
-			auto ptr = _environment_map->imageOutLock();
+			auto ptr = _environment_map->outLock();
 			_environment_map->outUnlock();
 		}
 	}*/
-    
-    
-    inLock();
+
+
+	auto buf = inLock();
+	auto loc = g_scene->camera_->GetPosition();
+	auto tpf = _rad_event->get_theta_phi_fov();
+	tpf.s[2] = 75.0f;
+	buf.set_camera_position({ loc.x, loc.y, loc.z }, tpf);
     
     update_return_type update_return;
 	if (_catch_exceptions) {
 		try {
-			update_return = update_catch(_share_opencl, up, (*_getImageMem(0))(), (*depth_image)(), (*normals_image)());
+			update_return = update_catch(_share_opencl, up, _getImageMem(0), (*depth_image)(), (*normals_image)());
 		} catch (std::runtime_error& e) {
 			putLog(e.what());
 			release();
 			return;
 		}
 	} else {
-		update_return = update(_share_opencl, up, (*_getImageMem(0))(), (*depth_image)(), (*normals_image)());
+		update_return = update(_share_opencl, up, _getImageMem(0), (*depth_image)(), (*normals_image)());
 	}
     auto ptr = update_return.image;
     auto depth_ptr = update_return.depth;
@@ -125,11 +129,11 @@ void radeonProcess::process() {
         origin[0] = 0; origin[1] = 0; origin[2] = 0;
         region[0] = _width; region[1] = _height; region[2] = 1;
     
-        queue->enqueueWriteImage(*_getImageMem(0), CL_TRUE, origin, region, 0, 0, ptr, NULL, &event);
+        queue->enqueueWriteImage(_getImageMem(0), CL_TRUE, origin, region, 0, 0, ptr, NULL, &event);
         event.wait();
         
-        _divide->setArg(0, *_getImageMem(0));
-        _divide->setArg(1, *_getImageMem(0));
+        _divide->setArg(0, _getImageMem(0));
+        _divide->setArg(1, _getImageMem(0));
         queue->enqueueNDRangeKernel(*_divide, cl::NullRange, cl::NDRange(_width, _height), cl::NullRange, NULL, &event);
         event.wait();
         
