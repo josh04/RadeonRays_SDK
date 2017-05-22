@@ -14,6 +14,7 @@
 #include <Mush Core/camera_base.hpp>
 #include <Mush Core/camera_event_handler.hpp>
 #include <Mush Core/sphereMapProcess.hpp>
+#include <Mush Core/SetThreadName.hpp>
 
 #include <Mush Core/timerWrapper.hpp>
 
@@ -251,7 +252,7 @@ void radeonProcessor::process() {
 }
 
 void radeonProcessor::go() {
-
+	SetThreadName("RadeonRays");
 	std::atomic_bool closing;
 	closing = false;
 
