@@ -101,7 +101,7 @@ void radeonProcessor::init(std::shared_ptr<mush::opencl> context, const std::ini
 
 	if (_config.camera == mush::camera_type::spherical_equirectangular) {
 		if (std::string(_config.automatic_camera_path).length() > 0) {
-			_sphere = std::make_shared<mush::sphereMapProcess>(1920, 1080, true, _config.automatic_camera_path, 1.0f);
+			_sphere = std::make_shared<mush::sphereMapProcess>(1920, 1080, true, _config.automatic_camera_path, 1.0f, _config.quit_on_camera_path);
 
 			if (_config.auto_camera_frame_offset > 0) {
 				for (int i = 0; i < _config.auto_camera_frame_offset; ++i) {
