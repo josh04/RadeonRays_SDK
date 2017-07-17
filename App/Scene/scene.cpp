@@ -1219,9 +1219,9 @@ Scene* Scene::LoadFromObj(std::string const& filename, std::string const& basepa
 			}
 		} else {
 
-			float3 normal;
+			float3 normal = { 0.0f, 0.0f, 0.0f };
 			for (int i = prev_vertices; i < scene->vertices_.size(); ++i) {
-				if (i % 3 == 0) {
+				if (i % 3 == 0 && i+2 < scene->vertices_.size()) {
 					float3 one = scene->vertices_[i];
 					float3 two = scene->vertices_[i+1];
 					float3 three = scene->vertices_[i+2];

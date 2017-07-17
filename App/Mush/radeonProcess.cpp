@@ -66,8 +66,7 @@ void radeonProcess::process() {
 		call_once = true;
 	}
 
-	up = up;
-	_change_environment = _change_environment && up;
+	//_change_environment = _change_environment && up;
 
 	if (_change_environment) {
 		_change_environment = false;
