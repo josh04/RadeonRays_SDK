@@ -25,7 +25,7 @@ public:
     }
     
     
-    void init(std::shared_ptr<mush::opencl> context, const std::initializer_list<std::shared_ptr<mush::ringBuffer>>& buffers) override {
+    void init(std::shared_ptr<mush::opencl> context, const std::initializer_list<std::shared_ptr<mush::ringBuffer>> buffers) override {
         assert(buffers.size() == 1);
         
         _rad = std::dynamic_pointer_cast<radeonProcess>(buffers.begin()[0]);

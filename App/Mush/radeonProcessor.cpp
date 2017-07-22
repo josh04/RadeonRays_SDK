@@ -33,7 +33,7 @@ radeonProcessor::~radeonProcessor() {
     
 }
 
-void radeonProcessor::init(std::shared_ptr<mush::opencl> context, const std::initializer_list<std::shared_ptr<mush::ringBuffer>>& buffers) {
+void radeonProcessor::init(std::shared_ptr<mush::opencl> context, const std::initializer_list<std::shared_ptr<mush::ringBuffer>> buffers) {
 	setup(_config);
 
 	_mush_camera = std::make_shared<mush::camera::base>();

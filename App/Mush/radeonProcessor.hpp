@@ -37,7 +37,7 @@ public:
     radeonProcessor(const mush::radeonConfig& config, bool catch_exceptions);
     ~radeonProcessor();
     
-    void init(std::shared_ptr<mush::opencl> context, const std::initializer_list<std::shared_ptr<mush::ringBuffer>>& buffers) override;
+    void init(std::shared_ptr<mush::opencl> context, const std::initializer_list<std::shared_ptr<mush::ringBuffer>> buffers) override;
     
     void process() override;
     
