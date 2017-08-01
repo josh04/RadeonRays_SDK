@@ -21,7 +21,7 @@ radeonProcess::~radeonProcess() {
     
 }
 
-void radeonProcess::init(std::shared_ptr<mush::opencl> context, const std::initializer_list<std::shared_ptr<mush::ringBuffer> > &buffers) {
+void radeonProcess::init(std::shared_ptr<mush::opencl> context, const std::initializer_list<std::shared_ptr<mush::ringBuffer>> buffers) {
     assert(buffers.size() == 0 || buffers.size() == 1);
     
 	unsigned int env_depth = 0;
